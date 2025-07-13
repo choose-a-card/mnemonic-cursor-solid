@@ -1,0 +1,1 @@
+export const FEEDBACK_TIMER_MS = 1500; 
