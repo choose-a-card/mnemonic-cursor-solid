@@ -8,6 +8,7 @@ import CuttingEstimation from './CuttingEstimation'
 import type { QuizResult, CardInterval } from '../../types'
 import FirstOrSecondHalf from './FirstOrSecondHalf'
 import QuartetPosition from './QuartetPosition'
+import CutToPosition from './CutToPosition'
 
 interface PracticeViewProps {
   stack: string[];
@@ -66,6 +67,12 @@ const PRACTICE_MODES: PracticeMode[] = [
     name: 'Quartet Position', 
     icon: '4️⃣', 
     description: 'Enter the positions of all four cards of a given rank (e.g., all 7s)'
+  },
+  { 
+    id: 'cut-to-position', 
+    name: 'Cut to Position', 
+    icon: '🔀', 
+    description: 'Given a target card and position, enter the cut card needed to put the target at that position'
   },
 ]
 
@@ -219,6 +226,15 @@ export default function PracticeView(props: PracticeViewProps) {
                 </Show>
                 <Show when={currentMode() === 'quartet-position'}>
                   <QuartetPosition
+                    stack={props.stack}
+                    practiceStack={props.practiceStack}
+                    cardInterval={props.cardInterval}
+                    soundEnabled={props.soundEnabled}
+                    onResult={props.onResult}
+                  />
+                </Show>
+                <Show when={currentMode() === 'cut-to-position'}>
+                  <CutToPosition
                     stack={props.stack}
                     practiceStack={props.practiceStack}
                     cardInterval={props.cardInterval}
