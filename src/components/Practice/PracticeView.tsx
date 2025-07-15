@@ -5,11 +5,14 @@ import PositionToCard from './PositionToCard'
 import OneAhead from './OneAhead'
 import StackContext from './StackContext'
 import CuttingEstimation from './CuttingEstimation'
-import type { QuizResult } from '../../types'
+import type { QuizResult, CardInterval } from '../../types'
+import FirstOrSecondHalf from './FirstOrSecondHalf'
+import QuartetPosition from './QuartetPosition'
 
 interface PracticeViewProps {
-  numCards: number;
   stack: string[];
+  practiceStack: string[];
+  cardInterval: CardInterval;
   soundEnabled: boolean;
   onResult: (result: QuizResult) => void;
 }
@@ -51,6 +54,18 @@ const PRACTICE_MODES: PracticeMode[] = [
     name: 'Cutting Estimation', 
     icon: '✂️', 
     description: 'Estimate how many cards to cut to reach a target card from any position'
+  },
+  { 
+    id: 'first-or-second-half', 
+    name: 'First or Second Half', 
+    icon: '🃏', 
+    description: 'Given a card, say if it is in the first (1-26) or second (27-52) half of the deck'
+  },
+  { 
+    id: 'quartet-position', 
+    name: 'Quartet Position', 
+    icon: '4️⃣', 
+    description: 'Enter the positions of all four cards of a given rank (e.g., all 7s)'
   },
 ]
 
@@ -125,7 +140,8 @@ export default function PracticeView(props: PracticeViewProps) {
                     return (
                       <ClassicQuiz 
                         stack={props.stack}
-                        numCards={props.numCards}
+                        practiceStack={props.practiceStack}
+                        cardInterval={props.cardInterval}
                         soundEnabled={props.soundEnabled}
                         onResult={props.onResult}
                       />
@@ -139,7 +155,8 @@ export default function PracticeView(props: PracticeViewProps) {
                     return (
                       <PositionToCard 
                         stack={props.stack}
-                        numCards={props.numCards}
+                        practiceStack={props.practiceStack}
+                        cardInterval={props.cardInterval}
                         soundEnabled={props.soundEnabled}
                         onResult={props.onResult}
                       />
@@ -153,7 +170,8 @@ export default function PracticeView(props: PracticeViewProps) {
                     return (
                       <OneAhead 
                         stack={props.stack}
-                        numCards={props.numCards}
+                        practiceStack={props.practiceStack}
+                        cardInterval={props.cardInterval}
                         soundEnabled={props.soundEnabled}
                         onResult={props.onResult}
                       />
@@ -167,7 +185,8 @@ export default function PracticeView(props: PracticeViewProps) {
                     return (
                       <StackContext 
                         stack={props.stack}
-                        numCards={props.numCards}
+                        practiceStack={props.practiceStack}
+                        cardInterval={props.cardInterval}
                         soundEnabled={props.soundEnabled}
                         onResult={props.onResult}
                       />
@@ -181,12 +200,31 @@ export default function PracticeView(props: PracticeViewProps) {
                     return (
                       <CuttingEstimation 
                         stack={props.stack}
-                        numCards={props.numCards}
+                        practiceStack={props.practiceStack}
+                        cardInterval={props.cardInterval}
                         soundEnabled={props.soundEnabled}
                         onResult={props.onResult}
                       />
                     )
                   })()}
+                </Show>
+                <Show when={currentMode() === 'first-or-second-half'}>
+                  <FirstOrSecondHalf
+                    stack={props.stack}
+                    practiceStack={props.practiceStack}
+                    cardInterval={props.cardInterval}
+                    soundEnabled={props.soundEnabled}
+                    onResult={props.onResult}
+                  />
+                </Show>
+                <Show when={currentMode() === 'quartet-position'}>
+                  <QuartetPosition
+                    stack={props.stack}
+                    practiceStack={props.practiceStack}
+                    cardInterval={props.cardInterval}
+                    soundEnabled={props.soundEnabled}
+                    onResult={props.onResult}
+                  />
                 </Show>
               </div>
             </>

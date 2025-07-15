@@ -25,7 +25,18 @@ export function useCardQuiz(options: UseCardQuizOptions) {
     const q = question()
     const userAnswer = input().toUpperCase().replace(/\s+/g,'')
     const correctAnswer = String(q.answer).replace(/\s+/g,'').toUpperCase()
-    const correct = userAnswer === correctAnswer
+    let correct = userAnswer === correctAnswer
+
+    // Special handling for first-or-second-half mode: accept 'first', 'first half', '1', 'one' for first half, and similar for second half
+    if (q.type === 'first-or-second-half') {
+      const firstHalfAnswers = ['FIRST', 'FIRSTHALF', '1', 'ONE']
+      const secondHalfAnswers = ['SECOND', 'SECONDHALF', '2', 'TWO']
+      if (correctAnswer === 'FIRSTHALF') {
+        correct = firstHalfAnswers.includes(userAnswer)
+      } else if (correctAnswer === 'SECONDHALF') {
+        correct = secondHalfAnswers.includes(userAnswer)
+      }
+    }
     
     playSound(options.soundEnabled, correct ? 'correct' : 'incorrect')
     

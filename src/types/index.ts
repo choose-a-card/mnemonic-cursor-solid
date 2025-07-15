@@ -2,7 +2,7 @@ export interface QuizQuestion {
   card?: string;
   pos?: number;
   answer: string | number;
-  type: 'card-to-pos' | 'pos-to-card' | 'one-ahead' | 'context-prev' | 'context-next' | 'cutting';
+  type: 'card-to-pos' | 'pos-to-card' | 'one-ahead' | 'context-prev' | 'context-next' | 'cutting' | 'first-or-second-half' | 'quartet-position';
   targetCard?: string;
   cutCard?: string;
   targetPos?: number;
@@ -42,4 +42,9 @@ export interface PracticeMode {
   id: string;
   name: string;
   icon: string;
+}
+
+export interface CardInterval {
+  start: number;
+  end: number;
 } 

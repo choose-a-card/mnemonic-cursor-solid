@@ -35,8 +35,9 @@
 
 .stack-item {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 1rem;
   padding: 1rem 1.25rem;
   background: var(--surface, #f8f9fa);
   border-radius: 12px;
@@ -63,6 +64,7 @@
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
   border: 1px solid var(--border-light, #f0f0f3);
+  flex-shrink: 0;
 }
 
 .stack-card {
@@ -70,4 +72,16 @@
   letter-spacing: 0.02em;
   font-size: 1.1rem;
   color: var(--text-primary, #1a1a1a);
+  flex: 1;
+  text-align: center;
+}
+
+/* Red suits */
+.stack-card.card-red {
+  color: #dc2626;
+}
+
+/* Black suits */
+.stack-card.card-black {
+  color: #1a1a1a;
 } 

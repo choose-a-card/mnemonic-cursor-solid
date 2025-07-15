@@ -2,12 +2,13 @@ import { onMount } from 'solid-js'
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
 import { useCardQuiz } from '../../hooks/useCardQuiz'
-import type { QuizResult } from '../../types'
+import type { QuizResult, CardInterval } from '../../types'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 
 interface StackContextProps {
   stack: string[];
-  numCards: number;
+  practiceStack: string[];
+  cardInterval: CardInterval;
   soundEnabled: boolean;
   onResult: (result: QuizResult) => void;
 }
@@ -20,21 +21,22 @@ export default function StackContext(props: StackContextProps) {
   })
 
   function nextQuestion(): void {
-    const idx = getRandomInt(props.numCards)
-    const card = props.stack[idx]
+    // Pick a random card from the practice stack
+    const practiceIdx = getRandomInt(props.practiceStack.length)
+    const card = props.practiceStack[practiceIdx]
     const contextType = Math.random() > 0.5 ? 'previous' : 'next'
     
-    if (contextType === 'previous' && idx > 0) {
-      const prevCard = props.stack[idx - 1]
+    if (contextType === 'previous' && practiceIdx > 0) {
+      const prevCard = props.practiceStack[practiceIdx - 1]
       quiz.updateQuestion({ card, answer: prevCard, type: 'context-prev' })
-    } else if (contextType === 'next' && idx < props.numCards - 1) {
-      const nextCard = props.stack[idx + 1]
+    } else if (contextType === 'next' && practiceIdx < props.practiceStack.length - 1) {
+      const nextCard = props.practiceStack[practiceIdx + 1]
       quiz.updateQuestion({ card, answer: nextCard, type: 'context-next' })
     } else {
       // Fallback to next if at beginning or previous if at end
-      const fallbackIdx = idx === 0 ? idx + 1 : idx - 1
-      const fallbackCard = props.stack[fallbackIdx]
-      const fallbackType = idx === 0 ? 'context-next' : 'context-prev'
+      const fallbackIdx = practiceIdx === 0 ? practiceIdx + 1 : practiceIdx - 1
+      const fallbackCard = props.practiceStack[fallbackIdx]
+      const fallbackType = practiceIdx === 0 ? 'context-next' : 'context-prev'
       quiz.updateQuestion({ card, answer: fallbackCard, type: fallbackType })
     }
   }

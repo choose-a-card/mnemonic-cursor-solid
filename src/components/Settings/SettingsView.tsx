@@ -1,6 +1,19 @@
 import './SettingsView.css'
+import type { CardInterval } from '../../types'
 
-export default function SettingsView(props) {
+interface SettingsViewProps {
+  stackType: string;
+  setStackType: (type: string) => void;
+  cardInterval: CardInterval;
+  setCardInterval: (interval: CardInterval) => void;
+  darkMode: boolean;
+  setDarkMode: (mode: boolean) => void;
+  soundEnabled: boolean;
+  setSoundEnabled: (enabled: boolean) => void;
+  onResetStats: () => void;
+}
+
+export default function SettingsView(props: SettingsViewProps) {
   return (
     <div class="settings-view">
       <div class="settings-section">
@@ -31,20 +44,39 @@ export default function SettingsView(props) {
         </div>
 
         <div class="settings-block">
-          <div class="settings-label">Number of Cards to Practice</div>
-          <div class="number-input-container">
-            <input
-              class="settings-input"
-              type="number"
-              min="1"
-              max="52"
-              value={props.numCards}
-              onInput={e => props.setNumCards(Number(e.target.value))}
-            />
-            <span class="input-suffix">cards</span>
+          <div class="settings-label">Practice Range</div>
+          <div class="range-slider-container">
+            <div class="range-slider">
+              <input
+                type="range"
+                min="1"
+                max="52"
+                value={props.cardInterval.start}
+                onInput={e => props.setCardInterval({ 
+                  ...props.cardInterval, 
+                  start: Number(e.target.value) 
+                })}
+                class="range-slider-input start-slider"
+              />
+              <input
+                type="range"
+                min="1"
+                max="52"
+                value={props.cardInterval.end}
+                onInput={e => props.setCardInterval({ 
+                  ...props.cardInterval, 
+                  end: Number(e.target.value) 
+                })}
+                class="range-slider-input end-slider"
+              />
+            </div>
+            <div class="range-labels">
+              <span class="range-label">Start: {props.cardInterval.start}</span>
+              <span class="range-label">End: {props.cardInterval.end}</span>
+            </div>
           </div>
           <div class="settings-hint">
-            Practice with the first N cards of the stack
+            Practice with cards from position {props.cardInterval.start} to {props.cardInterval.end} ({props.cardInterval.end - props.cardInterval.start + 1} cards)
           </div>
         </div>
       </div>
@@ -106,6 +138,29 @@ export default function SettingsView(props) {
             <div class="app-version">Version 1.0.0</div>
             <div class="app-description">
               Practice and master the Tamariz, Aronson, and 5th Faro card stacks with multiple training modes and detailed analytics.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="section-title">☕ Support</h3>
+        
+        <div class="settings-block">
+          <div class="support-info">
+            <div class="support-text">
+              If you find this app helpful for your card magic practice, consider supporting its development.
+            </div>
+            <a 
+              href="https://buymeacoffee.com/yourusername" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="support-button"
+            >
+              ☕ Buy Me a Coffee
+            </a>
+            <div class="support-hint">
+              Your support helps keep this app free and continuously improved.
             </div>
           </div>
         </div>

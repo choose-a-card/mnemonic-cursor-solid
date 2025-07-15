@@ -1,12 +1,13 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult } from '../../types'
+import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 
 interface ClassicQuizProps {
   stack: string[];
-  numCards: number;
+  practiceStack: string[];
+  cardInterval: CardInterval;
   soundEnabled: boolean;
   onResult: (result: QuizResult) => void;
 }
@@ -20,11 +21,14 @@ export default function ClassicQuiz(props: ClassicQuizProps) {
     setFeedback('')
     setInput('')
     
-    const idx = getRandomInt(props.numCards)
-    const card = props.stack[idx]
-    const pos = idx + 1
+    // Pick a random card from the practice stack
+    const practiceIdx = getRandomInt(props.practiceStack.length)
+    const card = props.practiceStack[practiceIdx]
     
-    setQuestion({ card, answer: pos, type: 'card-to-pos' })
+    // Calculate the actual position in the full stack
+    const actualPos = props.cardInterval.start + practiceIdx
+    
+    setQuestion({ card, answer: actualPos, type: 'card-to-pos' })
   }
 
   function handleSubmit(e: Event): void {

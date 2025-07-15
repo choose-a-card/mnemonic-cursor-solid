@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult } from '../../types'
+import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
@@ -7,7 +7,8 @@ import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 
 interface OneAheadProps {
   stack: string[];
-  numCards: number;
+  practiceStack: string[];
+  cardInterval: CardInterval;
   soundEnabled: boolean;
   onResult: (result: QuizResult) => void;
 }
@@ -25,10 +26,13 @@ export default function OneAhead(props: OneAheadProps) {
     setInput('')
     setShowKeyboard(false)
     
-    const idx = getRandomInt(props.numCards)
-    const card = props.stack[idx]
-    const nextIdx = (idx + 1) % props.numCards
-    const nextCard = props.stack[nextIdx]
+    // Pick a random card from the practice stack
+    const practiceIdx = getRandomInt(props.practiceStack.length)
+    const card = props.practiceStack[practiceIdx]
+    
+    // Calculate the next card position in the practice range
+    const nextPracticeIdx = (practiceIdx + 1) % props.practiceStack.length
+    const nextCard = props.practiceStack[nextPracticeIdx]
     
     setQuestion({ card, answer: nextCard, type: 'one-ahead' })
   }

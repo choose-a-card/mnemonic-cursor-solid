@@ -2,12 +2,13 @@ import { onMount } from 'solid-js'
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
 import { useCardQuiz } from '../../hooks/useCardQuiz'
-import type { QuizResult } from '../../types'
+import type { QuizResult, CardInterval } from '../../types'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 
 interface PositionToCardProps {
   stack: string[];
-  numCards: number;
+  practiceStack: string[];
+  cardInterval: CardInterval;
   soundEnabled: boolean;
   onResult: (result: QuizResult) => void;
 }
@@ -20,11 +21,12 @@ export default function PositionToCard(props: PositionToCardProps) {
   })
 
   function nextQuestion(): void {
-    const idx = getRandomInt(props.numCards)
-    const card = props.stack[idx]
-    const pos = idx + 1
+    // Pick a random position from the practice range
+    const practiceIdx = getRandomInt(props.practiceStack.length)
+    const card = props.practiceStack[practiceIdx]
+    const actualPos = props.cardInterval.start + practiceIdx
     
-    quiz.updateQuestion({ pos, answer: card, type: 'pos-to-card' })
+    quiz.updateQuestion({ pos: actualPos, answer: card, type: 'pos-to-card' })
   }
 
   function submitAndContinue(): void {

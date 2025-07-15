@@ -7,6 +7,13 @@ interface StackViewProps {
 }
 
 const StackView: Component<StackViewProps> = (props) => {
+  function getCardColorClass(card: string): string {
+    if (card.includes('♥') || card.includes('♦')) {
+      return 'card-red'
+    }
+    return 'card-black'
+  }
+
   return (
     <div class="stack-view">
       <div class="stack-header">
@@ -16,7 +23,7 @@ const StackView: Component<StackViewProps> = (props) => {
         {props.stack.map((card, i) => (
           <li class="stack-item">
             <span class="stack-pos">{i + 1}</span>
-            <span class="stack-card">{card}</span>
+            <span class={`stack-card ${getCardColorClass(card)}`}>{card}</span>
           </li>
         ))}
       </ul>

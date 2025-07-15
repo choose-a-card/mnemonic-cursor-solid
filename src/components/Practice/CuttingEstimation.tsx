@@ -1,12 +1,13 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult } from '../../types'
+import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 
 interface CuttingEstimationProps {
   stack: string[];
-  numCards: number;
+  practiceStack: string[];
+  cardInterval: CardInterval;
   soundEnabled: boolean;
   onResult: (result: QuizResult) => void;
 }
@@ -20,33 +21,27 @@ export default function CuttingEstimation(props: CuttingEstimationProps) {
     setFeedback('')
     setInput('')
     
-    // Cut card is always the bottom card (position 1, index 0)
-    const cutIdx = 0
-    const cutCard = props.stack[cutIdx]
+    // Randomly select a cut position (simulating a cut)
+    const N = props.practiceStack.length
+    const cutIdx = getRandomInt(N)
+    const cutCard = props.practiceStack[cutIdx]
     
-    // Target can be anywhere in the stack
-    const targetIdx = getRandomInt(props.numCards)
-    const targetCard = props.stack[targetIdx]
-    
-    // Calculate distance: positive if target is after cut, negative if before
-    // For cutting estimation, we want: how many cards to cut from bottom to reach target
-    let distance: number
-    if (targetIdx === cutIdx) {
-      distance = 0 // Target is the bottom card
-    } else if (targetIdx > cutIdx) {
-      distance = targetIdx - cutIdx // Target is after bottom card
-    } else {
-      // Target is before bottom card (wrapped around)
-      distance = -(props.numCards - targetIdx) // Negative distance
+    // Randomly select an offset between -8 and +8, excluding 0
+    let offset = 0
+    while (offset === 0) {
+      offset = getRandomInt(17) - 8 // -8 to +8
     }
+    // Compute target position, wrapping around
+    const targetIdx = (cutIdx + offset + N) % N
+    const targetCard = props.practiceStack[targetIdx]
     
     setQuestion({ 
       targetCard, 
       cutCard, 
-      answer: distance, 
+      answer: offset, 
       type: 'cutting',
-      targetPos: targetIdx + 1,
-      cutPos: cutIdx + 1
+      targetPos: props.cardInterval.start + targetIdx,
+      cutPos: props.cardInterval.start + cutIdx
     })
   }
 
@@ -83,7 +78,9 @@ export default function CuttingEstimation(props: CuttingEstimationProps) {
       {/* Question */}
       <div class="question-card">
         <div class="question-text">
-          Target: {question().targetCard}. You cut to {question().cutCard}. How many more cards to cut?
+          <div><b>Bottom card:</b> {question().cutCard}</div>
+          <div><b>Target card:</b> {question().targetCard}</div>
+          <div style={{'margin-top': '1rem'}}>How many cards (±8) to cut to bring the target to the top? <br/>(+ = forward, – = backward)</div>
         </div>
       </div>
       

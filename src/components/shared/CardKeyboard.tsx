@@ -1,7 +1,8 @@
-import { createEffect, createSignal, type Component, batch } from 'solid-js'
+import { createEffect, createSignal, type Component, batch, onMount, onCleanup } from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { RANKS, SUITS } from '../../constants/cards'
-import { isValidCard } from '../../utils/utils';
+import { isValidCard } from '../../utils/utils'
+import './CardKeyboard.css'
 
 interface CardKeyboardProps {
   isVisible: boolean;
@@ -13,6 +14,21 @@ interface CardKeyboardProps {
 const CardKeyboard: Component<CardKeyboardProps> = (props) => {
   const [selectedRank, setSelectedRank] = createSignal<string>('')
   const [selectedSuit, setSelectedSuit] = createSignal<string>('')
+  let keyboardRef: HTMLDivElement | undefined
+
+  // Group ranks into three rows: A-4, 5-10, J-K
+  const rankRows = [
+    RANKS.slice(0, 5),  // A, 2, 3, 4, 5
+    RANKS.slice(5, 10), // 6, 7, 8, 9, 10
+    RANKS.slice(10)     // J, Q, K, A
+  ]
+
+  // Click outside handler
+  function handleClickOutside(event: MouseEvent) {
+    if (keyboardRef && !keyboardRef.contains(event.target as Node)) {
+      handleClose()
+    }
+  }
 
   // Effect for partial selection updates
   createEffect(() => {
@@ -58,31 +74,34 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
     props.onClose()
   }
 
+  // Add/remove click outside listener
+  onMount(() => {
+    document.addEventListener('mousedown', handleClickOutside)
+  })
+
+  onCleanup(() => {
+    document.removeEventListener('mousedown', handleClickOutside)
+  })
+
   return (
     <Transition name="keyboard-slide">
       {props.isVisible && (
-        <div class="card-keyboard">
-          <div class="keyboard-header">
-            <button 
-              type="button" 
-              class="keyboard-close"
-              onClick={handleClose}
-            >
-              ×
-            </button>
-          </div>
-          
+        <div class="card-keyboard" ref={keyboardRef}>
           <div class="keyboard-content">
             <div class="rank-selection">
-              <div class="rank-grid">
-                {RANKS.map(r => (
-                  <button 
-                    type="button" 
-                    class={`rank-btn ${selectedRank() === r ? 'selected' : ''}`}
-                    onClick={() => setSelectedRank(r)}
-                  >
-                    {r}
-                  </button>
+              <div class="rank-rows">
+                {rankRows.map(row => (
+                  <div class="rank-row">
+                    {row.map(r => (
+                      <button 
+                        type="button" 
+                        class={`rank-btn ${selectedRank() === r ? 'selected' : ''}`}
+                        onClick={() => setSelectedRank(r)}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
