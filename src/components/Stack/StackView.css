@@ -6,6 +6,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+  min-height: 100vh;
+  justify-content: flex-start;
 }
 
 /* Large screens and up */
@@ -21,6 +23,7 @@
   align-items: center;
   width: 100%;
   margin-bottom: 2rem;
+  text-align: center;
 }
 
 .stack-title {
@@ -37,6 +40,8 @@
   gap: 0.75rem;
   width: 100%;
   max-width: 600px;
+  justify-content: center;
+  margin: 0 auto;
 }
 
 /* Small screens */
@@ -44,6 +49,7 @@
   .stack-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
+    max-width: 400px;
   }
 }
 
@@ -52,6 +58,7 @@
   .stack-grid {
     grid-template-columns: repeat(6, 1fr);
     gap: 1rem;
+    max-width: 600px;
   }
 }
 
@@ -87,6 +94,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 /* Playing Card Design */
@@ -94,28 +102,26 @@
   width: 100%;
   height: 100%;
   background: var(--surface, #f8f9fa);
-  border: 2px solid var(--border, #e5e5e7);
-  border-radius: 12px;
+  border: 1px solid var(--border, #e5e5e7);
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .playing-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   border-color: var(--accent, #007aff);
 }
 
 /* Card Content */
 .card-value {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 0.25rem;
   line-height: 1;
 }
@@ -172,6 +178,11 @@
   .stack-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
+    max-width: 300px;
+  }
+  
+  .playing-card {
+    border-radius: 6px;
   }
   
   .card-value {
@@ -184,5 +195,8 @@
   
   .card-index {
     font-size: 0.6rem;
+    padding: 0.1rem 0.2rem;
+    bottom: 0.2rem;
+    left: 0.2rem;
   }
 } 
