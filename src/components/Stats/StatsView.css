@@ -8,13 +8,12 @@
 }
 
 /* Desktop layout improvements */
+/* Large screens and up */
 @media (min-width: 1024px) {
   .stats-view {
     max-width: none;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    align-items: stretch;
+    padding: 0;
+    padding-bottom: 0; /* No need for bottom nav padding on desktop */
   }
   
   .stats-overview {
@@ -56,7 +55,8 @@
   }
 }
 
-@media (min-width: 1440px) {
+/* Extra large screens and up */
+@media (min-width: 1280px) {
   .stats-view {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
@@ -590,42 +590,46 @@
   border-color: var(--border);
 }
 
-@media (max-width: 480px) {
-  .stats-overview {
-    flex-direction: column;
-    gap: 1.25rem;
-    text-align: center;
-  }
-  
-  .accuracy-circle {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .accuracy-value {
-    font-size: 1.8rem;
-  }
-  
-  .quick-stats {
-    flex-direction: row;
-    justify-content: space-around;
-    width: 100%;
-  }
-  
+/* Small screens and down */
+@media (max-width: 640px) {
   .stats-view {
-    gap: 0.875rem;
+    padding: 0.75rem;
+    gap: 1rem;
   }
   
-  .stats-block {
-    padding: 1rem;
-    height: auto;
+  .stats-header {
+    padding: 0.25rem 0 0.125rem;
   }
   
-  .stats-block-content {
-    overflow-y: auto;
-    padding-right: 0;
-    max-height: 300px;
-    display: flex;
-    flex-direction: column;
+  .stats-title {
+    font-size: 1.5rem;
+  }
+  
+  .stats-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .stats-card {
+    padding: 0.75rem;
+  }
+  
+  .stats-icon {
+    font-size: 1.5rem;
+  }
+  
+  .stats-name {
+    font-size: 1rem;
+  }
+  
+  .stats-description {
+    font-size: 0.8rem;
+  }
+  
+  .stats-value {
+    font-size: 1.5rem;
+  }
+  
+  .stats-label {
+    font-size: 0.8rem;
   }
 } 

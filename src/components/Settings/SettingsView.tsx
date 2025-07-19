@@ -133,21 +133,18 @@ export default function SettingsView() {
                   onClick={() => setStackType('tamariz' as any)}
                 >
                   <span class="option-name">Tamariz</span>
-                  <span class="option-desc">Classic stack</span>
                 </button>
                 <button
                   class={`stack-option ${stackType() === 'aronson' ? 'active' : ''}`}
                   onClick={() => setStackType('aronson' as any)}
                 >
                   <span class="option-name">Aronson</span>
-                  <span class="option-desc">Modern stack</span>
                 </button>
                 <button
                   class={`stack-option ${stackType() === 'faro' ? 'active' : ''}`}
                   onClick={() => setStackType('faro' as any)}
                 >
                   <span class="option-name">5th Faro</span>
-                  <span class="option-desc">Advanced stack</span>
                 </button>
               </div>
             </div>

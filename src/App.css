@@ -60,13 +60,15 @@
 }
 
 /* Desktop layout improvements */
-@media (min-width: 1401px) {
+/* Large screens and up */
+@media (min-width: 1024px) {
   .main-content {
     padding: 2rem;
     padding-bottom: 2rem; /* No need for bottom nav padding on desktop */
   }
 }
 
+/* Extra large screens and up */
 @media (min-width: 1280px) {
   .main-content {
     padding: 2.5rem;
@@ -74,8 +76,16 @@
   }
 }
 
+/* 2XL screens and up */
+@media (min-width: 1536px) {
+  .main-content {
+    padding: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
 /* Mobile and tablet improvements */
-@media (max-width: 1400px) {
+@media (max-width: 1023px) {
   .main-content {
     padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav */
   }

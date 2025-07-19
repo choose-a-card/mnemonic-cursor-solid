@@ -110,22 +110,36 @@
   color: var(--background);
 }
 
-/* Mobile improvements */
+/* Medium screens and down */
 @media (max-width: 768px) {
-  .slider-handle {
-    width: 28px;
-    height: 28px;
-    border-width: 2px;
-    touch-action: manipulation;
-  }
-  
-  .handle-value {
-    font-size: 0.7rem;
-    padding: 1px 4px;
-  }
-  
   .dual-range-slider {
-    touch-action: manipulation;
+    padding: 1rem;
+  }
+  
+  .slider-container {
+    margin: 1rem 0;
+  }
+  
+  .range-slider {
+    height: 6px;
+  }
+  
+  .range-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .range-labels {
+    font-size: 0.8rem;
+  }
+  
+  .range-values {
+    font-size: 0.9rem;
   }
 }
 

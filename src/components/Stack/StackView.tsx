@@ -16,21 +16,36 @@ const StackView: Component = () => {
     return 'card-black'
   }
 
+  function getCardSuit(card: string): string {
+    if (card.includes('♠')) return '♠'
+    if (card.includes('♥')) return '♥'
+    if (card.includes('♦')) return '♦'
+    if (card.includes('♣')) return '♣'
+    return ''
+  }
+
+  function getCardValue(card: string): string {
+    return card.replace(/[♠♥♦♣]/g, '').trim()
+  }
+
   return (
     <div class="stack-view">
       <div class="stack-header">
         <h2 class="stack-title">{stackTitle()}</h2>
       </div>
-      <ul class="stack-list">
+      <div class="stack-grid">
         <Index each={displayStack()}>
           {(card, i) => (
-            <li class="stack-item">
-              <span class="stack-pos">{cardInterval().start + i}</span>
-              <span class={`stack-card ${getCardColorClass(card())}`}>{card()}</span>
-            </li>
+            <div class="stack-card-item">
+              <div class={`playing-card ${getCardColorClass(card())}`}>
+                <div class="card-value">{getCardValue(card())}</div>
+                <div class="card-suit">{getCardSuit(card())}</div>
+                <div class="card-index">{cardInterval().start + i}</div>
+              </div>
+            </div>
           )}
         </Index>
-      </ul>
+      </div>
     </div>
   )
 }

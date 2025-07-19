@@ -3,15 +3,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 420px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 1rem;
 }
 
-/* Desktop layout improvements */
+/* Large screens and up */
 @media (min-width: 1024px) {
   .stack-view {
-    max-width: none;
-    align-items: flex-start;
+    padding: 2rem;
   }
 }
 
@@ -30,98 +30,159 @@
   margin: 0;
 }
 
-.stack-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* Card Grid Layout */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.75rem;
   width: 100%;
-  max-width: 360px;
+  max-width: 600px;
+}
+
+/* Small screens */
+@media (min-width: 640px) {
+  .stack-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Medium screens */
+@media (min-width: 768px) {
+  .stack-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1024px) {
+  .stack-grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1.25rem;
+    max-width: 800px;
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1280px) {
+  .stack-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 1.5rem;
+    max-width: 1000px;
+  }
+}
+
+/* 2XL screens */
+@media (min-width: 1536px) {
+  .stack-grid {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+    max-width: 1200px;
+  }
+}
+
+.stack-card-item {
+  aspect-ratio: 2.5 / 3.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Playing Card Design */
+.playing-card {
+  width: 100%;
+  height: 100%;
+  background: var(--surface, #f8f9fa);
+  border: 2px solid var(--border, #e5e5e7);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Desktop multi-column layout */
-@media (min-width: 1024px) {
-  .stack-list {
-    max-width: none;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-  
-  .stack-item {
-    height: 100%;
-    min-height: 60px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .stack-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1920px) {
-  .stack-list {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.stack-item {
-  display: flex;
-  justify-content: flex-start;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  background: var(--surface, #f8f9fa);
-  border-radius: 12px;
-  border: 1px solid var(--border, #e5e5e7);
-  font-size: 1.1rem;
-  color: var(--text, #222);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.stack-item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.playing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   border-color: var(--accent, #007aff);
 }
 
-.stack-pos {
-  font-variant-numeric: tabular-nums;
-  color: var(--text-secondary, #888);
+/* Card Content */
+.card-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.card-suit {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.card-index {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  font-size: 0.9rem;
-  min-width: 2.5ch;
+  color: var(--text-secondary, #666);
   background: var(--background, #fff);
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
   border: 1px solid var(--border-light, #f0f0f3);
-  flex-shrink: 0;
 }
 
-.stack-card {
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  font-size: 1.1rem;
-  color: var(--text-primary, #1a1a1a);
-  flex: 1;
-  text-align: center;
-}
-
-/* Red suits */
-.stack-card.card-red {
+/* Card Colors */
+.playing-card.card-red .card-value,
+.playing-card.card-red .card-suit {
   color: #dc2626;
 }
 
-/* Black suits */
-.stack-card.card-black {
+.playing-card.card-black .card-value,
+.playing-card.card-black .card-suit {
   color: #1a1a1a;
 }
 
-/* Dark mode adjustments */
-.app-container.dark .stack-card.card-black {
+/* Dark Mode Adjustments */
+.app-container.dark .playing-card {
+  background: var(--surface, #2a2a2a);
+  border-color: var(--border, #404040);
+}
+
+.app-container.dark .playing-card.card-black .card-value,
+.app-container.dark .playing-card.card-black .card-suit {
   color: #ffffff;
+}
+
+.app-container.dark .card-index {
+  background: var(--background, #1a1a1a);
+  border-color: var(--border, #404040);
+  color: var(--text-secondary, #ccc);
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 480px) {
+  .stack-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .card-value {
+    font-size: 1rem;
+  }
+  
+  .card-suit {
+    font-size: 1.25rem;
+  }
+  
+  .card-index {
+    font-size: 0.6rem;
+  }
 } 

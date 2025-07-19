@@ -305,7 +305,7 @@
 
 
 /* Responsive adjustments */
-@media (max-width: 1400px) {
+@media (max-width: 1023px) {
   .desktop-menu {
     display: none !important;
   }
@@ -315,7 +315,7 @@
   }
 }
 
-@media (min-width: 1401px) {
+@media (min-width: 1024px) {
   .bottom-nav {
     display: none !important;
   }
