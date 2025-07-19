@@ -1,28 +1,24 @@
 import './SettingsView.css'
-import type { CardInterval } from '../../types'
 import { createSignal, onMount, Show } from 'solid-js'
-import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallPrompt, getPWAInstallPrompt, checkServiceWorkerStatus, forceServiceWorkerRegistration } from '../../utils/pwa'
+import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallPrompt, getPWAInstallPrompt, checkServiceWorkerStatus } from '../../utils/pwa'
 import { isFeatureEnabled } from '../../utils/featureFlags'
+import { useAppSettings } from '../../contexts/AppSettingsContext'
+import { useStats } from '../../contexts/StatsContext'
 import DualRangeSlider from './DualRangeSlider'
 
-interface SettingsViewProps {
-  stackType: string;
-  setStackType: (type: string) => void;
-  cardInterval: CardInterval;
-  setCardInterval: (interval: CardInterval) => void;
-  darkMode: boolean;
-  setDarkMode: (mode: boolean) => void;
-  soundEnabled: boolean;
-  setSoundEnabled: (enabled: boolean) => void;
-  onResetStats: () => void;
-}
-
-export default function SettingsView(props: SettingsViewProps) {
+export default function SettingsView() {
+  const { 
+    stackType, setStackType, 
+    cardInterval, setCardInterval, 
+    darkMode, setDarkMode, 
+    soundEnabled, setSoundEnabled 
+  } = useAppSettings()
+  const { resetStats } = useStats()
   const [canInstall, setCanInstall] = createSignal(false)
   const [isInstalled, setIsInstalled] = createSignal(false)
   const [onlineStatus, setOnlineStatus] = createSignal(true)
   const [installing, setInstalling] = createSignal(false)
-  const [debugInfo, setDebugInfo] = createSignal<any>({})
+
 
   onMount(() => {
     // Only run PWA logic if the feature is enabled
@@ -38,15 +34,7 @@ export default function SettingsView(props: SettingsViewProps) {
         setIsInstalled(installed)
         setCanInstall(canShow)
         
-        setDebugInfo({
-          installed,
-          installable,
-          hasPrompt,
-          canShow,
-          userAgent: navigator.userAgent,
-          isOnline: isOnline(),
-          serviceWorkerStatus: swStatus
-        })
+
         
         console.log('PWA Status Check:', {
           installed,
@@ -119,38 +107,7 @@ export default function SettingsView(props: SettingsViewProps) {
     }
   }
 
-  const handleForceSWRegistration = async () => {
-    if (!isFeatureEnabled('pwaEnabled')) return
-    
-    console.log('Forcing service worker registration...')
-    const success = await forceServiceWorkerRegistration()
-    if (success) {
-      // Recheck PWA status after registration
-      setTimeout(async () => {
-        const checkPWAStatus = async () => {
-          const installed = isPWAInstalled()
-          const installable = isPWAInstallable()
-          const hasPrompt = !!getPWAInstallPrompt()
-          const canShow = canShowInstallPrompt()
-          const swStatus = await checkServiceWorkerStatus()
-          
-          setIsInstalled(installed)
-          setCanInstall(canShow)
-          
-          setDebugInfo({
-            installed,
-            installable,
-            hasPrompt,
-            canShow,
-            userAgent: navigator.userAgent,
-            isOnline: isOnline(),
-            serviceWorkerStatus: swStatus
-          })
-        }
-        await checkPWAStatus()
-      }, 1000)
-    }
-  }
+
 
   const isMobileChrome = () => {
     const userAgent = navigator.userAgent
@@ -172,22 +129,22 @@ export default function SettingsView(props: SettingsViewProps) {
               <label class="setting-label">Stack Type</label>
               <div class="stack-options">
                 <button
-                  class={`stack-option ${props.stackType === 'tamariz' ? 'active' : ''}`}
-                  onClick={() => props.setStackType('tamariz')}
+                  class={`stack-option ${stackType() === 'tamariz' ? 'active' : ''}`}
+                  onClick={() => setStackType('tamariz' as any)}
                 >
                   <span class="option-name">Tamariz</span>
                   <span class="option-desc">Classic stack</span>
                 </button>
                 <button
-                  class={`stack-option ${props.stackType === 'aronson' ? 'active' : ''}`}
-                  onClick={() => props.setStackType('aronson')}
+                  class={`stack-option ${stackType() === 'aronson' ? 'active' : ''}`}
+                  onClick={() => setStackType('aronson' as any)}
                 >
                   <span class="option-name">Aronson</span>
                   <span class="option-desc">Modern stack</span>
                 </button>
                 <button
-                  class={`stack-option ${props.stackType === 'faro' ? 'active' : ''}`}
-                  onClick={() => props.setStackType('faro')}
+                  class={`stack-option ${stackType() === 'faro' ? 'active' : ''}`}
+                  onClick={() => setStackType('faro' as any)}
                 >
                   <span class="option-name">5th Faro</span>
                   <span class="option-desc">Advanced stack</span>
@@ -201,16 +158,16 @@ export default function SettingsView(props: SettingsViewProps) {
                 <DualRangeSlider
                   min={1}
                   max={52}
-                  start={props.cardInterval.start}
-                  end={props.cardInterval.end}
+                  start={cardInterval().start}
+                  end={cardInterval().end}
                   onRangeChange={(start, end) => {
-                    props.setCardInterval({ start, end })
+                    setCardInterval({ start, end })
                   }}
                   step={1}
                 />
                 <div class="range-info">
-                  <span class="range-text">Cards {props.cardInterval.start} - {props.cardInterval.end}</span>
-                  <span class="range-count">({props.cardInterval.end - props.cardInterval.start + 1} cards)</span>
+                  <span class="range-text">Cards {cardInterval().start} - {cardInterval().end}</span>
+                  <span class="range-count">({cardInterval().end - cardInterval().start + 1} cards)</span>
                 </div>
               </div>
             </div>
@@ -231,8 +188,10 @@ export default function SettingsView(props: SettingsViewProps) {
                   <span class="setting-desc">Switch between light and dark themes</span>
                 </div>
                 <button 
-                  class={`toggle-switch ${props.darkMode ? 'active' : ''}`}
-                  onClick={() => props.setDarkMode(!props.darkMode)}
+                  class={`toggle-switch ${darkMode() ? 'active' : ''}`}
+                  onClick={() => setDarkMode(!darkMode())}
+                  type="button"
+                  aria-label={`${darkMode() ? 'Disable' : 'Enable'} dark mode`}
                 >
                   <div class="toggle-slider"></div>
                 </button>
@@ -246,8 +205,10 @@ export default function SettingsView(props: SettingsViewProps) {
                   <span class="setting-desc">Audio feedback for answers</span>
                 </div>
                 <button 
-                  class={`toggle-switch ${props.soundEnabled ? 'active' : ''}`}
-                  onClick={() => props.setSoundEnabled(!props.soundEnabled)}
+                  class={`toggle-switch ${soundEnabled() ? 'active' : ''}`}
+                  onClick={() => setSoundEnabled(!soundEnabled())}
+                  type="button"
+                  aria-label={`${soundEnabled() ? 'Disable' : 'Enable'} sound effects`}
                 >
                   <div class="toggle-slider"></div>
                 </button>
@@ -329,7 +290,7 @@ export default function SettingsView(props: SettingsViewProps) {
                 <label class="setting-label">Reset Statistics</label>
                 <span class="setting-desc">Permanently delete all progress data</span>
               </div>
-              <button class="reset-button" onClick={props.onResetStats}>
+              <button class="reset-button" onClick={resetStats}>
                 🗑️ Reset All Data
               </button>
             </div>

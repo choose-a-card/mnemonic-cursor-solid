@@ -1,24 +1,18 @@
-import { createSignal, Show, createMemo } from 'solid-js'
+import { createSignal, Show, createMemo, For } from 'solid-js'
 import './PracticeView.css'
 import ClassicQuiz from './ClassicQuiz'
 import PositionToCard from './PositionToCard'
 import OneAhead from './OneAhead'
 import StackContext from './StackContext'
 import CuttingEstimation from './CuttingEstimation'
-import type { QuizResult, CardInterval } from '../../types'
+
 import FirstOrSecondHalf from './FirstOrSecondHalf'
 import QuartetPosition from './QuartetPosition'
 import CutToPosition from './CutToPosition'
 import { useStats } from '../../contexts/StatsContext'
+import { useAppSettings } from '../../contexts/AppSettingsContext'
+import { getStack } from '../../constants/stacks'
 import { isFeatureEnabled } from '../../utils/featureFlags'
-
-interface PracticeViewProps {
-  stack: string[];
-  practiceStack: string[];
-  cardInterval: CardInterval;
-  soundEnabled: boolean;
-  onResult: (result: QuizResult) => void;
-}
 
 interface PracticeMode {
   id: string;
@@ -78,9 +72,13 @@ const PRACTICE_MODES: PracticeMode[] = [
   },
 ]
 
-export default function PracticeView(props: PracticeViewProps) {
+export default function PracticeView() {
   const [currentMode, setCurrentMode] = createSignal<string>('selection')
   const { stats, badges } = useStats()
+  const { stackType, cardInterval, soundEnabled } = useAppSettings()
+  const stack = () => getStack(stackType())
+  const practiceStack = () => stack().slice(cardInterval().start - 1, cardInterval().end)
+  const { addResult } = useStats()
 
   // Calculate badge progress for motivation
   const badgeProgress = createMemo(() => {
@@ -165,35 +163,37 @@ export default function PracticeView(props: PracticeViewProps) {
         </div>
         
         <div class="mode-list" role="listbox" aria-label="Practice modes">
-          {PRACTICE_MODES.map(mode => {
-            const accuracy = getModeAccuracy(mode.name)
-            const attempts = getModeAttempts(mode.name)
-            
-            return (
-              <button 
-                class="mode-card"
-                onClick={() => handleModeClick(mode.id)}
-                onKeyDown={(e) => handleKeyDown(e, mode.id)}
-                type="button"
-                role="option"
-                tabindex={0}
-                aria-label={`${mode.name}: ${mode.description}. ${attempts > 0 ? `${accuracy}% accuracy from ${attempts} attempts` : 'No attempts yet'}`}
-              >
-                <div class="mode-icon" aria-hidden="true">{mode.icon}</div>
-                <div class="mode-content">
-                  <div class="mode-name">{mode.name}</div>
-                  <div class="mode-description">{mode.description}</div>
-                  {attempts > 0 && (
-                    <div class="mode-stats">
-                      <span class="mode-accuracy">{accuracy}% accuracy</span>
-                      <span class="mode-attempts">({attempts} attempts)</span>
-                    </div>
-                  )}
-                </div>
-                <div class="mode-arrow" aria-hidden="true">→</div>
-              </button>
-            )
-          })}
+          <For each={PRACTICE_MODES}>
+            {(mode) => {
+              const accuracy = getModeAccuracy(mode.name)
+              const attempts = getModeAttempts(mode.name)
+              
+              return (
+                <button 
+                  class="mode-card"
+                  onClick={() => handleModeClick(mode.id)}
+                  onKeyDown={(e) => handleKeyDown(e, mode.id)}
+                  type="button"
+                  role="option"
+                  tabindex={0}
+                  aria-label={`${mode.name}: ${mode.description}. ${attempts > 0 ? `${accuracy}% accuracy from ${attempts} attempts` : 'No attempts yet'}`}
+                >
+                  <div class="mode-icon" aria-hidden="true">{mode.icon}</div>
+                  <div class="mode-content">
+                    <div class="mode-name">{mode.name}</div>
+                    <div class="mode-description">{mode.description}</div>
+                    {attempts > 0 && (
+                      <div class="mode-stats">
+                        <span class="mode-accuracy">{accuracy}% accuracy</span>
+                        <span class="mode-attempts">({attempts} attempts)</span>
+                      </div>
+                    )}
+                  </div>
+                  <div class="mode-arrow" aria-hidden="true">→</div>
+                </button>
+              )
+            }}
+          </For>
         </div>
       </Show>
 
@@ -230,11 +230,11 @@ export default function PracticeView(props: PracticeViewProps) {
                     console.log('PracticeView: Rendering ClassicQuiz component')
                     return (
                       <ClassicQuiz 
-                        stack={props.stack}
-                        practiceStack={props.practiceStack}
-                        cardInterval={props.cardInterval}
-                        soundEnabled={props.soundEnabled}
-                        onResult={props.onResult}
+                        stack={stack()}
+                        practiceStack={practiceStack()}
+                        cardInterval={cardInterval()}
+                        soundEnabled={soundEnabled()}
+                        onResult={addResult}
                       />
                     )
                   })()}
@@ -245,11 +245,11 @@ export default function PracticeView(props: PracticeViewProps) {
                     console.log('PracticeView: Rendering PositionToCard component')
                     return (
                       <PositionToCard 
-                        stack={props.stack}
-                        practiceStack={props.practiceStack}
-                        cardInterval={props.cardInterval}
-                        soundEnabled={props.soundEnabled}
-                        onResult={props.onResult}
+                        stack={stack()}
+                        practiceStack={practiceStack()}
+                        cardInterval={cardInterval()}
+                        soundEnabled={soundEnabled()}
+                        onResult={addResult}
                       />
                     )
                   })()}
@@ -260,11 +260,11 @@ export default function PracticeView(props: PracticeViewProps) {
                     console.log('PracticeView: Rendering OneAhead component')
                     return (
                       <OneAhead 
-                        stack={props.stack}
-                        practiceStack={props.practiceStack}
-                        cardInterval={props.cardInterval}
-                        soundEnabled={props.soundEnabled}
-                        onResult={props.onResult}
+                        stack={stack()}
+                        practiceStack={practiceStack()}
+                        cardInterval={cardInterval()}
+                        soundEnabled={soundEnabled()}
+                        onResult={addResult}
                       />
                     )
                   })()}
@@ -275,11 +275,11 @@ export default function PracticeView(props: PracticeViewProps) {
                     console.log('PracticeView: Rendering StackContext component')
                     return (
                       <StackContext 
-                        stack={props.stack}
-                        practiceStack={props.practiceStack}
-                        cardInterval={props.cardInterval}
-                        soundEnabled={props.soundEnabled}
-                        onResult={props.onResult}
+                        stack={stack()}
+                        practiceStack={practiceStack()}
+                        cardInterval={cardInterval()}
+                        soundEnabled={soundEnabled()}
+                        onResult={addResult}
                       />
                     )
                   })()}
@@ -290,40 +290,40 @@ export default function PracticeView(props: PracticeViewProps) {
                     console.log('PracticeView: Rendering CuttingEstimation component')
                     return (
                       <CuttingEstimation 
-                        stack={props.stack}
-                        practiceStack={props.practiceStack}
-                        cardInterval={props.cardInterval}
-                        soundEnabled={props.soundEnabled}
-                        onResult={props.onResult}
+                        stack={stack()}
+                        practiceStack={practiceStack()}
+                        cardInterval={cardInterval()}
+                        soundEnabled={soundEnabled()}
+                        onResult={addResult}
                       />
                     )
                   })()}
                 </Show>
                 <Show when={currentMode() === 'first-or-second-half'}>
                   <FirstOrSecondHalf
-                    stack={props.stack}
-                    practiceStack={props.practiceStack}
-                    cardInterval={props.cardInterval}
-                    soundEnabled={props.soundEnabled}
-                    onResult={props.onResult}
+                    stack={stack()}
+                    practiceStack={practiceStack()}
+                    cardInterval={cardInterval()}
+                    soundEnabled={soundEnabled()}
+                    onResult={addResult}
                   />
                 </Show>
                 <Show when={currentMode() === 'quartet-position'}>
                   <QuartetPosition
-                    stack={props.stack}
-                    practiceStack={props.practiceStack}
-                    cardInterval={props.cardInterval}
-                    soundEnabled={props.soundEnabled}
-                    onResult={props.onResult}
+                    stack={stack()}
+                    practiceStack={practiceStack()}
+                    cardInterval={cardInterval()}
+                    soundEnabled={soundEnabled()}
+                    onResult={addResult}
                   />
                 </Show>
                 <Show when={currentMode() === 'cut-to-position'}>
                   <CutToPosition
-                    stack={props.stack}
-                    practiceStack={props.practiceStack}
-                    cardInterval={props.cardInterval}
-                    soundEnabled={props.soundEnabled}
-                    onResult={props.onResult}
+                    stack={stack()}
+                    practiceStack={practiceStack()}
+                    cardInterval={cardInterval()}
+                    soundEnabled={soundEnabled()}
+                    onResult={addResult}
                   />
                 </Show>
               </div>

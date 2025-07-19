@@ -1,7 +1,8 @@
-import { createMemo } from 'solid-js'
+import { createMemo, For } from 'solid-js'
 import './StatsView.css'
 import { useStats } from '../../contexts/StatsContext'
-import type { Stats } from '../../types'
+import { useAppSettings } from '../../contexts/AppSettingsContext'
+import { getStack } from '../../constants/stacks'
 import BadgeDisplay from './BadgeDisplay'
 import { isFeatureEnabled } from '../../utils/featureFlags'
 
@@ -29,19 +30,16 @@ const createAccuracyChart = (history: any[]) => {
   return sessions.slice(-8)
 }
 
-interface StatsViewProps {
-  stack: string[];
-  onGenerateDebugStats?: (() => void) | undefined;
-}
-
-export default function StatsView(props: StatsViewProps) {
-  const { stats, badges, lastUnlockedBadge } = useStats()
+export default function StatsView() {
+  const { stats, badges, lastUnlockedBadge, generateDebugStats } = useStats()
+  const { stackType, debugMode } = useAppSettings()
+  const stack = () => getStack(stackType())
   
   console.log('StatsView rendered with stats:', stats())
-  console.log('StatsView props.onGenerateDebugStats:', props.onGenerateDebugStats)
+  console.log('StatsView debugMode:', debugMode)
   
   const topCards = createMemo(() => topN(stats().cardFails, 5, c => c))
-  const topPos = createMemo(() => topN(stats().posFails, 5, p => `${p} (${props.stack[Number(p)-1] || ''})`))
+  const topPos = createMemo(() => topN(stats().posFails, 5, p => `${p} (${stack()[Number(p)-1] || ''})`))
   const accuracy = createMemo(() => stats().total ? Math.round((stats().correct / stats().total) * 100) : 100)
 
 
@@ -50,12 +48,12 @@ export default function StatsView(props: StatsViewProps) {
 
 
   const handleDebugClick = () => {
-    console.log('Debug button clicked, onGenerateDebugStats:', props.onGenerateDebugStats)
-    if (props.onGenerateDebugStats) {
-      console.log('Calling onGenerateDebugStats')
-      props.onGenerateDebugStats()
+    console.log('Debug button clicked, debugMode:', debugMode)
+    if (debugMode && generateDebugStats) {
+      console.log('Calling generateDebugStats')
+      generateDebugStats()
     } else {
-      console.log('onGenerateDebugStats is undefined')
+      console.log('generateDebugStats is not available')
     }
   }
 
@@ -86,7 +84,7 @@ export default function StatsView(props: StatsViewProps) {
       </div>
 
       {/* Debug Button - only show if debug function is provided */}
-      {props.onGenerateDebugStats && (
+      {debugMode && (
         <div class="debug-section">
           <button 
             class="debug-button" 
@@ -111,29 +109,31 @@ export default function StatsView(props: StatsViewProps) {
               Shows your accuracy over practice sessions (10 attempts each). Higher bars = better performance.
             </div>
             <div class="accuracy-chart" role="img" aria-label="Accuracy trend chart">
-              {(chartData() || []).map((session, _i) => {
-                let barClass = 'bar-fill'
-                if (session.accuracy === 100) {
-                  barClass = 'bar-fill perfect'
-                } else if (session.accuracy < 50) {
-                  barClass = 'bar-fill poor'
-                } else {
-                  barClass = 'bar-fill good'
-                }
-                
-                return (
-                  <div class="chart-bar">
-                    <div 
-                      class={barClass}
-                      style={{ height: `${session.accuracy}%` }}
-                      title={`Session ${session.session}: ${session.accuracy.toFixed(1)}%`}
-                      role="img"
-                      aria-label={`Session ${session.session} accuracy: ${session.accuracy.toFixed(1)}%`}
-                    ></div>
-                    <div class="bar-label">{session.session}</div>
-                  </div>
-                )
-              })}
+              <For each={chartData() || []}>
+                {(session) => {
+                  let barClass = 'bar-fill'
+                  if (session.accuracy === 100) {
+                    barClass = 'bar-fill perfect'
+                  } else if (session.accuracy < 50) {
+                    barClass = 'bar-fill poor'
+                  } else {
+                    barClass = 'bar-fill good'
+                  }
+                  
+                  return (
+                    <div class="chart-bar">
+                      <div 
+                        class={barClass}
+                        style={{ height: `${session.accuracy}%` }}
+                        title={`Session ${session.session}: ${session.accuracy.toFixed(1)}%`}
+                        role="img"
+                        aria-label={`Session ${session.session} accuracy: ${session.accuracy.toFixed(1)}%`}
+                      ></div>
+                      <div class="bar-label">{session.session}</div>
+                    </div>
+                  )
+                }}
+              </For>
             </div>
             <div class="chart-footer">
               Latest {(chartData() || []).length} sessions • Each bar = 10 attempts
@@ -162,12 +162,14 @@ export default function StatsView(props: StatsViewProps) {
         <div class="stats-block-content">
           <ul class="stats-list" role="list" aria-label="Most frequently missed cards">
             {topCards().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
-            {topCards().map((item, _i) => (
-              <li class="stats-item" role="listitem">
-                <span class="card-display">{item.label}</span>
-                <span class="stats-count">×{item.count}</span>
-              </li>
-            ))}
+            <For each={topCards()}>
+              {(item) => (
+                <li class="stats-item" role="listitem">
+                  <span class="card-display">{item.label}</span>
+                  <span class="stats-count">×{item.count}</span>
+                </li>
+              )}
+            </For>
           </ul>
         </div>
       </div>
@@ -177,12 +179,14 @@ export default function StatsView(props: StatsViewProps) {
         <div class="stats-block-content">
           <ul class="stats-list" role="list" aria-label="Most frequently missed positions">
             {topPos().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
-            {topPos().map((item, _i) => (
-              <li class="stats-item" role="listitem">
-                <span class="position-display">{item.label}</span>
-                <span class="stats-count">×{item.count}</span>
-              </li>
-            ))}
+            <For each={topPos()}>
+              {(item) => (
+                <li class="stats-item" role="listitem">
+                  <span class="position-display">{item.label}</span>
+                  <span class="stats-count">×{item.count}</span>
+                </li>
+              )}
+            </For>
           </ul>
         </div>
       </div>
@@ -195,14 +199,16 @@ export default function StatsView(props: StatsViewProps) {
             <div class="recent-performance-section">
               <div class="recent-label">Last 20 attempts:</div>
               <div class="recent-attempts" role="img" aria-label="Recent performance dots">
-                {stats().history.slice(-20).map((attempt, _i) => (
-                  <div 
-                    class={`attempt-dot ${attempt.correct ? 'correct' : 'incorrect'}`}
-                    title={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
-                    role="img"
-                    aria-label={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
-                  ></div>
-                ))}
+                <For each={stats().history.slice(-20)}>
+                  {(attempt) => (
+                    <div 
+                      class={`attempt-dot ${attempt.correct ? 'correct' : 'incorrect'}`}
+                      title={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
+                      role="img"
+                      aria-label={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
+                    ></div>
+                  )}
+                </For>
               </div>
             </div>
 

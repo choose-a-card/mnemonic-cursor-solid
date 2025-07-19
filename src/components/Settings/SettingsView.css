@@ -217,6 +217,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .toggle-switch.active {
@@ -233,10 +238,31 @@
   border-radius: 50%;
   transition: transform 0.2s ease;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  pointer-events: none;
 }
 
 .toggle-switch.active .toggle-slider {
   transform: translateX(24px);
+}
+
+/* Mobile improvements for toggle switches */
+@media (max-width: 768px) {
+  .toggle-switch {
+    width: 56px;
+    height: 32px;
+    border-radius: 16px;
+  }
+  
+  .toggle-slider {
+    width: 28px;
+    height: 28px;
+    top: 2px;
+    left: 2px;
+  }
+  
+  .toggle-switch.active .toggle-slider {
+    transform: translateX(24px);
+  }
 }
 
 /* Status Indicator */

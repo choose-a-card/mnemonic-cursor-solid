@@ -3,10 +3,14 @@
   --primary-light: #333;
   --text-primary: #1a1a1a;
   --text-secondary: #666;
+  --text: #222;
   --background: #ffffff;
   --background-alt: #f8f8fa;
+  --surface: #f8f9fa;
   --border: #e5e5e7;
   --border-light: #f0f0f3;
+  --accent: #007aff;
+  --accent-light: #e3f2fd;
   --red: #e11d48;
   --red-light: #fecdd3;
   --black: #1a1a1a;
@@ -33,16 +37,21 @@
 
 .app-container.dark {
   --background: #1a1a1a;
-  --text: #fff;
+  --background-alt: #2a2a2a;
   --surface: #2a2a2a;
+  --text: #fff;
+  --text-primary: #fff;
+  --text-secondary: #ccc;
   --border: #404040;
+  --border-light: #333;
   --accent: #007aff;
+  --accent-light: #1a3a5a;
 }
 
 .main-content {
   flex: 1;
   padding: 1rem;
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav + safe area + additional space */
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav + safe area + additional space */
   overflow-y: auto;
   height: 0; /* Force flex item to respect container height */
   min-height: 0; /* Allow flex item to shrink */
@@ -51,7 +60,7 @@
 }
 
 /* Desktop layout improvements */
-@media (min-width: 1024px) {
+@media (min-width: 1401px) {
   .main-content {
     padding: 2rem;
     padding-bottom: 2rem; /* No need for bottom nav padding on desktop */
@@ -65,236 +74,11 @@
   }
 }
 
-/* Mobile-specific improvements */
-@media (max-width: 768px) {
+/* Mobile and tablet improvements */
+@media (max-width: 1400px) {
   .main-content {
-    padding-bottom: calc(6rem + env(safe-area-inset-bottom) + 1.5rem); /* Extra padding on mobile */
-  }
-  
-  .bottom-nav {
-    height: calc(4.5rem + env(safe-area-inset-bottom)); /* Slightly taller on mobile */
-  }
-}
-
-/* Ensure content can scroll to bottom on devices with home indicators */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .main-content {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom) + 1.5rem);
-  }
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: var(--surface, #f8f9fa);
-  border-top: 1px solid var(--border, #e5e5e7);
-  padding: 0.5rem 0;
-  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); /* Account for safe area on devices with home indicator */
-  backdrop-filter: blur(10px);
-  z-index: 100;
-  height: calc(4rem + env(safe-area-inset-bottom)); /* Dynamic height including safe area */
-  box-sizing: border-box;
-}
-
-/* Desktop hamburger menu */
-.desktop-menu {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .desktop-menu {
-    display: block;
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1000;
-  }
-  
-  .hamburger-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border: 1px solid var(--border, #e5e5e7);
-    border-radius: 12px;
-    background: var(--surface, #f8f9fa);
-    color: var(--text, #222);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-  }
-  
-  .hamburger-button:hover {
-    background: var(--accent-light, #e3f2fd);
-    border-color: var(--accent, #007aff);
-    color: var(--accent, #007aff);
-  }
-  
-  .hamburger-icon {
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-  
-  .menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 999;
-  }
-  
-  .desktop-nav {
-    position: fixed;
-    top: 5rem;
-    right: 1rem;
-    background: var(--surface, #f8f9fa);
-    border: 1px solid var(--border, #e5e5e7);
-    border-radius: 12px;
-    padding: 0.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    z-index: 1000;
-    min-width: 200px;
-  }
-  
-  .menu-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: none;
-    border-radius: 8px;
-    background: none;
-    color: var(--text, #222);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-  }
-  
-  .menu-item:hover {
-    background: var(--accent-light, #e3f2fd);
-    color: var(--accent, #007aff);
-  }
-  
-  .menu-item.active {
-    background: var(--accent, #007aff);
-    color: white;
-  }
-  
-  .menu-icon {
-    font-size: 1.2rem;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-  
-  .menu-label {
-    font-size: 0.95rem;
-    font-weight: 500;
-  }
-  
-  /* Hide mobile navigation on desktop */
-  .bottom-nav {
-    display: none;
-  }
-}
-
-.nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  color: var(--text-secondary, #888);
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.nav-item.active {
-  color: var(--accent, #007aff);
-}
-
-
-
-.nav-icon {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.nav-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1;
-}
-
-/* Dark mode overrides */
-.app-container.dark .bottom-nav {
-  background: var(--surface);
-  border-top-color: var(--border);
-}
-
-.app-container.dark .nav-item {
-  color: #888;
-}
-
-.app-container.dark .nav-item.active {
-  color: var(--accent);
-}
-
-/* Desktop dark mode overrides */
-@media (min-width: 1024px) {
-  .app-container.dark .hamburger-button {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--text);
-  }
-  
-  .app-container.dark .hamburger-button:hover {
-    background: var(--accent-light, #1a3a5f);
-    border-color: var(--accent, #007aff);
-    color: var(--accent, #007aff);
-  }
-  
-  .app-container.dark .desktop-nav {
-    background: var(--surface);
-    border-color: var(--border);
-  }
-  
-  .app-container.dark .menu-item {
-    color: var(--text);
-  }
-  
-  .app-container.dark .menu-item:hover {
-    background: var(--accent-light, #1a3a5f);
-    color: var(--accent, #007aff);
-  }
-  
-  .app-container.dark .menu-item.active {
-    background: var(--accent, #007aff);
-    color: white;
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav */
   }
 }
 
 
-
-/* Remove old styles */
-.tab-bar {
-  display: none;
-}
-
-.tab {
-  display: none;
-}
-
-.tab-content {
-  display: none;
-}

@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, createEffect } from 'solid-js'
+import { createSignal } from 'solid-js'
 import './DualRangeSlider.css'
 
 interface DualRangeSliderProps {
@@ -12,7 +12,6 @@ interface DualRangeSliderProps {
 
 export default function DualRangeSlider(props: DualRangeSliderProps) {
   const [isDragging, setIsDragging] = createSignal<'start' | 'end' | null>(null)
-  const [sliderRect, setSliderRect] = createSignal<DOMRect | null>(null)
   let sliderRef: HTMLDivElement | undefined
 
   const step = props.step || 1
@@ -26,19 +25,11 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
     return Math.round(value / step) * step
   }
 
-  const handleMouseDown = (e: MouseEvent, handle: 'start' | 'end') => {
-    e.preventDefault()
-    setIsDragging(handle)
-    if (sliderRef) {
-      setSliderRect(sliderRef.getBoundingClientRect())
-    }
-  }
+  const handleMove = (clientX: number) => {
+    if (!isDragging() || !sliderRef) return
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging() || !sliderRect()) return
-
-    const rect = sliderRect()!
-    const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+    const rect = sliderRef.getBoundingClientRect()
+    const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))
     const value = getValueFromPercentage(percentage)
 
     if (isDragging() === 'start') {
@@ -54,26 +45,58 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
     }
   }
 
-  const handleMouseUp = () => {
+  const handleEnd = () => {
     setIsDragging(null)
-    setSliderRect(null)
   }
 
-  onMount(() => {
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  })
+  // Mouse event handlers
+  const handleMouseDown = (e: MouseEvent, handle: 'start' | 'end') => {
+    e.preventDefault()
+    setIsDragging(handle)
+  }
 
-  onCleanup(() => {
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
-  })
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging()) return
+    e.preventDefault()
+    handleMove(e.clientX)
+  }
+
+  const handleMouseUp = () => {
+    handleEnd()
+  }
+
+  // Touch event handlers
+  const handleTouchStart = (e: TouchEvent, handle: 'start' | 'end') => {
+    e.preventDefault()
+    if (e.touches.length > 0) {
+      setIsDragging(handle)
+    }
+  }
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!isDragging() || e.touches.length === 0) return
+    e.preventDefault()
+    handleMove(e.touches[0].clientX)
+  }
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    e.preventDefault()
+    handleEnd()
+  }
 
   const startPercentage = () => getPercentage(props.start)
   const endPercentage = () => getPercentage(props.end)
 
   return (
-    <div class="dual-range-slider" ref={sliderRef}>
+    <div 
+      class="dual-range-slider" 
+      ref={sliderRef}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <div class="slider-track">
         <div 
           class="slider-fill" 
@@ -88,6 +111,7 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
         class="slider-handle start-handle"
         style={{ left: `${startPercentage()}%` }}
         onMouseDown={(e) => handleMouseDown(e, 'start')}
+        onTouchStart={(e) => handleTouchStart(e, 'start')}
       >
         <div class="handle-value">{props.start}</div>
       </div>
@@ -96,6 +120,7 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
         class="slider-handle end-handle"
         style={{ left: `${endPercentage()}%` }}
         onMouseDown={(e) => handleMouseDown(e, 'end')}
+        onTouchStart={(e) => handleTouchStart(e, 'end')}
       >
         <div class="handle-value">{props.end}</div>
       </div>

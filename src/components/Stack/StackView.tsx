@@ -1,12 +1,14 @@
-import { type Component } from 'solid-js'
+import { type Component, Index } from 'solid-js'
+import { useAppSettings } from '../../contexts/AppSettingsContext'
+import { getStack, getStackTitle } from '../../constants/stacks'
 import './StackView.css'
 
-interface StackViewProps {
-  stack: string[]
-  title: string
-}
+const StackView: Component = () => {
+  const { stackType, cardInterval } = useAppSettings()
+  const stack = () => getStack(stackType())
+  const stackTitle = () => getStackTitle(stackType())
+  const displayStack = () => stack().slice(cardInterval().start - 1, cardInterval().end)
 
-const StackView: Component<StackViewProps> = (props) => {
   function getCardColorClass(card: string): string {
     if (card.includes('♥') || card.includes('♦')) {
       return 'card-red'
@@ -17,15 +19,17 @@ const StackView: Component<StackViewProps> = (props) => {
   return (
     <div class="stack-view">
       <div class="stack-header">
-        <h2 class="stack-title">{props.title}</h2>
+        <h2 class="stack-title">{stackTitle()}</h2>
       </div>
       <ul class="stack-list">
-        {props.stack.map((card, i) => (
-          <li class="stack-item">
-            <span class="stack-pos">{i + 1}</span>
-            <span class={`stack-card ${getCardColorClass(card)}`}>{card}</span>
-          </li>
-        ))}
+        <Index each={displayStack()}>
+          {(card, i) => (
+            <li class="stack-item">
+              <span class="stack-pos">{cardInterval().start + i}</span>
+              <span class={`stack-card ${getCardColorClass(card())}`}>{card()}</span>
+            </li>
+          )}
+        </Index>
       </ul>
     </div>
   )
