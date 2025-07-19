@@ -23,13 +23,13 @@ A modern, professional web application for practicing and mastering the Tamariz,
 - **Failure Analysis**: Most missed cards and positions
 - **Performance Trends**: Recent attempt visualization
 - **Session Statistics**: Comprehensive progress tracking
+- **Achievement System**: Badges and progress tracking (can be disabled)
 
 ### ⚙️ **Comprehensive Settings**
 - **Stack Selection**: Switch between Tamariz, Aronson & 5th Faro stacks
-- **Practice Configuration**: Set number of cards to practice
-- **Appearance**: Dark mode support with system integration
-- **Audio Controls**: Enable/disable sound effects
-- **Data Management**: Reset statistics and progress
+- **Feature Flags**: Control app features via URL parameters
+  - `?enableBadges=true` - Enable the badges/achievement system (disabled by default)
+  - `?enablePWA=true` - Enable PWA installation functionality (disabled by default)
 
 ## 🏗️ Project Structure
 

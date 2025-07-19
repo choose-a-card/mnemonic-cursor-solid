@@ -1,6 +1,7 @@
 import { createMemo, type Component } from 'solid-js'
 import type { Badge } from '../../types'
 import { getCategoryInfo } from '../../utils/badges'
+import { isFeatureEnabled } from '../../utils/featureFlags'
 import './BadgeDisplay.css'
 
 interface BadgeDisplayProps {
@@ -9,6 +10,11 @@ interface BadgeDisplayProps {
 }
 
 const BadgeDisplay: Component<BadgeDisplayProps> = (props) => {
+  // Early return if badges are disabled
+  if (!isFeatureEnabled('badgesEnabled')) {
+    return null
+  }
+
   // Group badges by category
   const badgesByCategory = createMemo(() => {
     const grouped = props.badges.reduce((acc, badge) => {

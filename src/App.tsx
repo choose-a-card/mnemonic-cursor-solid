@@ -1,4 +1,4 @@
-import { createSignal, type Component, onMount } from 'solid-js'
+import { createSignal, type Component, onMount, createEffect } from 'solid-js'
 import StackView from './components/Stack/StackView'
 import PracticeView from './components/Practice/PracticeView'
 import StatsView from './components/Stats/StatsView'
@@ -6,6 +6,7 @@ import SettingsView from './components/Settings/SettingsView'
 import { getStack, getStackTitle, type StackType } from './constants/stacks'
 import type { TabInfo, CardInterval } from './types'
 import { StatsProvider, useStats } from './contexts/StatsContext'
+import { saveToLocalStorage, loadFromLocalStorage } from './utils/pwa'
 import './App.css'
 
 const TABS: TabInfo[] = [
@@ -26,7 +27,37 @@ const AppContent: Component<AppContentProps> = (props) => {
   const [darkMode, setDarkMode] = createSignal<boolean>(false)
   const [soundEnabled, setSoundEnabled] = createSignal<boolean>(true)
 
+  // Load settings from localStorage on mount
+  onMount(() => {
+    const savedStackType = loadFromLocalStorage<StackType>('mnemonic-stack-type', 'tamariz')
+    const savedCardInterval = loadFromLocalStorage<CardInterval>('mnemonic-card-interval', { start: 1, end: 52 })
+    const savedDarkMode = loadFromLocalStorage<boolean>('mnemonic-dark-mode', false)
+    const savedSoundEnabled = loadFromLocalStorage<boolean>('mnemonic-sound-enabled', true)
+    
+    setStackType(savedStackType)
+    setCardInterval(savedCardInterval)
+    setDarkMode(savedDarkMode)
+    setSoundEnabled(savedSoundEnabled)
+  })
+
   const { addResult, resetStats, generateDebugStats } = useStats()
+
+  // Save settings to localStorage whenever they change
+  createEffect(() => {
+    saveToLocalStorage('mnemonic-stack-type', stackType())
+  })
+
+  createEffect(() => {
+    saveToLocalStorage('mnemonic-card-interval', cardInterval())
+  })
+
+  createEffect(() => {
+    saveToLocalStorage('mnemonic-dark-mode', darkMode())
+  })
+
+  createEffect(() => {
+    saveToLocalStorage('mnemonic-sound-enabled', soundEnabled())
+  })
 
   const stack = (): string[] => getStack(stackType())
   const stackTitle = (): string => getStackTitle(stackType())

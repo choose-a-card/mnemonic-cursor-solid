@@ -1,5 +1,8 @@
 import './SettingsView.css'
 import type { CardInterval } from '../../types'
+import { createSignal, onMount, Show, createEffect } from 'solid-js'
+import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallPrompt, getPWAInstallPrompt, checkServiceWorkerStatus, forceServiceWorkerRegistration } from '../../utils/pwa'
+import { isFeatureEnabled } from '../../utils/featureFlags'
 
 interface SettingsViewProps {
   stackType: string;
@@ -14,8 +17,222 @@ interface SettingsViewProps {
 }
 
 export default function SettingsView(props: SettingsViewProps) {
+  const [canInstall, setCanInstall] = createSignal(false)
+  const [isInstalled, setIsInstalled] = createSignal(false)
+  const [onlineStatus, setOnlineStatus] = createSignal(true)
+  const [installing, setInstalling] = createSignal(false)
+  const [debugInfo, setDebugInfo] = createSignal<any>({})
+
+  onMount(() => {
+    // Only run PWA logic if the feature is enabled
+    if (isFeatureEnabled('pwaEnabled')) {
+      // Initial checks
+      const checkPWAStatus = async () => {
+        const installed = isPWAInstalled()
+        const installable = isPWAInstallable()
+        const hasPrompt = !!getPWAInstallPrompt()
+        const canShow = canShowInstallPrompt()
+        const swStatus = await checkServiceWorkerStatus()
+        
+        setIsInstalled(installed)
+        setCanInstall(canShow)
+        
+        setDebugInfo({
+          installed,
+          installable,
+          hasPrompt,
+          canShow,
+          userAgent: navigator.userAgent,
+          isOnline: isOnline(),
+          serviceWorkerStatus: swStatus
+        })
+        
+        console.log('PWA Status Check:', {
+          installed,
+          installable,
+          hasPrompt,
+          canShow,
+          userAgent: navigator.userAgent,
+          serviceWorkerStatus: swStatus
+        })
+      }
+
+      // Initial check
+      checkPWAStatus()
+      setOnlineStatus(isOnline())
+
+      // Listen for online status changes
+      window.addEventListener('online', () => {
+        setOnlineStatus(true)
+        checkPWAStatus()
+      })
+      window.addEventListener('offline', () => {
+        setOnlineStatus(false)
+        checkPWAStatus()
+      })
+
+      // Listen for beforeinstallprompt event
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt event fired!')
+        checkPWAStatus()
+      })
+
+      // Listen for appinstalled event
+      window.addEventListener('appinstalled', () => {
+        console.log('appinstalled event fired!')
+        checkPWAStatus()
+      })
+
+      // Check again after a delay to catch any delayed events
+      setTimeout(checkPWAStatus, 2000)
+    }
+  })
+
+  const handleInstall = async () => {
+    if (!isFeatureEnabled('pwaEnabled')) return
+    
+    setInstalling(true)
+    try {
+      const success = await installPWA()
+      if (success) {
+        setIsInstalled(true)
+        setCanInstall(false)
+      }
+    } catch (error) {
+      console.error('Installation failed:', error)
+    } finally {
+      setInstalling(false)
+    }
+  }
+
+  const handleManualInstall = () => {
+    if (!isFeatureEnabled('pwaEnabled')) return
+    
+    // For mobile Chrome, try to trigger the install banner
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
+        console.log('Service Worker ready, trying to trigger install banner')
+        // This might trigger the install banner on mobile Chrome
+        window.dispatchEvent(new Event('beforeinstallprompt'))
+      })
+    }
+  }
+
+  const handleForceSWRegistration = async () => {
+    if (!isFeatureEnabled('pwaEnabled')) return
+    
+    console.log('Forcing service worker registration...')
+    const success = await forceServiceWorkerRegistration()
+    if (success) {
+      // Recheck PWA status after registration
+      setTimeout(async () => {
+        const checkPWAStatus = async () => {
+          const installed = isPWAInstalled()
+          const installable = isPWAInstallable()
+          const hasPrompt = !!getPWAInstallPrompt()
+          const canShow = canShowInstallPrompt()
+          const swStatus = await checkServiceWorkerStatus()
+          
+          setIsInstalled(installed)
+          setCanInstall(canShow)
+          
+          setDebugInfo({
+            installed,
+            installable,
+            hasPrompt,
+            canShow,
+            userAgent: navigator.userAgent,
+            isOnline: isOnline(),
+            serviceWorkerStatus: swStatus
+          })
+        }
+        await checkPWAStatus()
+      }, 1000)
+    }
+  }
+
+  const isMobileChrome = () => {
+    const userAgent = navigator.userAgent
+    return /Android/.test(userAgent) && /Chrome/.test(userAgent) && !/Edge/.test(userAgent)
+  }
+
   return (
     <div class="settings-view">
+      <Show when={isFeatureEnabled('pwaEnabled')}>
+        <div class="settings-section">
+          <h3 class="section-title">📱 App Installation</h3>
+        
+        <div class="settings-block">
+          <div class="settings-row">
+            <div class="settings-label">Install App</div>
+            <div class="status-indicator">
+              <span class={`status-dot ${onlineStatus() ? 'online' : 'offline'}`}></span>
+              <span class="status-text">{onlineStatus() ? 'Online' : 'Offline'}</span>
+            </div>
+          </div>
+          
+          <Show when={isInstalled()}>
+            <div class="pwa-status installed">
+              ✅ App is installed and can work offline
+            </div>
+          </Show>
+          
+          <Show when={canInstall() && !isInstalled()}>
+            <button 
+              class="install-button" 
+              onClick={handleInstall}
+              disabled={installing()}
+            >
+              {installing() ? 'Installing...' : '📱 Install App'}
+            </button>
+            <div class="settings-hint">
+              Install this app on your device to use it offline and access it like a native app.
+            </div>
+          </Show>
+          
+          <Show when={!canInstall() && !isInstalled()}>
+            <div class="pwa-status not-supported">
+              ℹ️ App installation not available
+            </div>
+            
+            <Show when={isMobileChrome()}>
+              <div class="mobile-install-options">
+                <h4>📱 Mobile Chrome Installation Options:</h4>
+                <ol>
+                  <li>Look for the install banner at the bottom of the screen</li>
+                  <li>Tap the menu (⋮) → "Install app"</li>
+                  <li>Try refreshing the page and wait 30+ seconds</li>
+                  <li>Navigate between different tabs in the app</li>
+                </ol>
+                <button 
+                  class="secondary-button" 
+                  onClick={handleManualInstall}
+                >
+                  🔄 Try Manual Trigger
+                </button>
+                <button 
+                  class="secondary-button" 
+                  onClick={handleForceSWRegistration}
+                >
+                  🔧 Force Service Worker Registration
+                </button>
+              </div>
+            </Show>
+            
+            <div class="debug-info">
+              <details>
+                <summary>Debug Info</summary>
+                <pre>{JSON.stringify(debugInfo(), null, 2)}</pre>
+              </details>
+            </div>
+            <div class="settings-hint">
+              Try refreshing the page or check if you're using a supported browser (Chrome, Edge, Safari).
+            </div>
+          </Show>
+        </div>
+      </div>
+      </Show>
+
       <div class="settings-section">
         <h3 class="section-title">🎴 Stack Configuration</h3>
         

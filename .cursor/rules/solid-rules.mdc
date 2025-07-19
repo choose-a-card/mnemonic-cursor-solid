@@ -38,3 +38,4 @@ Follow these rules when you write code:
 - Use consts instead of functions, for example, “const toggle = () =>”. Also, define a type if possible.
 - Never destructure the props of a component, that breaks reactivity.
 - Always use descriptive variable names, avoid using one letter variables.
+- Use SolidJS <Show> for conditional rendering, use primitives.

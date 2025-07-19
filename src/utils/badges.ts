@@ -1,4 +1,5 @@
 import type { Badge, Stats } from '../types'
+import { isFeatureEnabled } from './featureFlags'
 
 // Badge definitions
 export const BADGE_DEFINITIONS: Omit<Badge, 'unlocked' | 'unlockedAt' | 'progress' | 'maxProgress'>[] = [
@@ -288,6 +289,11 @@ const checkAllModesAccuracy = (modeStats: Record<string, any>, minAccuracy: numb
 
 // Calculate badge progress and unlock status
 export const calculateBadgeProgress = (stats: Stats): Badge[] => {
+  // Early return if badges are disabled
+  if (!isFeatureEnabled('badgesEnabled')) {
+    return []
+  }
+
   const { total, correct, history, modeStats } = stats
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0
   const uniqueModes = new Set(history.map(h => h.mode)).size

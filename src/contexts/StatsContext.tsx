@@ -1,6 +1,8 @@
-import { createContext, useContext, createSignal, createMemo, createEffect, type Component, type JSX } from 'solid-js'
+import { createContext, useContext, createSignal, createMemo, createEffect, onMount, type Component, type JSX } from 'solid-js'
 import type { Stats, Badge } from '../types'
 import { calculateBadgeProgress } from '../utils/badges'
+import { initializePWA, saveToLocalStorage, loadFromLocalStorage, isOnline, onOnlineStatusChange } from '../utils/pwa'
+import { isFeatureEnabled } from '../utils/featureFlags'
 
 interface StatsContextValue {
   stats: () => Stats
@@ -9,6 +11,7 @@ interface StatsContextValue {
   generateDebugStats: () => void
   badges: () => Badge[]
   lastUnlockedBadge: () => Badge | null
+  isOnline: () => boolean
 }
 
 const StatsContext = createContext<StatsContextValue>()
@@ -31,15 +34,45 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
 
   const [lastUnlockedBadge, setLastUnlockedBadge] = createSignal<Badge | null>(null)
   const [previousBadges, setPreviousBadges] = createSignal<Badge[]>([])
+  const [onlineStatus, setOnlineStatus] = createSignal<boolean>(true)
 
-  // Calculate badges from current stats
+  // Initialize PWA features (only if enabled)
+  onMount(() => {
+    if (isFeatureEnabled('pwaEnabled')) {
+      initializePWA()
+    }
+    setOnlineStatus(isOnline())
+    onOnlineStatusChange(setOnlineStatus)
+    
+    // Load stats from localStorage
+    const savedStats = loadFromLocalStorage<Stats>('mnemonic-stats', {
+      cardFails: {},
+      posFails: {},
+      total: 0,
+      correct: 0,
+      history: [],
+      modeStats: {}
+    })
+    setStats(savedStats)
+  })
+
+  // Calculate badges from current stats (only if badges are enabled)
   const badges = createMemo(() => {
+    if (!isFeatureEnabled('badgesEnabled')) {
+      return []
+    }
     const currentStats = stats()
     return calculateBadgeProgress(currentStats)
   })
 
-  // Track badge unlocks using an effect
+  // Track badge unlocks using an effect (only if badges are enabled)
   createEffect(() => {
+    if (!isFeatureEnabled('badgesEnabled')) {
+      setLastUnlockedBadge(null)
+      setPreviousBadges([])
+      return
+    }
+    
     const currentBadges = badges()
     const prevBadges = previousBadges()
     
@@ -56,6 +89,12 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     
     // Update previous badges for next comparison
     setPreviousBadges(currentBadges)
+  })
+
+  // Persist stats to localStorage whenever they change
+  createEffect(() => {
+    const currentStats = stats()
+    saveToLocalStorage('mnemonic-stats', currentStats)
   })
 
   const addResult = (result: any) => {
@@ -106,15 +145,17 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
   }
 
   const resetStats = () => {
-    setStats({
+    const emptyStats = {
       cardFails: {},
       posFails: {},
       total: 0,
       correct: 0,
       history: [],
       modeStats: {}
-    })
+    }
+    setStats(emptyStats)
     setLastUnlockedBadge(null)
+    saveToLocalStorage('mnemonic-stats', emptyStats)
   }
 
   const generateDebugStats = (): void => {
@@ -170,7 +211,8 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     resetStats,
     generateDebugStats,
     badges,
-    lastUnlockedBadge
+    lastUnlockedBadge,
+    isOnline: onlineStatus
   }
 
   return (

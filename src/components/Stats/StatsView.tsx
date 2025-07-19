@@ -3,6 +3,7 @@ import './StatsView.css'
 import { useStats } from '../../contexts/StatsContext'
 import type { Stats } from '../../types'
 import BadgeDisplay from './BadgeDisplay'
+import { isFeatureEnabled } from '../../utils/featureFlags'
 
 const topN = (obj: Record<string, number>, n: number, labeler: (key: string) => string) => {
   return Object.entries(obj)
@@ -186,12 +187,7 @@ export default function StatsView(props: StatsViewProps) {
   const suggestions = createMemo(() => getAISuggestions(stats(), props.stack))
   const chartData = createMemo(() => createAccuracyChart(stats().history))
 
-  // Get sorted mode stats
-  const modeStats = createMemo(() => {
-    return Object.entries(stats().modeStats)
-      .sort((a, b) => b[1].total - a[1].total) // Sort by total attempts
-      .map(([mode, stats]) => ({ mode, ...stats }))
-  })
+
 
   const handleDebugClick = () => {
     console.log('Debug button clicked, onGenerateDebugStats:', props.onGenerateDebugStats)
@@ -245,26 +241,7 @@ export default function StatsView(props: StatsViewProps) {
         </div>
       )}
 
-      {/* Mode-specific stats */}
-      {modeStats().length > 0 && (
-        <div class="stats-block">
-          <div class="stats-title">🎮 Practice Mode Performance</div>
-          <div class="mode-stats-list" role="list" aria-label="Practice mode performance statistics">
-            {modeStats().map((modeStat, i) => (
-              <div class="mode-stat-item" role="listitem">
-                <div class="mode-stat-header">
-                  <span class="mode-stat-name">{modeStat.mode}</span>
-                  <span class="mode-stat-accuracy">{modeStat.accuracy}%</span>
-                </div>
-                <div class="mode-stat-details">
-                  <span class="mode-stat-attempts">{modeStat.total} attempts</span>
-                  <span class="mode-stat-correct">{modeStat.correct} correct</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
 
       {chartData() && chartData()!.length > 1 && (
         <div class="stats-block">
@@ -312,14 +289,16 @@ export default function StatsView(props: StatsViewProps) {
         </ul>
       </div>
 
-      {/* Badges Section */}
-      <div class="stats-block">
-        <div class="stats-title">🏆 Achievements</div>
-        <BadgeDisplay 
-          badges={badges()} 
-          lastUnlockedBadge={lastUnlockedBadge()} 
-        />
-      </div>
+      {/* Badges Section - only show if badges are enabled */}
+      {isFeatureEnabled('badgesEnabled') && (
+        <div class="stats-block">
+          <div class="stats-title">🏆 Achievements</div>
+          <BadgeDisplay 
+            badges={badges()} 
+            lastUnlockedBadge={lastUnlockedBadge()} 
+          />
+        </div>
+      )}
 
       <div class="stats-block">
         <div class="stats-title">🎯 Most Missed Cards</div>

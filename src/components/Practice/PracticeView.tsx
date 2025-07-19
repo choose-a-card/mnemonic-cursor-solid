@@ -10,6 +10,7 @@ import FirstOrSecondHalf from './FirstOrSecondHalf'
 import QuartetPosition from './QuartetPosition'
 import CutToPosition from './CutToPosition'
 import { useStats } from '../../contexts/StatsContext'
+import { isFeatureEnabled } from '../../utils/featureFlags'
 
 interface PracticeViewProps {
   stack: string[];
@@ -144,21 +145,23 @@ export default function PracticeView(props: PracticeViewProps) {
           <h2 class="selection-title">Choose Practice Mode</h2>
           <p class="selection-subtitle">Select the type of practice you want to focus on</p>
           
-          {/* Badge Progress Indicator */}
-          <div class="badge-progress-indicator">
-            <div class="badge-progress-info">
-              <span class="badge-progress-icon">🏆</span>
-              <span class="badge-progress-text">
-                {badgeProgress().unlockedCount} of {badgeProgress().totalCount} badges unlocked
-              </span>
+          {/* Badge Progress Indicator - only show if badges are enabled */}
+          <Show when={isFeatureEnabled('badgesEnabled')}>
+            <div class="badge-progress-indicator">
+              <div class="badge-progress-info">
+                <span class="badge-progress-icon">🏆</span>
+                <span class="badge-progress-text">
+                  {badgeProgress().unlockedCount} of {badgeProgress().totalCount} badges unlocked
+                </span>
+              </div>
+              <div class="badge-progress-bar-mini">
+                <div 
+                  class="badge-progress-fill-mini" 
+                  style={{ width: `${badgeProgress().percentage}%` }}
+                ></div>
+              </div>
             </div>
-            <div class="badge-progress-bar-mini">
-              <div 
-                class="badge-progress-fill-mini" 
-                style={{ width: `${badgeProgress().percentage}%` }}
-              ></div>
-            </div>
-          </div>
+          </Show>
         </div>
         
         <div class="mode-list" role="listbox" aria-label="Practice modes">
