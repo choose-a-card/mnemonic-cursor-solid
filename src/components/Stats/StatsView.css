@@ -154,13 +154,39 @@
 }
 
 .suggestion-item {
-  padding: 0.75rem 1rem;
   background: var(--accent-light, #e3f2fd);
-  border-radius: 8px;
   color: var(--text, #222);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--accent, #007aff);
   font-size: 0.95rem;
-  line-height: 1.4;
-  border-left: 3px solid var(--accent, #007aff);
+  line-height: 1.5;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.suggestion-item:hover {
+  background: var(--accent-light, #d1e7ff);
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+}
+
+.suggestion-item:last-child {
+  margin-bottom: 0;
+}
+
+.suggestion-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent, #007aff), var(--accent-hover, #0056cc));
+  opacity: 0.7;
 }
 
 .stats-list {
@@ -208,6 +234,66 @@
   font-style: italic;
   padding: 1rem 0;
   text-align: center;
+}
+
+.mode-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mode-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--background, #fff);
+  border: 1px solid var(--border, #e5e5e7);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.mode-stat-item:hover {
+  border-color: var(--accent, #007aff);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.1);
+}
+
+.mode-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mode-stat-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text, #222);
+}
+
+.mode-stat-accuracy {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent, #007aff);
+  background: var(--accent-light, #e3f2fd);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.mode-stat-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+}
+
+.mode-stat-attempts {
+  font-weight: 500;
+}
+
+.mode-stat-correct {
+  font-weight: 500;
+  color: var(--success, #28a745);
 }
 
 .recent-attempts {

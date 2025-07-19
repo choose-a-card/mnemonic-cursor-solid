@@ -24,12 +24,19 @@ export interface AttemptHistory {
   input: string;
 }
 
+export interface ModeStats {
+  total: number;
+  correct: number;
+  accuracy: number;
+}
+
 export interface Stats {
   cardFails: Record<string, number>;
   posFails: Record<string, number>;
   total: number;
   correct: number;
   history: AttemptHistory[];
+  modeStats: Record<string, ModeStats>;
 }
 
 export interface TabInfo {

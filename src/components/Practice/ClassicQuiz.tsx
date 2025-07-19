@@ -20,14 +20,14 @@ export default function ClassicQuiz(props: ClassicQuizProps) {
   function nextQuestion(): void {
     setFeedback('')
     setInput('')
-    
+
     // Pick a random card from the practice stack
     const practiceIdx = getRandomInt(props.practiceStack.length)
     const card = props.practiceStack[practiceIdx]
-    
+
     // Calculate the actual position in the full stack
     const actualPos = props.cardInterval.start + practiceIdx
-    
+
     setQuestion({ card, answer: actualPos, type: 'card-to-pos' })
   }
 
@@ -35,23 +35,23 @@ export default function ClassicQuiz(props: ClassicQuizProps) {
     e.preventDefault()
     const q = question()
     const correct = Number(input()) === q.answer
-    
+
     playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
-    
+
     if (correct) {
       setFeedback('Correct! ✅')
     } else {
       setFeedback(`Wrong. Answer: ${q.answer}`)
     }
-    
-    props.onResult({ 
-      correct, 
-      question: q, 
-      input: input(), 
-      mode: 'Card → Position' 
+
+    props.onResult({
+      correct,
+      question: q,
+      input: input(),
+      mode: 'Card → Position'
     })
-    
-            setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
+
+    setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
   }
 
   onMount(() => {
@@ -64,7 +64,7 @@ export default function ClassicQuiz(props: ClassicQuizProps) {
       <div class="question-card">
         <div class="question-text">What position is {question().card}?</div>
       </div>
-      
+
       {/* Answer Form */}
       <form class="answer-form" onSubmit={handleSubmit}>
         <div class="input-container">

@@ -18,13 +18,11 @@ export default function OneAhead(props: OneAheadProps) {
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string>('')
   const [showKeyboard, setShowKeyboard] = createSignal<boolean>(false)
-  createEffect(() => {
-    console.log('OneAhead: showKeyboard changed to:', showKeyboard())
-  })
+  
   function nextQuestion(): void {
     setFeedback('')
     setInput('')
-    setShowKeyboard(false)
+    setShowKeyboard(true) // Keep keyboard open for next question
     
     // Pick a random card from the practice stack
     const practiceIdx = getRandomInt(props.practiceStack.length)
@@ -37,11 +35,11 @@ export default function OneAhead(props: OneAheadProps) {
     setQuestion({ card, answer: nextCard, type: 'one-ahead' })
   }
 
-  function handleSubmit(e: Event): void {
-    e.preventDefault()
+  function handleCardSelect(card: string): void {
+    setInput(card)
     const q = question()
     
-    const correct = input().toUpperCase().replace(/\s+/g,'') === String(q.answer).replace(/\s+/g,'').toUpperCase()
+    const correct = card.toUpperCase().replace(/\s+/g,'') === String(q.answer).replace(/\s+/g,'').toUpperCase()
     
     playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
     
@@ -54,28 +52,19 @@ export default function OneAhead(props: OneAheadProps) {
     props.onResult({ 
       correct, 
       question: q, 
-      input: input(), 
+      input: card, 
       mode: 'One Ahead' 
     })
     
-            setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
+    setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
   }
 
-  function handleCardSelect(card: string): void {
-    setInput(card)
-    setShowKeyboard(false)
-    setTimeout(() => {
-      const event = new Event('submit')
-      handleSubmit(event)
-    }, 100)
+  function handlePartialSelect(partial: string): void {
+    setInput(partial)
   }
 
   onMount(() => {
     nextQuestion()
-  })
-
-  createEffect(() => {
-    console.log('OneAhead: showKeyboard changed to:', showKeyboard())
   })
 
   return (
@@ -86,7 +75,7 @@ export default function OneAhead(props: OneAheadProps) {
       </div>
       
       {/* Answer Form */}
-      <form class="answer-form" onSubmit={handleSubmit}>
+      <div class="answer-form">
         <div class="input-container">
           <input
             class="answer-input"
@@ -104,6 +93,7 @@ export default function OneAhead(props: OneAheadProps) {
             isVisible={showKeyboard()}
             onClose={() => setShowKeyboard(false)}
             onCardSelect={handleCardSelect}
+            onPartialSelect={handlePartialSelect}
           />
         </div>
 
@@ -112,7 +102,7 @@ export default function OneAhead(props: OneAheadProps) {
             <div class="feedback-message">{feedback()}</div>
           )}
         </div>
-      </form>
+      </div>
     </div>
   )
 } 

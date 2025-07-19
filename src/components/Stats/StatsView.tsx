@@ -1,54 +1,94 @@
 import { createMemo } from 'solid-js'
 import './StatsView.css'
+import { useStats } from '../../contexts/StatsContext'
 import type { Stats } from '../../types'
 
-function topN(obj: Record<string, number>, n: number, labeler: (key: string) => string) {
+const topN = (obj: Record<string, number>, n: number, labeler: (key: string) => string) => {
   return Object.entries(obj)
     .sort((a, b) => b[1] - a[1])
     .slice(0, n)
     .map(([k, v]) => ({ label: labeler(k), count: v }))
 }
 
-function getAISuggestions(stats: Stats, stack: string[]) {
+const getAISuggestions = (stats: Stats, stack: string[]) => {
   const suggestions = []
-  const { history, cardFails, posFails, total, correct } = stats
+  const { history, cardFails, posFails, total, correct, modeStats } = stats
   
   if (total === 0) return ['Start practicing to get personalized suggestions!']
   
   const accuracy = (correct / total) * 100
   
-  // Overall accuracy suggestions with more specific guidance
+  // Overall accuracy suggestions
   if (accuracy < 40) {
-    suggestions.push('Focus on memorizing the first 10 cards thoroughly. Start with Card → Position mode.')
+    suggestions.push('🎯 **Beginner Focus**: Start with Card → Position mode for positions 1-10. Build a solid foundation before advancing.')
   } else if (accuracy < 60) {
-    suggestions.push('You\'re building a foundation! Practice positions 1-20 in smaller chunks of 5 cards.')
+    suggestions.push('📈 **Building Momentum**: Practice positions 1-20 in smaller chunks. Try Position → Card mode to strengthen recall.')
   } else if (accuracy < 75) {
-    suggestions.push('Good progress! Try One Ahead mode to strengthen your card-to-card connections.')
+    suggestions.push('🚀 **Good Progress**: Challenge yourself with One Ahead mode. Your foundation is solid - time to build connections.')
   } else if (accuracy < 85) {
-    suggestions.push('Excellent! Focus on your most missed cards. Try Stack Context mode for advanced practice.')
+    suggestions.push('⭐ **Advanced Level**: Focus on your weakest areas. Try Stack Context mode to test your comprehensive knowledge.')
   } else if (accuracy < 95) {
-    suggestions.push('Outstanding accuracy! Challenge yourself with Cutting Estimation to test your stack knowledge.')
+    suggestions.push('🏆 **Expert Level**: Challenge yourself with Cutting Estimation and Quartet Position modes. You\'re mastering the stack!')
   } else {
-    suggestions.push('Master level! Try practicing with the full 52-card stack or switch to a different stack.')
+    suggestions.push('👑 **Master Level**: Consider switching to a different stack or practicing with the full 52-card range. You\'ve mastered this one!')
   }
   
-  // Position-based suggestions with specific ranges
+  // Mode-specific analysis and recommendations
+  const modeEntries = Object.entries(modeStats)
+  if (modeEntries.length > 0) {
+    // Find the mode with lowest accuracy
+    const worstMode = modeEntries.reduce((a, b) => a[1].accuracy < b[1].accuracy ? a : b)
+    const bestMode = modeEntries.reduce((a, b) => a[1].accuracy > b[1].accuracy ? a : b)
+    
+    // Suggest improvements for worst performing mode
+    if (worstMode[1].total >= 5) { // Only suggest if they've tried it enough
+      const mode = worstMode[0]
+      const modeAccuracy = worstMode[1].accuracy
+      
+      if (mode === 'Card → Position' && modeAccuracy < 70) {
+        suggestions.push(`🎴 **Card → Position** (${modeAccuracy}%): Focus on memorizing card names first. Practice with positions 1-10 repeatedly.`)
+      } else if (mode === 'Position → Card' && modeAccuracy < 70) {
+        suggestions.push(`📍 **Position → Card** (${modeAccuracy}%): Visualize the stack layout. Practice with familiar positions first.`)
+      } else if (mode === 'One Ahead' && modeAccuracy < 60) {
+        suggestions.push(`⏭️ **One Ahead** (${modeAccuracy}%): This is advanced! Master Card → Position first, then practice with small ranges.`)
+      } else if (mode === 'Stack Context' && modeAccuracy < 65) {
+        suggestions.push(`🔗 **Stack Context** (${modeAccuracy}%): Build card-to-card connections. Practice adjacent cards together.`)
+      } else if (mode === 'Cutting Estimation' && modeAccuracy < 50) {
+        suggestions.push(`✂️ **Cutting Estimation** (${modeAccuracy}%): This tests deep knowledge. Focus on mastering basic modes first.`)
+      } else if (mode === 'First or Second Half' && modeAccuracy < 70) {
+        suggestions.push(`📊 **First or Second Half** (${modeAccuracy}%): Practice dividing the stack mentally. Focus on positions 1-26 vs 27-52.`)
+      } else if (mode === 'Quartet Position' && modeAccuracy < 60) {
+        suggestions.push(`🎭 **Quartet Position** (${modeAccuracy}%): Advanced mode! Master individual positions before grouping.`)
+      } else if (mode === 'Cut to Position' && modeAccuracy < 55) {
+        suggestions.push(`🎯 **Cut to Position** (${modeAccuracy}%): Most advanced mode! Requires complete stack mastery. Practice basics first.`)
+      }
+    }
+    
+    // Celebrate best performing mode
+    if (bestMode[1].accuracy >= 85 && bestMode[1].total >= 10) {
+      suggestions.push(`🌟 **Strengths**: You excel at ${bestMode[0]} (${bestMode[1].accuracy}%). Use this confidence to tackle harder modes!`)
+    }
+  }
+  
+  // Position-based suggestions
   const positionFailures = Object.entries(posFails)
   if (positionFailures.length > 0) {
     const highestFailPos = positionFailures.reduce((a, b) => a[1] > b[1] ? a : b)
     const pos = Number(highestFailPos[0])
     const failCount = highestFailPos[1]
     
-    if (pos <= 10) {
-      suggestions.push(`Focus on positions 1-10 (${failCount} failures). These are your foundation cards.`)
-    } else if (pos <= 20) {
-      suggestions.push(`Practice positions 11-20 more (${failCount} failures). Build your middle section.`)
-    } else if (pos <= 30) {
-      suggestions.push(`Strengthen positions 21-30 (${failCount} failures). This section needs attention.`)
-    } else if (pos <= 40) {
-      suggestions.push(`Work on positions 31-40 (${failCount} failures). The upper section is challenging.`)
-    } else {
-      suggestions.push(`Focus on the final positions 41-52 (${failCount} failures). End-game cards need practice.`)
+    if (failCount >= 3) {
+      if (pos <= 10) {
+        suggestions.push(`🔢 **Foundation Issue**: Position ${pos} (${failCount} failures) - Critical for all modes. Practice this position daily.`)
+      } else if (pos <= 20) {
+        suggestions.push(`📚 **Core Section**: Position ${pos} (${failCount} failures) - Essential for most tricks. Focus on this range.`)
+      } else if (pos <= 30) {
+        suggestions.push(`🎪 **Middle Section**: Position ${pos} (${failCount} failures) - Important for advanced moves. Practice with context.`)
+      } else if (pos <= 40) {
+        suggestions.push(`🎯 **Upper Section**: Position ${pos} (${failCount} failures) - Less common but valuable. Review occasionally.`)
+      } else {
+        suggestions.push(`🏁 **End Section**: Position ${pos} (${failCount} failures) - Rare but impressive. Practice when confident.`)
+      }
     }
   }
   
@@ -60,51 +100,59 @@ function getAISuggestions(stats: Stats, stack: string[]) {
     const failCount = topFailedCard[1]
     
     if (failCount >= 3) {
-      suggestions.push(`Card ${card} is your biggest challenge (${failCount} failures). Practice it specifically.`)
+      suggestions.push(`🃏 **Problem Card**: ${card} (${failCount} failures) - Create a memorable association for this card.`)
     }
   }
   
-  // Mode-specific suggestions based on history
-  const recentModes = history.slice(-20).map(h => h.mode)
-  const modeCounts = recentModes.reduce((acc, mode) => {
-    acc[mode] = (acc[mode] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-  
-  const mostUsedMode = Object.entries(modeCounts).reduce((a, b) => a[1] > b[1] ? a : b, ['', 0])
-  
-  if (mostUsedMode[1] > 10) {
-    const mode = mostUsedMode[0]
-    if (mode === 'Card → Position') {
-      suggestions.push('Try Position → Card mode to strengthen your position recall.')
-    } else if (mode === 'Position → Card') {
-      suggestions.push('Switch to Card → Position mode to improve your card recognition.')
-    } else if (mode === 'One Ahead') {
-      suggestions.push('Great! Try Stack Context mode to test your contextual memory.')
-    } else if (mode === 'Stack Context') {
-      suggestions.push('Excellent! Challenge yourself with Cutting Estimation mode.')
-    }
-  }
-  
-  // Practice frequency suggestions
+  // Practice frequency and consistency
   if (total < 20) {
-    suggestions.push('Practice more frequently! Aim for at least 50 attempts to see meaningful patterns.')
+    suggestions.push('⏰ **Practice More**: Aim for at least 50 attempts to see meaningful patterns. Daily practice builds consistency.')
   } else if (total < 100) {
-    suggestions.push('Good practice frequency! Try to practice daily for consistent improvement.')
+    suggestions.push('📅 **Good Frequency**: Try to practice daily for 10-15 minutes. Consistency beats intensity.')
+  } else if (total < 500) {
+    suggestions.push('💪 **Dedicated Practice**: Excellent commitment! Focus on quality over quantity now.')
   }
   
   // Recent performance trends
-  const recentAccuracy = history.slice(-10).filter(h => h.correct).length / Math.min(10, history.length) * 100
-  if (recentAccuracy > accuracy + 10) {
-    suggestions.push('You\'re improving! Your recent performance is better than your overall average.')
-  } else if (recentAccuracy < accuracy - 10) {
-    suggestions.push('Focus on consistency. Your recent performance has dipped slightly.')
+  const recentHistory = history.slice(-10)
+  if (recentHistory.length >= 5) {
+    const recentAccuracy = recentHistory.filter(h => h.correct).length / recentHistory.length * 100
+    const overallAccuracy = accuracy
+    
+    if (recentAccuracy > overallAccuracy + 15) {
+      suggestions.push('📈 **Improving Fast**: Your recent performance is significantly better! You\'re on the right track.')
+    } else if (recentAccuracy > overallAccuracy + 5) {
+      suggestions.push('👍 **Steady Progress**: Your recent performance shows improvement. Keep up the good work!')
+    } else if (recentAccuracy < overallAccuracy - 10) {
+      suggestions.push('⚠️ **Recent Dip**: Your recent performance has declined. Consider reviewing fundamentals or taking a short break.')
+    }
   }
   
-  return suggestions.slice(0, 3) // Limit to 3 suggestions
+  // Mode variety suggestions
+  const uniqueModes = new Set(history.map(h => h.mode)).size
+  if (uniqueModes < 3 && total > 50) {
+    suggestions.push('🔄 **Try New Modes**: You\'ve mostly practiced ${uniqueModes} mode(s). Variety builds comprehensive skills.')
+  } else if (uniqueModes >= 5) {
+    suggestions.push('🎯 **Well Rounded**: Great variety in practice modes! Focus on improving your weakest areas now.')
+  }
+  
+  // Specific mode recommendations based on current level
+  if (accuracy < 50) {
+    suggestions.push('🎯 **Recommended Next**: Start with Card → Position mode, positions 1-10 only. Master the basics first.')
+  } else if (accuracy < 70) {
+    suggestions.push('🎯 **Recommended Next**: Try Position → Card mode to strengthen your position recall skills.')
+  } else if (accuracy < 80) {
+    suggestions.push('🎯 **Recommended Next**: Challenge yourself with One Ahead mode to build card-to-card connections.')
+  } else if (accuracy < 90) {
+    suggestions.push('🎯 **Recommended Next**: Test your knowledge with Stack Context and Cutting Estimation modes.')
+  } else {
+    suggestions.push('🎯 **Recommended Next**: Master the advanced modes - Quartet Position and Cut to Position.')
+  }
+  
+  return suggestions.slice(0, 4) // Limit to 4 suggestions for better readability
 }
 
-function createAccuracyChart(history: any[]) {
+const createAccuracyChart = (history: any[]) => {
   if (history.length < 2) return null
   
   // Group by sessions (every 10 attempts)
@@ -120,21 +168,46 @@ function createAccuracyChart(history: any[]) {
 }
 
 interface StatsViewProps {
-  stats: Stats;
   stack: string[];
   onGenerateDebugStats?: (() => void) | undefined;
 }
 
 export default function StatsView(props: StatsViewProps) {
+  const { stats } = useStats()
   
-  console.log('StatsView rendered with stats:', props.stats)
+  console.log('StatsView rendered with stats:', stats())
+  console.log('StatsView props.onGenerateDebugStats:', props.onGenerateDebugStats)
   
-  const topCards = createMemo(() => topN(props.stats.cardFails, 5, c => c))
-  const topPos = createMemo(() => topN(props.stats.posFails, 5, p => `${p} (${props.stack[Number(p)-1] || ''})`))
-  const accuracy = createMemo(() => props.stats.total ? Math.round((props.stats.correct / props.stats.total) * 100) : 100)
+  const topCards = createMemo(() => topN(stats().cardFails, 5, c => c))
+  const topPos = createMemo(() => topN(stats().posFails, 5, p => `${p} (${props.stack[Number(p)-1] || ''})`))
+  const accuracy = createMemo(() => stats().total ? Math.round((stats().correct / stats().total) * 100) : 100)
 
-  const suggestions = createMemo(() => getAISuggestions(props.stats, props.stack))
-  const chartData = createMemo(() => createAccuracyChart(props.stats.history))
+  const suggestions = createMemo(() => getAISuggestions(stats(), props.stack))
+  const chartData = createMemo(() => createAccuracyChart(stats().history))
+
+  // Get sorted mode stats
+  const modeStats = createMemo(() => {
+    return Object.entries(stats().modeStats)
+      .sort((a, b) => b[1].total - a[1].total) // Sort by total attempts
+      .map(([mode, stats]) => ({ mode, ...stats }))
+  })
+
+  const handleDebugClick = () => {
+    console.log('Debug button clicked, onGenerateDebugStats:', props.onGenerateDebugStats)
+    if (props.onGenerateDebugStats) {
+      console.log('Calling onGenerateDebugStats')
+      props.onGenerateDebugStats()
+    } else {
+      console.log('onGenerateDebugStats is undefined')
+    }
+  }
+
+  const handleDebugKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleDebugClick()
+    }
+  }
 
   return (
     <div class="stats-view">
@@ -145,11 +218,11 @@ export default function StatsView(props: StatsViewProps) {
         </div>
         <div class="quick-stats">
           <div class="quick-stat">
-            <div class="stat-value">{props.stats.total}</div>
+            <div class="stat-value">{stats().total}</div>
             <div class="stat-label">Total Attempts</div>
           </div>
           <div class="quick-stat">
-            <div class="stat-value">{props.stats.correct}</div>
+            <div class="stat-value">{stats().correct}</div>
             <div class="stat-label">Correct</div>
           </div>
         </div>
@@ -160,11 +233,35 @@ export default function StatsView(props: StatsViewProps) {
         <div class="debug-section">
           <button 
             class="debug-button" 
-            onClick={props.onGenerateDebugStats}
+            onClick={handleDebugClick}
+            onKeyDown={handleDebugKeyDown}
             type="button"
+            aria-label="Generate 10000 debug results for testing"
+            tabindex={0}
           >
-            🧪 Generate 1000 Debug Results
+            🧪 Generate 10000 Debug Results
           </button>
+        </div>
+      )}
+
+      {/* Mode-specific stats */}
+      {modeStats().length > 0 && (
+        <div class="stats-block">
+          <div class="stats-title">🎮 Practice Mode Performance</div>
+          <div class="mode-stats-list" role="list" aria-label="Practice mode performance statistics">
+            {modeStats().map((modeStat, i) => (
+              <div class="mode-stat-item" role="listitem">
+                <div class="mode-stat-header">
+                  <span class="mode-stat-name">{modeStat.mode}</span>
+                  <span class="mode-stat-accuracy">{modeStat.accuracy}%</span>
+                </div>
+                <div class="mode-stat-details">
+                  <span class="mode-stat-attempts">{modeStat.total} attempts</span>
+                  <span class="mode-stat-correct">{modeStat.correct} correct</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -174,7 +271,7 @@ export default function StatsView(props: StatsViewProps) {
           <div class="chart-explanation">
             Shows your accuracy over practice sessions (10 attempts each). Higher bars = better performance.
           </div>
-          <div class="accuracy-chart">
+          <div class="accuracy-chart" role="img" aria-label="Accuracy trend chart">
             {(chartData() || []).map((session, i) => {
               let barClass = 'bar-fill'
               if (session.accuracy === 100) {
@@ -191,6 +288,8 @@ export default function StatsView(props: StatsViewProps) {
                     class={barClass}
                     style={{ height: `${session.accuracy}%` }}
                     title={`Session ${session.session}: ${session.accuracy.toFixed(1)}%`}
+                    role="img"
+                    aria-label={`Session ${session.session} accuracy: ${session.accuracy.toFixed(1)}%`}
                   ></div>
                   <div class="bar-label">{session.session}</div>
                 </div>
@@ -205,19 +304,19 @@ export default function StatsView(props: StatsViewProps) {
 
       <div class="stats-block">
         <div class="stats-title">🤖 AI Suggestions</div>
-        <ul class="suggestions-list">
+        <ul class="suggestions-list" role="list" aria-label="AI-powered practice suggestions">
           {(suggestions() || []).map((suggestion, i) => (
-            <li class="suggestion-item">{suggestion}</li>
+            <li class="suggestion-item" role="listitem">{suggestion}</li>
           ))}
         </ul>
       </div>
 
       <div class="stats-block">
         <div class="stats-title">🎯 Most Missed Cards</div>
-        <ul class="stats-list">
+        <ul class="stats-list" role="list" aria-label="Most frequently missed cards">
           {topCards().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
           {topCards().map((item, i) => (
-            <li class="stats-item">
+            <li class="stats-item" role="listitem">
               <span class="card-display">{item.label}</span>
               <span class="stats-count">×{item.count}</span>
             </li>
@@ -227,10 +326,10 @@ export default function StatsView(props: StatsViewProps) {
 
       <div class="stats-block">
         <div class="stats-title">📍 Most Missed Positions</div>
-        <ul class="stats-list">
+        <ul class="stats-list" role="list" aria-label="Most frequently missed positions">
           {topPos().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
           {topPos().map((item, i) => (
-            <li class="stats-item">
+            <li class="stats-item" role="listitem">
               <span class="position-display">{item.label}</span>
               <span class="stats-count">×{item.count}</span>
             </li>
@@ -238,18 +337,19 @@ export default function StatsView(props: StatsViewProps) {
         </ul>
       </div>
 
-      {props.stats.history.length > 0 && (
+      {stats().history.length > 0 && (
         <div class="stats-block">
           <div class="stats-title">📊 Recent Performance</div>
-          <div class="recent-attempts">
-            {props.stats.history.slice(-20).map((attempt, i) => (
+          <div class="recent-attempts" role="img" aria-label="Recent performance dots">
+            {stats().history.slice(-20).map((attempt, i) => (
               <div 
                 class={`attempt-dot ${attempt.correct ? 'correct' : 'incorrect'}`}
                 title={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
+                role="img"
+                aria-label={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
               ></div>
             ))}
           </div>
-          <div class="recent-label">Last 20 attempts</div>
         </div>
       )}
     </div>

@@ -91,6 +91,24 @@
   margin: 0;
 }
 
+.mode-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.mode-accuracy {
+  color: var(--accent, #007aff);
+  font-weight: 600;
+}
+
+.mode-attempts {
+  color: var(--text-secondary, #888);
+  font-weight: 500;
+}
+
 .mode-arrow {
   font-size: 1.2rem;
   color: var(--text-secondary, #999);

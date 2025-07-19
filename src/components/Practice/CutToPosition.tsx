@@ -26,6 +26,7 @@ export default function CutToPosition(props: CutToPositionProps) {
     setFeedback('')
     setAnswered(false)
     setInput('')
+    setShowKeyboard(true) // Keep keyboard open for next question
     // Pick a random target card and position
     const N = props.stack.length
     const targetIdx = getRandomInt(N)
@@ -41,20 +42,26 @@ export default function CutToPosition(props: CutToPositionProps) {
     })
   }
 
-  function handleSubmit() {
+  function handleCardSelect(card: string): void {
     if (answered()) return
+    
+    setInput(card)
     const q = question()
-    const correct = input().replace(/\s+/g, '').toUpperCase() === String(q.answer).replace(/\s+/g, '').toUpperCase()
+    const correct = card.replace(/\s+/g, '').toUpperCase() === String(q.answer).replace(/\s+/g, '').toUpperCase()
     playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'Correct! ✅' : `Wrong. Answer: ${q.answer}`)
     setAnswered(true)
     props.onResult({
       correct,
       question: q,
-      input: input(),
+      input: card,
       mode: 'Cut to Position'
     })
     setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
+  }
+
+  function handlePartialSelect(partial: string): void {
+    setInput(partial)
   }
 
   onMount(() => {
@@ -75,15 +82,13 @@ export default function CutToPosition(props: CutToPositionProps) {
           value={input()}
           placeholder="Select cut card"
           readonly
-          onClick={() => setShowKeyboard(true)}
+          onFocus={() => setShowKeyboard(true)}
         />
         <CardKeyboard
           isVisible={showKeyboard()}
           onClose={() => setShowKeyboard(false)}
-          onCardSelect={card => {
-            setInput(card)
-            setShowKeyboard(false)
-          }}
+          onCardSelect={handleCardSelect}
+          onPartialSelect={handlePartialSelect}
         />
       </div>
       <div class="feedback-area">
@@ -91,9 +96,6 @@ export default function CutToPosition(props: CutToPositionProps) {
           <div class="feedback-message">{feedback()}</div>
         )}
       </div>
-      <button class="submit-btn" type="button" onClick={handleSubmit} disabled={answered()}>
-        Submit
-      </button>
     </div>
   )
 } 

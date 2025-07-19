@@ -24,7 +24,7 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
   ]
 
   // Click outside handler
-  function handleClickOutside(event: MouseEvent) {
+  const handleClickOutside = (event: MouseEvent) => {
     if (keyboardRef && !keyboardRef.contains(event.target as Node)) {
       handleClose()
     }
@@ -65,13 +65,35 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
     }
   })
 
-  function handleClose(): void {
+  const handleClose = (): void => {
     // Reset selection atomically when closing
     batch(() => {
       setSelectedRank('')
       setSelectedSuit('')
     })
     props.onClose()
+  }
+
+  const handleRankClick = (rank: string) => {
+    setSelectedRank(rank)
+  }
+
+  const handleSuitClick = (suit: string) => {
+    setSelectedSuit(suit)
+  }
+
+  const handleRankKeyDown = (event: KeyboardEvent, rank: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleRankClick(rank)
+    }
+  }
+
+  const handleSuitKeyDown = (event: KeyboardEvent, suit: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleSuitClick(suit)
+    }
   }
 
   // Add/remove click outside listener
@@ -86,7 +108,7 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
   return (
     <Transition name="keyboard-slide">
       {props.isVisible && (
-        <div class="card-keyboard" ref={keyboardRef}>
+        <div class="card-keyboard" ref={keyboardRef} role="dialog" aria-label="Card selection keyboard">
           <div class="keyboard-content">
             <div class="rank-selection">
               <div class="rank-rows">
@@ -96,7 +118,11 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
                       <button 
                         type="button" 
                         class={`rank-btn ${selectedRank() === r ? 'selected' : ''}`}
-                        onClick={() => setSelectedRank(r)}
+                        onClick={() => handleRankClick(r)}
+                        onKeyDown={(e) => handleRankKeyDown(e, r)}
+                        aria-label={`Select rank ${r}`}
+                        aria-pressed={selectedRank() === r}
+                        tabindex={0}
                       >
                         {r}
                       </button>
@@ -112,7 +138,11 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
                   <button 
                     type="button" 
                     class={`suit-btn ${s.name} ${selectedSuit() === s.symbol ? 'selected' : ''}`}
-                    onClick={() => setSelectedSuit(s.symbol)}
+                    onClick={() => handleSuitClick(s.symbol)}
+                    onKeyDown={(e) => handleSuitKeyDown(e, s.symbol)}
+                    aria-label={`Select ${s.name} suit`}
+                    aria-pressed={selectedSuit() === s.symbol}
+                    tabindex={0}
                   >
                     {s.symbol}
                   </button>

@@ -9,6 +9,7 @@ import type { QuizResult, CardInterval } from '../../types'
 import FirstOrSecondHalf from './FirstOrSecondHalf'
 import QuartetPosition from './QuartetPosition'
 import CutToPosition from './CutToPosition'
+import { useStats } from '../../contexts/StatsContext'
 
 interface PracticeViewProps {
   stack: string[];
@@ -78,16 +79,50 @@ const PRACTICE_MODES: PracticeMode[] = [
 
 export default function PracticeView(props: PracticeViewProps) {
   const [currentMode, setCurrentMode] = createSignal<string>('selection')
+  const { stats } = useStats()
 
-  function selectMode(modeId: string): void {
+  const selectMode = (modeId: string): void => {
     console.log('PracticeView: selectMode called with:', modeId)
     setCurrentMode(modeId)
     console.log('PracticeView: currentMode set to:', currentMode())
   }
 
-  function goBack(): void {
+  const goBack = (): void => {
     console.log('PracticeView: goBack called')
     setCurrentMode('selection')
+  }
+
+  const getModeAccuracy = (modeName: string): number => {
+    const modeStats = stats().modeStats[modeName]
+    return modeStats ? modeStats.accuracy : 0
+  }
+
+  const getModeAttempts = (modeName: string): number => {
+    const modeStats = stats().modeStats[modeName]
+    return modeStats ? modeStats.total : 0
+  }
+
+  const handleModeClick = (modeId: string) => {
+    console.log('PracticeView: Button clicked for mode:', modeId)
+    selectMode(modeId)
+  }
+
+  const handleKeyDown = (event: KeyboardEvent, modeId: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleModeClick(modeId)
+    }
+  }
+
+  const handleBackClick = () => {
+    goBack()
+  }
+
+  const handleBackKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleBackClick()
+    }
   }
 
   console.log('PracticeView: Rendering with currentMode:', currentMode())
@@ -100,23 +135,36 @@ export default function PracticeView(props: PracticeViewProps) {
           <p class="selection-subtitle">Select the type of practice you want to focus on</p>
         </div>
         
-        <div class="mode-list">
-          {PRACTICE_MODES.map(mode => (
-            <button 
-              class="mode-card"
-              onClick={() => {
-                console.log('PracticeView: Button clicked for mode:', mode.id)
-                selectMode(mode.id)
-              }}
-            >
-              <div class="mode-icon">{mode.icon}</div>
-              <div class="mode-content">
-                <div class="mode-name">{mode.name}</div>
-                <div class="mode-description">{mode.description}</div>
-              </div>
-              <div class="mode-arrow">→</div>
-            </button>
-          ))}
+        <div class="mode-list" role="listbox" aria-label="Practice modes">
+          {PRACTICE_MODES.map(mode => {
+            const accuracy = getModeAccuracy(mode.name)
+            const attempts = getModeAttempts(mode.name)
+            
+            return (
+              <button 
+                class="mode-card"
+                onClick={() => handleModeClick(mode.id)}
+                onKeyDown={(e) => handleKeyDown(e, mode.id)}
+                type="button"
+                role="option"
+                tabindex={0}
+                aria-label={`${mode.name}: ${mode.description}. ${attempts > 0 ? `${accuracy}% accuracy from ${attempts} attempts` : 'No attempts yet'}`}
+              >
+                <div class="mode-icon" aria-hidden="true">{mode.icon}</div>
+                <div class="mode-content">
+                  <div class="mode-name">{mode.name}</div>
+                  <div class="mode-description">{mode.description}</div>
+                  {attempts > 0 && (
+                    <div class="mode-stats">
+                      <span class="mode-accuracy">{accuracy}% accuracy</span>
+                      <span class="mode-attempts">({attempts} attempts)</span>
+                    </div>
+                  )}
+                </div>
+                <div class="mode-arrow" aria-hidden="true">→</div>
+              </button>
+            )
+          })}
         </div>
       </Show>
 
@@ -130,11 +178,18 @@ export default function PracticeView(props: PracticeViewProps) {
             <>
               {/* Practice Header */}
               <div class="practice-header">
-                <button class="back-button" onClick={goBack}>
+                <button 
+                  class="back-button" 
+                  onClick={handleBackClick}
+                  onKeyDown={handleBackKeyDown}
+                  type="button"
+                  aria-label="Go back to practice mode selection"
+                  tabindex={0}
+                >
                   ← Back
                 </button>
                 <div class="practice-title">
-                  <span class="practice-icon">{currentModeInfo?.icon}</span>
+                  <span class="practice-icon" aria-hidden="true">{currentModeInfo?.icon}</span>
                   <span class="practice-name">{currentModeInfo?.name}</span>
                 </div>
               </div>
