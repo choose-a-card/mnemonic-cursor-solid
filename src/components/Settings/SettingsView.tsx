@@ -3,6 +3,7 @@ import type { CardInterval } from '../../types'
 import { createSignal, onMount, Show } from 'solid-js'
 import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallPrompt, getPWAInstallPrompt, checkServiceWorkerStatus, forceServiceWorkerRegistration } from '../../utils/pwa'
 import { isFeatureEnabled } from '../../utils/featureFlags'
+import DualRangeSlider from './DualRangeSlider'
 
 interface SettingsViewProps {
   stackType: string;
@@ -71,11 +72,11 @@ export default function SettingsView(props: SettingsViewProps) {
         checkPWAStatus()
       })
 
-          // Listen for beforeinstallprompt event
-    window.addEventListener('beforeinstallprompt', () => {
-      console.log('beforeinstallprompt event fired!')
-      checkPWAStatus()
-    })
+      // Listen for beforeinstallprompt event
+      window.addEventListener('beforeinstallprompt', () => {
+        console.log('beforeinstallprompt event fired!')
+        checkPWAStatus()
+      })
 
       // Listen for appinstalled event
       window.addEventListener('appinstalled', () => {
@@ -158,226 +159,222 @@ export default function SettingsView(props: SettingsViewProps) {
 
   return (
     <div class="settings-view">
-      <Show when={isFeatureEnabled('pwaEnabled')}>
-        <div class="settings-section">
-          <h3 class="section-title">📱 App Installation</h3>
-        
-        <div class="settings-block">
-          <div class="settings-row">
-            <div class="settings-label">Install App</div>
-            <div class="status-indicator">
-              <span class={`status-dot ${onlineStatus() ? 'online' : 'offline'}`}></span>
-              <span class="status-text">{onlineStatus() ? 'Online' : 'Offline'}</span>
-            </div>
+      {/* Main Configuration Section */}
+      <div class="settings-main">
+        {/* Stack Configuration */}
+        <div class="settings-card stack-config">
+          <div class="card-header">
+            <div class="card-icon">🎴</div>
+            <h3 class="card-title">Stack Configuration</h3>
           </div>
-          
-          <Show when={isInstalled()}>
-            <div class="pwa-status installed">
-              ✅ App is installed and can work offline
-            </div>
-          </Show>
-          
-          <Show when={canInstall() && !isInstalled()}>
-            <button 
-              class="install-button" 
-              onClick={handleInstall}
-              disabled={installing()}
-            >
-              {installing() ? 'Installing...' : '📱 Install App'}
-            </button>
-            <div class="settings-hint">
-              Install this app on your device to use it offline and access it like a native app.
-            </div>
-          </Show>
-          
-          <Show when={!canInstall() && !isInstalled()}>
-            <div class="pwa-status not-supported">
-              ℹ️ App installation not available
-            </div>
-            
-            <Show when={isMobileChrome()}>
-              <div class="mobile-install-options">
-                <h4>📱 Mobile Chrome Installation Options:</h4>
-                <ol>
-                  <li>Look for the install banner at the bottom of the screen</li>
-                  <li>Tap the menu (⋮) → "Install app"</li>
-                  <li>Try refreshing the page and wait 30+ seconds</li>
-                  <li>Navigate between different tabs in the app</li>
-                </ol>
-                <button 
-                  class="secondary-button" 
-                  onClick={handleManualInstall}
+          <div class="card-content">
+            <div class="setting-group">
+              <label class="setting-label">Stack Type</label>
+              <div class="stack-options">
+                <button
+                  class={`stack-option ${props.stackType === 'tamariz' ? 'active' : ''}`}
+                  onClick={() => props.setStackType('tamariz')}
                 >
-                  🔄 Try Manual Trigger
+                  <span class="option-name">Tamariz</span>
+                  <span class="option-desc">Classic stack</span>
                 </button>
-                <button 
-                  class="secondary-button" 
-                  onClick={handleForceSWRegistration}
+                <button
+                  class={`stack-option ${props.stackType === 'aronson' ? 'active' : ''}`}
+                  onClick={() => props.setStackType('aronson')}
                 >
-                  🔧 Force Service Worker Registration
+                  <span class="option-name">Aronson</span>
+                  <span class="option-desc">Modern stack</span>
+                </button>
+                <button
+                  class={`stack-option ${props.stackType === 'faro' ? 'active' : ''}`}
+                  onClick={() => props.setStackType('faro')}
+                >
+                  <span class="option-name">5th Faro</span>
+                  <span class="option-desc">Advanced stack</span>
                 </button>
               </div>
-            </Show>
-            
-            <div class="debug-info">
-              <details>
-                <summary>Debug Info</summary>
-                <pre>{JSON.stringify(debugInfo(), null, 2)}</pre>
-              </details>
             </div>
-            <div class="settings-hint">
-              Try refreshing the page or check if you're using a supported browser (Chrome, Edge, Safari).
-            </div>
-          </Show>
-        </div>
-      </div>
-      </Show>
 
-      <div class="settings-section">
-        <h3 class="section-title">🎴 Stack Configuration</h3>
-        
-        <div class="settings-block">
-          <div class="settings-label">Stack Type</div>
-          <div class="settings-options">
-            <button
-              class={props.stackType === 'tamariz' ? 'active' : ''}
-              onClick={() => props.setStackType('tamariz')}
-            >
-              Tamariz
-            </button>
-            <button
-              class={props.stackType === 'aronson' ? 'active' : ''}
-              onClick={() => props.setStackType('aronson')}
-            >
-              Aronson
-            </button>
-            <button
-              class={props.stackType === 'faro' ? 'active' : ''}
-              onClick={() => props.setStackType('faro')}
-            >
-              5th Faro
-            </button>
-          </div>
-        </div>
-
-        <div class="settings-block">
-          <div class="settings-label">Practice Range</div>
-          <div class="range-slider-container">
-            <div class="range-slider">
-              <input
-                type="range"
-                min="1"
-                max="52"
-                value={props.cardInterval.start}
-                onInput={e => props.setCardInterval({ 
-                  ...props.cardInterval, 
-                  start: Number(e.target.value) 
-                })}
-                class="range-slider-input start-slider"
-              />
-              <input
-                type="range"
-                min="1"
-                max="52"
-                value={props.cardInterval.end}
-                onInput={e => props.setCardInterval({ 
-                  ...props.cardInterval, 
-                  end: Number(e.target.value) 
-                })}
-                class="range-slider-input end-slider"
-              />
-            </div>
-            <div class="range-labels">
-              <span class="range-label">Start: {props.cardInterval.start}</span>
-              <span class="range-label">End: {props.cardInterval.end}</span>
+            <div class="setting-group">
+              <label class="setting-label">Practice Range</label>
+              <div class="range-container">
+                <DualRangeSlider
+                  min={1}
+                  max={52}
+                  start={props.cardInterval.start}
+                  end={props.cardInterval.end}
+                  onRangeChange={(start, end) => {
+                    props.setCardInterval({ start, end })
+                  }}
+                  step={1}
+                />
+                <div class="range-info">
+                  <span class="range-text">Cards {props.cardInterval.start} - {props.cardInterval.end}</span>
+                  <span class="range-count">({props.cardInterval.end - props.cardInterval.start + 1} cards)</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="settings-hint">
-            Practice with cards from position {props.cardInterval.start} to {props.cardInterval.end} ({props.cardInterval.end - props.cardInterval.start + 1} cards)
-          </div>
         </div>
-      </div>
 
-      <div class="settings-section">
-        <h3 class="section-title">🎨 Appearance</h3>
-        
-        <div class="settings-block">
-          <div class="settings-row">
-            <div class="settings-label">Dark Mode</div>
-            <button 
-              class={`toggle-switch ${props.darkMode ? 'active' : ''}`}
-              onClick={() => props.setDarkMode(!props.darkMode)}
-            >
-              <div class="toggle-slider"></div>
-            </button>
+        {/* Preferences */}
+        <div class="settings-card preferences">
+          <div class="card-header">
+            <div class="card-icon">⚙️</div>
+            <h3 class="card-title">Preferences</h3>
           </div>
-        </div>
-      </div>
+          <div class="card-content">
+            <div class="setting-group">
+              <div class="setting-row">
+                <div class="setting-info">
+                  <label class="setting-label">Dark Mode</label>
+                  <span class="setting-desc">Switch between light and dark themes</span>
+                </div>
+                <button 
+                  class={`toggle-switch ${props.darkMode ? 'active' : ''}`}
+                  onClick={() => props.setDarkMode(!props.darkMode)}
+                >
+                  <div class="toggle-slider"></div>
+                </button>
+              </div>
+            </div>
 
-      <div class="settings-section">
-        <h3 class="section-title">🔊 Audio</h3>
-        
-        <div class="settings-block">
-          <div class="settings-row">
-            <div class="settings-label">Sound Effects</div>
-            <button 
-              class={`toggle-switch ${props.soundEnabled ? 'active' : ''}`}
-              onClick={() => props.setSoundEnabled(!props.soundEnabled)}
-            >
-              <div class="toggle-slider"></div>
-            </button>
-          </div>
-          <div class="settings-hint">
-            Play sounds for correct/incorrect answers
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3 class="section-title">📊 Data</h3>
-        
-        <div class="settings-block">
-          <button class="settings-reset" onClick={props.onResetStats}>
-            🗑️ Reset All Statistics
-          </button>
-          <div class="settings-hint">
-            This will permanently delete all your progress data
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3 class="section-title">ℹ️ About</h3>
-        
-        <div class="settings-block">
-          <div class="about-info">
-            <div class="app-name">Mnemonic Stack Trainer</div>
-            <div class="app-version">Version 1.0.0</div>
-            <div class="app-description">
-              Practice and master the Tamariz, Aronson, and 5th Faro card stacks with multiple training modes and detailed analytics.
+            <div class="setting-group">
+              <div class="setting-row">
+                <div class="setting-info">
+                  <label class="setting-label">Sound Effects</label>
+                  <span class="setting-desc">Audio feedback for answers</span>
+                </div>
+                <button 
+                  class={`toggle-switch ${props.soundEnabled ? 'active' : ''}`}
+                  onClick={() => props.setSoundEnabled(!props.soundEnabled)}
+                >
+                  <div class="toggle-slider"></div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="settings-section">
-        <h3 class="section-title">☕ Support</h3>
-        
-        <div class="settings-block">
-          <div class="support-info">
-            <div class="support-text">
-              If you find this app helpful for your card magic practice, consider supporting its development.
+      {/* Sidebar Section */}
+      <div class="settings-sidebar">
+        {/* App Installation */}
+        <Show when={isFeatureEnabled('pwaEnabled')}>
+          <div class="settings-card pwa-card">
+            <div class="card-header">
+              <div class="card-icon">📱</div>
+              <h3 class="card-title">App Installation</h3>
             </div>
-            <a 
-              href="https://buymeacoffee.com/yourusername" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="support-button"
-            >
-              ☕ Buy Me a Coffee
-            </a>
-            <div class="support-hint">
-              Your support helps keep this app free and continuously improved.
+            <div class="card-content">
+              <div class="status-indicator">
+                <span class={`status-dot ${onlineStatus() ? 'online' : 'offline'}`}></span>
+                <span class="status-text">{onlineStatus() ? 'Online' : 'Offline'}</span>
+              </div>
+              
+              <Show when={isInstalled()}>
+                <div class="pwa-status installed">
+                  ✅ App installed and ready for offline use
+                </div>
+              </Show>
+              
+              <Show when={canInstall() && !isInstalled()}>
+                <button 
+                  class="install-button" 
+                  onClick={handleInstall}
+                  disabled={installing()}
+                >
+                  {installing() ? 'Installing...' : '📱 Install App'}
+                </button>
+                <div class="install-hint">
+                  Install for offline access and native app experience
+                </div>
+              </Show>
+              
+              <Show when={!canInstall() && !isInstalled()}>
+                <div class="pwa-status not-supported">
+                  ℹ️ Installation not available
+                </div>
+                
+                <Show when={isMobileChrome()}>
+                  <div class="mobile-install-options">
+                    <h4>📱 Mobile Chrome Options:</h4>
+                    <ol>
+                      <li>Look for install banner at bottom</li>
+                      <li>Tap menu (⋮) → "Install app"</li>
+                      <li>Refresh and wait 30+ seconds</li>
+                    </ol>
+                    <button 
+                      class="secondary-button" 
+                      onClick={handleManualInstall}
+                    >
+                      🔄 Try Manual Trigger
+                    </button>
+                  </div>
+                </Show>
+              </Show>
+            </div>
+          </div>
+        </Show>
+
+        {/* Data Management */}
+        <div class="settings-card data-card">
+          <div class="card-header">
+            <div class="card-icon">📊</div>
+            <h3 class="card-title">Data Management</h3>
+          </div>
+          <div class="card-content">
+            <div class="setting-group">
+              <div class="setting-info">
+                <label class="setting-label">Reset Statistics</label>
+                <span class="setting-desc">Permanently delete all progress data</span>
+              </div>
+              <button class="reset-button" onClick={props.onResetStats}>
+                🗑️ Reset All Data
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* About */}
+        <div class="settings-card about-card">
+          <div class="card-header">
+            <div class="card-icon">ℹ️</div>
+            <h3 class="card-title">About</h3>
+          </div>
+          <div class="card-content">
+            <div class="about-info">
+              <div class="app-name">Mnemonic Stack Trainer</div>
+              <div class="app-version">Version 1.0.0</div>
+              <div class="app-description">
+                Master the Tamariz, Aronson, and 5th Faro card stacks with multiple training modes and detailed analytics.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Support */}
+        <div class="settings-card support-card">
+          <div class="card-header">
+            <div class="card-icon">☕</div>
+            <h3 class="card-title">Support</h3>
+          </div>
+          <div class="card-content">
+            <div class="support-info">
+              <div class="support-text">
+                If you find this app helpful for your card magic practice, consider supporting its development.
+              </div>
+              <a 
+                href="https://buymeacoffee.com/yourusername" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="support-button"
+              >
+                ☕ Buy Me a Coffee
+              </a>
+              <div class="support-hint">
+                Your support helps keep this app free and continuously improved.
+              </div>
             </div>
           </div>
         </div>

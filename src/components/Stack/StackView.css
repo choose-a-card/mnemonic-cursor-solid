@@ -7,6 +7,14 @@
   margin: 0 auto;
 }
 
+/* Desktop layout improvements */
+@media (min-width: 1024px) {
+  .stack-view {
+    max-width: none;
+    align-items: flex-start;
+  }
+}
+
 .stack-header {
   display: flex;
   justify-content: center;
@@ -31,6 +39,33 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+/* Desktop multi-column layout */
+@media (min-width: 1024px) {
+  .stack-list {
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .stack-item {
+    height: 100%;
+    min-height: 60px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .stack-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1920px) {
+  .stack-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .stack-item {
@@ -84,4 +119,9 @@
 /* Black suits */
 .stack-card.card-black {
   color: #1a1a1a;
+}
+
+/* Dark mode adjustments */
+.app-container.dark .stack-card.card-black {
+  color: #ffffff;
 } 

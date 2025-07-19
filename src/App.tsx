@@ -1,4 +1,4 @@
-import { createSignal, type Component, onMount, createEffect } from 'solid-js'
+import { createSignal, type Component, onMount, createEffect, Show } from 'solid-js'
 import StackView from './components/Stack/StackView'
 import PracticeView from './components/Practice/PracticeView'
 import StatsView from './components/Stats/StatsView'
@@ -26,6 +26,7 @@ const AppContent: Component<AppContentProps> = (props) => {
   const [cardInterval, setCardInterval] = createSignal<CardInterval>({ start: 1, end: 52 })
   const [darkMode, setDarkMode] = createSignal<boolean>(false)
   const [soundEnabled, setSoundEnabled] = createSignal<boolean>(true)
+  const [menuOpen, setMenuOpen] = createSignal<boolean>(false)
 
   // Load settings from localStorage on mount
   onMount(() => {
@@ -92,8 +93,65 @@ const AppContent: Component<AppContentProps> = (props) => {
     }
   }
 
+  const handleMenuToggle = () => {
+    setMenuOpen(!menuOpen())
+  }
+
+  const handleMenuKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleMenuToggle()
+    }
+  }
+
+  const handleMenuTabClick = (tabIndex: number) => {
+    setTab(tabIndex)
+    setMenuOpen(false)
+  }
+
+  const handleMenuTabKeyDown = (event: KeyboardEvent, tabIndex: number) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleMenuTabClick(tabIndex)
+    }
+  }
+
   return (
     <div class={`app-container ${darkMode() ? 'dark' : ''}`}>
+      {/* Desktop Hamburger Menu */}
+      <div class="desktop-menu">
+        <button
+          class="hamburger-button"
+          onClick={handleMenuToggle}
+          onKeyDown={handleMenuKeyDown}
+          type="button"
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen()}
+          tabindex={0}
+        >
+          <span class="hamburger-icon" aria-hidden="true">☰</span>
+        </button>
+        
+        <Show when={menuOpen()}>
+          <div class="menu-overlay" onClick={handleMenuToggle}></div>
+          <nav class="desktop-nav" role="navigation" aria-label="Desktop navigation">
+            {TABS.map((t, i) => (
+              <button
+                class={tab() === i ? 'menu-item active' : 'menu-item'}
+                onClick={() => handleMenuTabClick(i)}
+                onKeyDown={(e) => handleMenuTabKeyDown(e, i)}
+                type="button"
+                tabindex={0}
+                aria-label={`${t.label} tab`}
+              >
+                <span class="menu-icon" aria-hidden="true">{t.icon}</span>
+                <span class="menu-label">{t.label}</span>
+              </button>
+            ))}
+          </nav>
+        </Show>
+      </div>
+
       <main class="main-content">
         {tab() === 0 && (
           <StackView
@@ -133,6 +191,8 @@ const AppContent: Component<AppContentProps> = (props) => {
           />
         )}
       </main>
+      
+      {/* Mobile Bottom Navigation */}
       <nav class="bottom-nav" role="tablist" aria-label="Main navigation">
         {TABS.map((t, i) => (
           <button

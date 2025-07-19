@@ -9,6 +9,15 @@
   padding-bottom: 6rem; /* space for bottom nav */
 }
 
+/* Desktop layout improvements */
+@media (min-width: 1024px) {
+  .practice-view {
+    max-width: none;
+    padding: 0;
+    padding-bottom: 0; /* No need for bottom nav padding on desktop */
+  }
+}
+
 /* Mode Selection Screen */
 .selection-header {
   text-align: center;
@@ -36,6 +45,27 @@
   padding: 0.25rem 0;
   flex: 1;
   min-height: 0;
+}
+
+/* Desktop multi-column layout */
+@media (min-width: 1024px) {
+  .mode-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 0;
+  }
+  
+  .mode-card {
+    height: 100%;
+    min-height: 120px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .mode-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .mode-card {
@@ -509,6 +539,11 @@
 
 .quiz-card-large.card-black {
   color: #1a1a1a;
+}
+
+/* Dark mode adjustments */
+.app-container.dark .quiz-card-large.card-black {
+  color: #ffffff;
 } 
 
 .quiz-question-text {

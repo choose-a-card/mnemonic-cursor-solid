@@ -246,98 +246,192 @@ export default function StatsView(props: StatsViewProps) {
       {chartData() && chartData()!.length > 1 && (
         <div class="stats-block">
           <div class="stats-title">📈 Accuracy Trend</div>
-          <div class="chart-explanation">
-            Shows your accuracy over practice sessions (10 attempts each). Higher bars = better performance.
-          </div>
-          <div class="accuracy-chart" role="img" aria-label="Accuracy trend chart">
-            {(chartData() || []).map((session, _i) => {
-              let barClass = 'bar-fill'
-              if (session.accuracy === 100) {
-                barClass = 'bar-fill perfect'
-              } else if (session.accuracy < 50) {
-                barClass = 'bar-fill poor'
-              } else {
-                barClass = 'bar-fill good'
-              }
-              
-              return (
-                <div class="chart-bar">
-                  <div 
-                    class={barClass}
-                    style={{ height: `${session.accuracy}%` }}
-                    title={`Session ${session.session}: ${session.accuracy.toFixed(1)}%`}
-                    role="img"
-                    aria-label={`Session ${session.session} accuracy: ${session.accuracy.toFixed(1)}%`}
-                  ></div>
-                  <div class="bar-label">{session.session}</div>
-                </div>
-              )
-            })}
-          </div>
-          <div class="chart-footer">
-            Latest {(chartData() || []).length} sessions • Each bar = 10 attempts
+          <div class="stats-block-content">
+            <div class="chart-explanation">
+              Shows your accuracy over practice sessions (10 attempts each). Higher bars = better performance.
+            </div>
+            <div class="accuracy-chart" role="img" aria-label="Accuracy trend chart">
+              {(chartData() || []).map((session, _i) => {
+                let barClass = 'bar-fill'
+                if (session.accuracy === 100) {
+                  barClass = 'bar-fill perfect'
+                } else if (session.accuracy < 50) {
+                  barClass = 'bar-fill poor'
+                } else {
+                  barClass = 'bar-fill good'
+                }
+                
+                return (
+                  <div class="chart-bar">
+                    <div 
+                      class={barClass}
+                      style={{ height: `${session.accuracy}%` }}
+                      title={`Session ${session.session}: ${session.accuracy.toFixed(1)}%`}
+                      role="img"
+                      aria-label={`Session ${session.session} accuracy: ${session.accuracy.toFixed(1)}%`}
+                    ></div>
+                    <div class="bar-label">{session.session}</div>
+                  </div>
+                )
+              })}
+            </div>
+            <div class="chart-footer">
+              Latest {(chartData() || []).length} sessions • Each bar = 10 attempts
+            </div>
           </div>
         </div>
       )}
 
       <div class="stats-block">
         <div class="stats-title">🤖 AI Suggestions</div>
-        <ul class="suggestions-list" role="list" aria-label="AI-powered practice suggestions">
-          {(suggestions() || []).map((suggestion, _i) => (
-            <li class="suggestion-item" role="listitem">{suggestion}</li>
-          ))}
-        </ul>
+        <div class="stats-block-content">
+          <ul class="suggestions-list" role="list" aria-label="AI-powered practice suggestions">
+            {(suggestions() || []).map((suggestion, _i) => (
+              <li class="suggestion-item" role="listitem">{suggestion}</li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Badges Section - only show if badges are enabled */}
       {isFeatureEnabled('badgesEnabled') && (
         <div class="stats-block">
           <div class="stats-title">🏆 Achievements</div>
-          <BadgeDisplay 
-            badges={badges()} 
-            lastUnlockedBadge={lastUnlockedBadge()} 
-          />
+          <div class="stats-block-content">
+            <BadgeDisplay 
+              badges={badges()} 
+              lastUnlockedBadge={lastUnlockedBadge()} 
+            />
+          </div>
         </div>
       )}
 
       <div class="stats-block">
         <div class="stats-title">🎯 Most Missed Cards</div>
-        <ul class="stats-list" role="list" aria-label="Most frequently missed cards">
-          {topCards().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
-          {topCards().map((item, _i) => (
-            <li class="stats-item" role="listitem">
-              <span class="card-display">{item.label}</span>
-              <span class="stats-count">×{item.count}</span>
-            </li>
-          ))}
-        </ul>
+        <div class="stats-block-content">
+          <ul class="stats-list" role="list" aria-label="Most frequently missed cards">
+            {topCards().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
+            {topCards().map((item, _i) => (
+              <li class="stats-item" role="listitem">
+                <span class="card-display">{item.label}</span>
+                <span class="stats-count">×{item.count}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div class="stats-block">
         <div class="stats-title">📍 Most Missed Positions</div>
-        <ul class="stats-list" role="list" aria-label="Most frequently missed positions">
-          {topPos().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
-          {topPos().map((item, _i) => (
-            <li class="stats-item" role="listitem">
-              <span class="position-display">{item.label}</span>
-              <span class="stats-count">×{item.count}</span>
-            </li>
-          ))}
-        </ul>
+        <div class="stats-block-content">
+          <ul class="stats-list" role="list" aria-label="Most frequently missed positions">
+            {topPos().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
+            {topPos().map((item, _i) => (
+              <li class="stats-item" role="listitem">
+                <span class="position-display">{item.label}</span>
+                <span class="stats-count">×{item.count}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {stats().history.length > 0 && (
         <div class="stats-block">
           <div class="stats-title">📊 Recent Performance</div>
-          <div class="recent-attempts" role="img" aria-label="Recent performance dots">
-            {stats().history.slice(-20).map((attempt, _i) => (
-              <div 
-                class={`attempt-dot ${attempt.correct ? 'correct' : 'incorrect'}`}
-                title={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
-                role="img"
-                aria-label={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
-              ></div>
-            ))}
+          <div class="stats-block-content">
+            {/* Recent Performance Dots */}
+            <div class="recent-performance-section">
+              <div class="recent-label">Last 20 attempts:</div>
+              <div class="recent-attempts" role="img" aria-label="Recent performance dots">
+                {stats().history.slice(-20).map((attempt, _i) => (
+                  <div 
+                    class={`attempt-dot ${attempt.correct ? 'correct' : 'incorrect'}`}
+                    title={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
+                    role="img"
+                    aria-label={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Performance Metrics */}
+            <div class="recent-metrics">
+              <div class="metric-row">
+                <div class="metric-item">
+                  <div class="metric-value">{(() => {
+                    const recent = stats().history.slice(-10)
+                    return recent.length > 0 ? Math.round((recent.filter(h => h.correct).length / recent.length) * 100) : 0
+                  })()}%</div>
+                  <div class="metric-label">Last 10</div>
+                </div>
+                <div class="metric-item">
+                  <div class="metric-value">{(() => {
+                    const recent = stats().history.slice(-5)
+                    return recent.length > 0 ? Math.round((recent.filter(h => h.correct).length / recent.length) * 100) : 0
+                  })()}%</div>
+                  <div class="metric-label">Last 5</div>
+                </div>
+                <div class="metric-item">
+                  <div class="metric-value">{(() => {
+                    let streak = 0
+                    for (let i = stats().history.length - 1; i >= 0; i--) {
+                      if (stats().history[i].correct) {
+                        streak++
+                      } else {
+                        break
+                      }
+                    }
+                    return streak
+                  })()}</div>
+                  <div class="metric-label">Current Streak</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Mode Breakdown */}
+            <div class="recent-modes">
+              <div class="recent-modes-title">Recent Modes Used:</div>
+              <div class="recent-modes-list">
+                {(() => {
+                  const recentModes = stats().history.slice(-10).map(h => h.mode)
+                  const modeCounts = recentModes.reduce((acc, mode) => {
+                    acc[mode] = (acc[mode] || 0) + 1
+                    return acc
+                  }, {} as Record<string, number>)
+                  
+                  return Object.entries(modeCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3)
+                    .map(([mode, count]) => (
+                      <div class="recent-mode-item">
+                        <span class="recent-mode-name">{mode}</span>
+                        <span class="recent-mode-count">{count}</span>
+                      </div>
+                    ))
+                })()}
+              </div>
+            </div>
+
+            {/* Performance Trend */}
+            <div class="performance-trend">
+              <div class="trend-label">Performance Trend:</div>
+              <div class="trend-indicator">
+                {(() => {
+                  const last10 = stats().history.slice(-10)
+                  const last20 = stats().history.slice(-20, -10)
+                  
+                  if (last10.length < 5 || last20.length < 5) return '📊 Not enough data'
+                  
+                  const recentAccuracy = last10.filter(h => h.correct).length / last10.length
+                  const previousAccuracy = last20.filter(h => h.correct).length / last20.length
+                  
+                  if (recentAccuracy > previousAccuracy + 0.1) return '📈 Improving'
+                  if (recentAccuracy < previousAccuracy - 0.1) return '📉 Declining'
+                  return '➡️ Stable'
+                })()}
+              </div>
+            </div>
           </div>
         </div>
       )}

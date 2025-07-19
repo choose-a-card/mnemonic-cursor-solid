@@ -119,6 +119,12 @@
   color: var(--text, #222);
 }
 
+/* Dark mode adjustments */
+.app-container.dark .suit-btn.spades,
+.app-container.dark .suit-btn.clubs {
+  color: #ffffff;
+}
+
 .suit-btn.hearts,
 .suit-btn.diamonds {
   color: #dc3545;
