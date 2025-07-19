@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal, Show, createMemo } from 'solid-js'
 import './PracticeView.css'
 import ClassicQuiz from './ClassicQuiz'
 import PositionToCard from './PositionToCard'
@@ -79,7 +79,17 @@ const PRACTICE_MODES: PracticeMode[] = [
 
 export default function PracticeView(props: PracticeViewProps) {
   const [currentMode, setCurrentMode] = createSignal<string>('selection')
-  const { stats } = useStats()
+  const { stats, badges } = useStats()
+
+  // Calculate badge progress for motivation
+  const badgeProgress = createMemo(() => {
+    const allBadges = badges()
+    const unlockedCount = allBadges.filter(b => b.unlocked).length
+    const totalCount = allBadges.length
+    const percentage = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0
+    
+    return { unlockedCount, totalCount, percentage }
+  })
 
   const selectMode = (modeId: string): void => {
     console.log('PracticeView: selectMode called with:', modeId)
@@ -133,6 +143,22 @@ export default function PracticeView(props: PracticeViewProps) {
         <div class="selection-header">
           <h2 class="selection-title">Choose Practice Mode</h2>
           <p class="selection-subtitle">Select the type of practice you want to focus on</p>
+          
+          {/* Badge Progress Indicator */}
+          <div class="badge-progress-indicator">
+            <div class="badge-progress-info">
+              <span class="badge-progress-icon">🏆</span>
+              <span class="badge-progress-text">
+                {badgeProgress().unlockedCount} of {badgeProgress().totalCount} badges unlocked
+              </span>
+            </div>
+            <div class="badge-progress-bar-mini">
+              <div 
+                class="badge-progress-fill-mini" 
+                style={{ width: `${badgeProgress().percentage}%` }}
+              ></div>
+            </div>
+          </div>
         </div>
         
         <div class="mode-list" role="listbox" aria-label="Practice modes">

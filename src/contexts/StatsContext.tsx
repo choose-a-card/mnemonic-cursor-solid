@@ -1,26 +1,21 @@
-import { createContext, createSignal, useContext, type Component, type JSX } from 'solid-js'
-import type { Stats, QuizResult } from '../types'
+import { createContext, useContext, createSignal, createMemo, createEffect, type Component, type JSX } from 'solid-js'
+import type { Stats, Badge } from '../types'
+import { calculateBadgeProgress } from '../utils/badges'
 
 interface StatsContextValue {
   stats: () => Stats
-  addResult: (result: QuizResult) => void
+  addResult: (result: any) => void
   resetStats: () => void
   generateDebugStats: () => void
+  badges: () => Badge[]
+  lastUnlockedBadge: () => Badge | null
 }
 
 const StatsContext = createContext<StatsContextValue>()
 
-const useStats = () => {
-  const context = useContext(StatsContext)
-  if (!context) {
-    throw new Error('useStats must be used within a StatsProvider')
-  }
-  return context
-}
-
 interface StatsProviderProps {
   children: JSX.Element
-  debugMode?: boolean
+  debugMode: boolean
   stack: () => string[]
 }
 
@@ -31,47 +26,95 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     total: 0,
     correct: 0,
     history: [],
-    modeStats: {},
+    modeStats: {}
   })
 
-  const addResult = (result: QuizResult): void => {
+  const [lastUnlockedBadge, setLastUnlockedBadge] = createSignal<Badge | null>(null)
+  const [previousBadges, setPreviousBadges] = createSignal<Badge[]>([])
+
+  // Calculate badges from current stats
+  const badges = createMemo(() => {
+    const currentStats = stats()
+    return calculateBadgeProgress(currentStats)
+  })
+
+  // Track badge unlocks using an effect
+  createEffect(() => {
+    const currentBadges = badges()
+    const prevBadges = previousBadges()
+    
+    // Check for newly unlocked badges
+    const newlyUnlocked = currentBadges.filter(badge => 
+      badge.unlocked && !prevBadges.find(pb => pb.id === badge.id && pb.unlocked)
+    )
+    
+    if (newlyUnlocked.length > 0) {
+      setLastUnlockedBadge(newlyUnlocked[0])
+      // Auto-clear after 3 seconds
+      setTimeout(() => setLastUnlockedBadge(null), 3000)
+    }
+    
+    // Update previous badges for next comparison
+    setPreviousBadges(currentBadges)
+  })
+
+  const addResult = (result: any) => {
+    const currentStats = stats()
     const { correct, question, input, mode } = result
-    setStats(prev => {
-      const s = { ...prev }
-      s.total++
-      if (correct) s.correct++
-      
-      // Add to history for charts
-      s.history.push({
-        timestamp: Date.now(),
-        correct,
-        mode,
-        question,
-        input
-      })
-      
-      // Update mode-specific stats
-      if (!s.modeStats[mode]) {
-        s.modeStats[mode] = { total: 0, correct: 0, accuracy: 0 }
+    
+    // Update basic stats
+    const newStats = {
+      ...currentStats,
+      total: currentStats.total + 1,
+      correct: currentStats.correct + (correct ? 1 : 0)
+    }
+    
+    // Update card failures
+    if (!correct && question.card) {
+      newStats.cardFails = {
+        ...newStats.cardFails,
+        [question.card]: (newStats.cardFails[question.card] || 0) + 1
       }
-      s.modeStats[mode].total++
-      if (correct) s.modeStats[mode].correct++
-      s.modeStats[mode].accuracy = Math.round((s.modeStats[mode].correct / s.modeStats[mode].total) * 100)
-      
-      if (!correct) {
-        if (question.card) {
-          s.cardFails[question.card] = (s.cardFails[question.card] || 0) + 1
-        }
-        if (question.pos) {
-          s.posFails[question.pos] = (s.posFails[question.pos] || 0) + 1
-        }
+    }
+    
+    // Update position failures
+    if (!correct && question.pos) {
+      newStats.posFails = {
+        ...newStats.posFails,
+        [question.pos.toString()]: (newStats.posFails[question.pos.toString()] || 0) + 1
       }
-      return s
+    }
+    
+    // Update mode stats
+    if (!newStats.modeStats[mode]) {
+      newStats.modeStats[mode] = { total: 0, correct: 0, accuracy: 0 }
+    }
+    newStats.modeStats[mode].total++
+    if (correct) newStats.modeStats[mode].correct++
+    newStats.modeStats[mode].accuracy = Math.round((newStats.modeStats[mode].correct / newStats.modeStats[mode].total) * 100)
+    
+    // Add to history
+    newStats.history.push({
+      timestamp: Date.now(),
+      correct,
+      mode,
+      question,
+      input
     })
+    
+    setStats(newStats)
   }
 
-  const resetStats = (): void => {
-    setStats({ cardFails: {}, posFails: {}, total: 0, correct: 0, history: [], modeStats: {} })
+  const resetStats = () => {
+    setStats({
+      cardFails: {},
+      posFails: {},
+      total: 0,
+      correct: 0,
+      history: [],
+      modeStats: {}
+    })
+    setLastUnlockedBadge(null)
   }
 
   const generateDebugStats = (): void => {
@@ -108,7 +151,7 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
       
       // Add to history
       newStats.history.push({
-        timestamp: Date.now() - (1000 - i) * 60000, // Spread over time
+        timestamp: Date.now() - (10000 - i) * 60000, // Spread over time
         correct,
         mode,
         question: { card, pos, answer: pos, type: 'card-to-pos' },
@@ -121,18 +164,26 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     console.log('StatsContext: Stats updated successfully')
   }
 
-  const contextValue: StatsContextValue = {
+  const value: StatsContextValue = {
     stats,
     addResult,
     resetStats,
-    generateDebugStats: props.debugMode ? generateDebugStats : () => {},
+    generateDebugStats,
+    badges,
+    lastUnlockedBadge
   }
 
   return (
-    <StatsContext.Provider value={contextValue}>
+    <StatsContext.Provider value={value}>
       {props.children}
     </StatsContext.Provider>
   )
 }
 
-export { useStats } 
+export const useStats = () => {
+  const context = useContext(StatsContext)
+  if (!context) {
+    throw new Error('useStats must be used within a StatsProvider')
+  }
+  return context
+} 

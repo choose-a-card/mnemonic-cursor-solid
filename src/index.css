@@ -22,6 +22,7 @@
 
 html {
   height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
   overflow: hidden;
 }
 
@@ -29,6 +30,7 @@ body {
   margin: 0;
   min-width: 320px;
   height: 100vh; /* Use fixed height instead of min-height */
+  height: 100dvh; /* Use dynamic viewport height for mobile */
   overflow: hidden; /* Prevent body scroll */
 }
 

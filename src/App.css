@@ -22,7 +22,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  height: 100vh; /* Force full viewport height */
+  min-height: 100dvh; /* Use dynamic viewport height for mobile */
+  height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
   background: var(--background, #fff);
   color: var(--text, #222);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -40,10 +42,30 @@
 .main-content {
   flex: 1;
   padding: 1rem;
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom)); /* Dynamic space for bottom nav */
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav + safe area + additional space */
   overflow-y: auto;
   height: 0; /* Force flex item to respect container height */
   min-height: 0; /* Allow flex item to shrink */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scroll-behavior: smooth; /* Smooth scrolling */
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom) + 1.5rem); /* Extra padding on mobile */
+  }
+  
+  .bottom-nav {
+    height: calc(4.5rem + env(safe-area-inset-bottom)); /* Slightly taller on mobile */
+  }
+}
+
+/* Ensure content can scroll to bottom on devices with home indicators */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .main-content {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom) + 1.5rem);
+  }
 }
 
 .bottom-nav {
@@ -58,7 +80,7 @@
   padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); /* Account for safe area on devices with home indicator */
   backdrop-filter: blur(10px);
   z-index: 100;
-  height: 4rem; /* Fixed height for consistent spacing */
+  height: calc(4rem + env(safe-area-inset-bottom)); /* Dynamic height including safe area */
   box-sizing: border-box;
 }
 

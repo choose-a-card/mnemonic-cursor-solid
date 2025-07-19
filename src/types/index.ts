@@ -54,4 +54,22 @@ export interface PracticeMode {
 export interface CardInterval {
   start: number;
   end: number;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: 'accuracy' | 'practice' | 'modes' | 'streaks' | 'milestones';
+  requirement: number;
+  unlocked: boolean;
+  unlockedAt?: number;
+  progress: number;
+  maxProgress: number;
+}
+
+export interface BadgeProgress {
+  badges: Badge[];
+  lastUnlocked: Badge | null;
 } 

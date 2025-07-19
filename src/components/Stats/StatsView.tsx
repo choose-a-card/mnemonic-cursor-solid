@@ -1,7 +1,8 @@
-import { createMemo } from 'solid-js'
+import { createMemo, type Component } from 'solid-js'
 import './StatsView.css'
 import { useStats } from '../../contexts/StatsContext'
 import type { Stats } from '../../types'
+import BadgeDisplay from './BadgeDisplay'
 
 const topN = (obj: Record<string, number>, n: number, labeler: (key: string) => string) => {
   return Object.entries(obj)
@@ -173,7 +174,7 @@ interface StatsViewProps {
 }
 
 export default function StatsView(props: StatsViewProps) {
-  const { stats } = useStats()
+  const { stats, badges, lastUnlockedBadge } = useStats()
   
   console.log('StatsView rendered with stats:', stats())
   console.log('StatsView props.onGenerateDebugStats:', props.onGenerateDebugStats)
@@ -309,6 +310,15 @@ export default function StatsView(props: StatsViewProps) {
             <li class="suggestion-item" role="listitem">{suggestion}</li>
           ))}
         </ul>
+      </div>
+
+      {/* Badges Section */}
+      <div class="stats-block">
+        <div class="stats-title">🏆 Achievements</div>
+        <BadgeDisplay 
+          badges={badges()} 
+          lastUnlockedBadge={lastUnlockedBadge()} 
+        />
       </div>
 
       <div class="stats-block">
