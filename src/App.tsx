@@ -156,7 +156,7 @@ const AppContent: Component<AppContentProps> = (props) => {
 
 const App: Component = () => {
   const [debugMode, setDebugMode] = createSignal<boolean>(false)
-  const [stackType, setStackType] = createSignal<StackType>('tamariz')
+  const [stackType] = createSignal<StackType>('tamariz')
 
   const stack = (): string[] => getStack(stackType())
 

@@ -6,17 +6,11 @@ This app has been converted into a Progressive Web App (PWA) that can be install
 
 ## 📱 Installation Instructions
 
-### On Android (Chrome/Edge):
-1. Open the app in Chrome or Edge browser
-2. You'll see an "Install" banner at the bottom of the screen
-3. Tap "Install" to add the app to your home screen
+### On Mobile (Chrome/Edge/Safari):
+1. Open the app in your mobile browser
+2. You'll see an "Install" banner or can use the browser menu
+3. Tap "Install" or "Add to Home Screen" to add the app to your home screen
 4. The app will now work like a native app!
-
-### On iPhone (Safari):
-1. Open the app in Safari browser
-2. Tap the Share button (square with arrow)
-3. Scroll down and tap "Add to Home Screen"
-4. Tap "Add" to install the app
 
 ### Manual Installation:
 1. Go to Settings → App Installation in the app

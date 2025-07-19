@@ -1,6 +1,6 @@
 import './SettingsView.css'
 import type { CardInterval } from '../../types'
-import { createSignal, onMount, Show, createEffect } from 'solid-js'
+import { createSignal, onMount, Show } from 'solid-js'
 import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallPrompt, getPWAInstallPrompt, checkServiceWorkerStatus, forceServiceWorkerRegistration } from '../../utils/pwa'
 import { isFeatureEnabled } from '../../utils/featureFlags'
 
@@ -71,11 +71,11 @@ export default function SettingsView(props: SettingsViewProps) {
         checkPWAStatus()
       })
 
-      // Listen for beforeinstallprompt event
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstallprompt event fired!')
-        checkPWAStatus()
-      })
+          // Listen for beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', () => {
+      console.log('beforeinstallprompt event fired!')
+      checkPWAStatus()
+    })
 
       // Listen for appinstalled event
       window.addEventListener('appinstalled', () => {
@@ -110,7 +110,7 @@ export default function SettingsView(props: SettingsViewProps) {
     
     // For mobile Chrome, try to trigger the install banner
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then((registration) => {
+      navigator.serviceWorker.ready.then(() => {
         console.log('Service Worker ready, trying to trigger install banner')
         // This might trigger the install banner on mobile Chrome
         window.dispatchEvent(new Event('beforeinstallprompt'))

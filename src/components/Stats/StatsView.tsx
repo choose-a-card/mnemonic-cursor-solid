@@ -1,4 +1,4 @@
-import { createMemo, type Component } from 'solid-js'
+import { createMemo } from 'solid-js'
 import './StatsView.css'
 import { useStats } from '../../contexts/StatsContext'
 import type { Stats } from '../../types'
@@ -12,7 +12,7 @@ const topN = (obj: Record<string, number>, n: number, labeler: (key: string) => 
     .map(([k, v]) => ({ label: labeler(k), count: v }))
 }
 
-const getAISuggestions = (stats: Stats, stack: string[]) => {
+const getAISuggestions = (stats: Stats) => {
   const suggestions = []
   const { history, cardFails, posFails, total, correct, modeStats } = stats
   
@@ -184,7 +184,7 @@ export default function StatsView(props: StatsViewProps) {
   const topPos = createMemo(() => topN(stats().posFails, 5, p => `${p} (${props.stack[Number(p)-1] || ''})`))
   const accuracy = createMemo(() => stats().total ? Math.round((stats().correct / stats().total) * 100) : 100)
 
-  const suggestions = createMemo(() => getAISuggestions(stats(), props.stack))
+  const suggestions = createMemo(() => getAISuggestions(stats()))
   const chartData = createMemo(() => createAccuracyChart(stats().history))
 
 
@@ -250,7 +250,7 @@ export default function StatsView(props: StatsViewProps) {
             Shows your accuracy over practice sessions (10 attempts each). Higher bars = better performance.
           </div>
           <div class="accuracy-chart" role="img" aria-label="Accuracy trend chart">
-            {(chartData() || []).map((session, i) => {
+            {(chartData() || []).map((session, _i) => {
               let barClass = 'bar-fill'
               if (session.accuracy === 100) {
                 barClass = 'bar-fill perfect'
@@ -283,7 +283,7 @@ export default function StatsView(props: StatsViewProps) {
       <div class="stats-block">
         <div class="stats-title">🤖 AI Suggestions</div>
         <ul class="suggestions-list" role="list" aria-label="AI-powered practice suggestions">
-          {(suggestions() || []).map((suggestion, i) => (
+          {(suggestions() || []).map((suggestion, _i) => (
             <li class="suggestion-item" role="listitem">{suggestion}</li>
           ))}
         </ul>
@@ -304,7 +304,7 @@ export default function StatsView(props: StatsViewProps) {
         <div class="stats-title">🎯 Most Missed Cards</div>
         <ul class="stats-list" role="list" aria-label="Most frequently missed cards">
           {topCards().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
-          {topCards().map((item, i) => (
+          {topCards().map((item, _i) => (
             <li class="stats-item" role="listitem">
               <span class="card-display">{item.label}</span>
               <span class="stats-count">×{item.count}</span>
@@ -317,7 +317,7 @@ export default function StatsView(props: StatsViewProps) {
         <div class="stats-title">📍 Most Missed Positions</div>
         <ul class="stats-list" role="list" aria-label="Most frequently missed positions">
           {topPos().length === 0 && <li class="stats-empty">None yet - keep practicing!</li>}
-          {topPos().map((item, i) => (
+          {topPos().map((item, _i) => (
             <li class="stats-item" role="listitem">
               <span class="position-display">{item.label}</span>
               <span class="stats-count">×{item.count}</span>
@@ -330,7 +330,7 @@ export default function StatsView(props: StatsViewProps) {
         <div class="stats-block">
           <div class="stats-title">📊 Recent Performance</div>
           <div class="recent-attempts" role="img" aria-label="Recent performance dots">
-            {stats().history.slice(-20).map((attempt, i) => (
+            {stats().history.slice(-20).map((attempt, _i) => (
               <div 
                 class={`attempt-dot ${attempt.correct ? 'correct' : 'incorrect'}`}
                 title={`${attempt.mode}: ${attempt.correct ? 'Correct' : 'Incorrect'}`}

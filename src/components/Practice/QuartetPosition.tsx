@@ -69,7 +69,7 @@ export default function QuartetPosition(props: QuartetPositionProps) {
     const correct =
       userPositions.length === 4 &&
       userPositions.every((pos, i) => pos === correctPositions[i]) &&
-      userPositions.every((pos, i, arr) => i === 0 || arr[i] > arr[i - 1])
+      userPositions.every((_pos, i, arr) => i === 0 || arr[i] > arr[i - 1])
     let wrongs: number[] = []
     if (!correct) {
       // Mark wrong inputs

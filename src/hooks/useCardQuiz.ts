@@ -1,7 +1,7 @@
-import { createSignal, createEffect } from 'solid-js'
+import { createSignal } from 'solid-js'
 import type { QuizQuestion, QuizResult } from '../types'
 import { playSound } from '../sounds/sounds'
-import { FEEDBACK_TIMER_MS } from '../constants/timers'
+
 
 interface UseCardQuizOptions {
   soundEnabled: boolean;

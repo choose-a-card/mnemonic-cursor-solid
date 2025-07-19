@@ -65,24 +65,18 @@ window.dispatchEvent(new Event('beforeinstallprompt'));
 
 ### Fix 4: Test on Different Browser
 Try installing on:
-- Chrome (Android)
-- Edge (Android)
+- Chrome (Mobile/Desktop)
+- Edge (Mobile/Desktop)
 - Safari (iOS)
-- Firefox (Android)
+- Firefox (Mobile/Desktop)
 
 ## 📱 Platform-Specific Instructions
 
-### Android (Chrome/Edge):
-1. Open app in Chrome/Edge
+### Mobile (Chrome/Edge/Safari):
+1. Open app in your mobile browser
 2. Look for install banner at bottom
 3. Or tap menu (⋮) → "Install app"
 4. Or go to Settings → App Installation → "📱 Install App"
-
-### iPhone (Safari):
-1. Open app in Safari
-2. Tap Share button (square with arrow)
-3. Scroll down to "Add to Home Screen"
-4. Tap "Add"
 
 ### Desktop (Chrome/Edge):
 1. Look for install icon in address bar

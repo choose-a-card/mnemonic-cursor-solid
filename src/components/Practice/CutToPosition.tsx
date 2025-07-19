@@ -4,7 +4,7 @@ import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import CardKeyboard from '../shared/CardKeyboard'
-import { SUITS, RANKS } from '../../constants/cards'
+
 import { calculateCutCard } from './cutToPositionUtils'
 
 interface CutToPositionProps {

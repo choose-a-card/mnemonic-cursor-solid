@@ -1,15 +1,15 @@
-# Pixel 6 Chrome PWA Debug Steps
+# Mobile Chrome PWA Debug Steps
 
-## 🔍 Step-by-Step Debugging for Pixel 6 Chrome
+## 🔍 Step-by-Step Debugging for Mobile Chrome
 
-### 1. **Open the App on Your Pixel 6**
+### 1. **Open the App on Your Mobile Device**
 ```
 http://YOUR_IP_ADDRESS:5173
 ```
 Replace `YOUR_IP_ADDRESS` with your computer's IP address (e.g., `192.168.1.100`)
 
 ### 2. **Check Browser Console**
-1. Open Chrome on your Pixel 6
+1. Open Chrome on your mobile device
 2. Go to the app URL
 3. Open Developer Tools:
    - Tap the menu (⋮) → More tools → Developer tools
@@ -68,16 +68,16 @@ Chrome requires user engagement before showing install prompt:
 ### 9. **Alternative Installation Methods**
 
 #### If Chrome doesn't show install prompt:
-1. **Try Edge browser** on your Pixel 6
+1. **Try Edge browser** on your mobile device
 2. **Use Samsung Internet** if available
-3. **Try Firefox** for Android
+3. **Try Firefox** for mobile
 
 #### Manual Home Screen Addition:
 1. Open Chrome menu (⋮)
 2. Tap "Add to Home screen"
 3. Follow the prompts
 
-### 10. **Common Pixel 6 Issues & Solutions**
+### 10. **Common Mobile Issues & Solutions**
 
 #### Issue: No install prompt appears
 **Solutions:**
@@ -98,7 +98,7 @@ Chrome requires user engagement before showing install prompt:
 - Force service worker registration
 - Check network connectivity
 
-### 11. **Expected Behavior on Pixel 6**
+### 11. **Expected Behavior on Mobile**
 
 #### ✅ What Should Happen:
 - After 30+ seconds of interaction
@@ -131,4 +131,4 @@ Chrome requires user engagement before showing install prompt:
 3. **Try on different device** (if available)
 4. **Check if it's a Chrome version issue**
 
-The app is designed to work on all modern Android devices with Chrome. If you're still having issues, the debug information will help identify the specific problem! 
+The app is designed to work on all modern mobile devices with Chrome. If you're still having issues, the debug information will help identify the specific problem! 

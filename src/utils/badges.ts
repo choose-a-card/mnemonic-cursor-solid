@@ -246,18 +246,7 @@ export const BADGE_DEFINITIONS: Omit<Badge, 'unlocked' | 'unlockedAt' | 'progres
   }
 ]
 
-// Calculate current streak from history
-const calculateCurrentStreak = (history: any[]): number => {
-  let streak = 0
-  for (let i = history.length - 1; i >= 0; i--) {
-    if (history[i].correct) {
-      streak++
-    } else {
-      break
-    }
-  }
-  return streak
-}
+
 
 // Calculate max streak from history
 const calculateMaxStreak = (history: any[]): number => {
@@ -297,7 +286,7 @@ export const calculateBadgeProgress = (stats: Stats): Badge[] => {
   const { total, correct, history, modeStats } = stats
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0
   const uniqueModes = new Set(history.map(h => h.mode)).size
-  const currentStreak = calculateCurrentStreak(history)
+
   const maxStreak = calculateMaxStreak(history)
   
   // Calculate session streaks (consecutive correct in recent history)
