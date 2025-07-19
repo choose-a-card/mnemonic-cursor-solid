@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-navigation/native": "^7.1.14",
     "solid-js": "^1.8.22",
     "solid-transition-group": "^0.3.0"
   },

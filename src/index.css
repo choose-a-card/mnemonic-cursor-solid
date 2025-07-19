@@ -20,10 +20,16 @@
   padding: 0;
 }
 
+html {
+  height: 100vh;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  height: 100vh; /* Use fixed height instead of min-height */
+  overflow: hidden; /* Prevent body scroll */
 }
 
 h1 {
