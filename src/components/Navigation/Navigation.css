@@ -96,7 +96,7 @@
 }
 
 .menu-item.active {
-  background: #007AFF;
+  background: var(--accent, #007AFF);
   color: white;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
@@ -173,7 +173,7 @@
 
 
 .nav-item.active {
-  background: linear-gradient(135deg, #007AFF, #0056CC);
+  background: linear-gradient(135deg, var(--accent, #007AFF), var(--accent-hover, #0056CC));
   color: white;
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
   transform: translateY(-2px);
@@ -188,7 +188,7 @@
   transform: translateX(-50%);
   width: 20px;
   height: 3px;
-  background: linear-gradient(90deg, #007AFF, #0056CC);
+  background: linear-gradient(90deg, var(--accent, #007AFF), var(--accent-hover, #0056CC));
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 122, 255, 0.3);
 }

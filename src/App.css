@@ -10,6 +10,7 @@
   --border: #e5e5e7;
   --border-light: #f0f0f3;
   --accent: #007aff;
+  --accent-hover: #0056cc;
   --accent-light: #e3f2fd;
   --red: #e11d48;
   --red-light: #fecdd3;
@@ -44,7 +45,8 @@
   --text-secondary: #ccc;
   --border: #404040;
   --border-light: #333;
-  --accent: #007aff;
+  --accent: #0A84FF;
+  --accent-hover: #0056cc;
   --accent-light: #1a3a5a;
 }
 
