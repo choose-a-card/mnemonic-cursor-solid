@@ -315,16 +315,17 @@
 
 /* Feedback Area */
 .feedback-area {
-  min-height: 3rem;
+  min-height: 4rem; /* Increased to accommodate feedback message with padding */
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 1rem 0; /* Fixed margin for consistent spacing */
 }
 
 .feedback-message {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   text-align: center;
   background: var(--surface, #f8f9fa);
@@ -481,6 +482,16 @@
     font-size: 1rem;
     padding: 0.75rem;
   }
+  
+  .feedback-area {
+    min-height: 3.5rem; /* Slightly smaller on mobile */
+    margin: 0.75rem 0;
+  }
+  
+  .feedback-message {
+    font-size: 0.95rem;
+    padding: 0.625rem 1rem;
+  }
 }
 
 /* Extra small screens and down */
@@ -520,6 +531,7 @@
   flex-direction: column;
   min-height: 0;
   overflow: auto;
+  padding: 0.75rem 1rem;
 }
 
 .practice-mode {
@@ -535,7 +547,7 @@
   display: flex;
   gap: 1.5rem;
   justify-content: center;
-  margin: 1.5rem 0 0.5rem 0;
+  margin: 1.5rem 0 0 0; /* Removed bottom margin to rely on feedback-area margin */
 }
 
 .answer-btn {

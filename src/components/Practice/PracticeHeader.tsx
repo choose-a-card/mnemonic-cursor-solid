@@ -30,7 +30,7 @@ export default function PracticeHeader(props: PracticeHeaderProps) {
         aria-label="Go back to practice mode selection"
         tabindex={0}
       >
-        ← Back
+        ←
       </button>
       <div class="practice-title">
         <Show when={currentModeInfo()}>

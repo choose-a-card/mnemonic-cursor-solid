@@ -13,17 +13,19 @@
 .back-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 1rem;
+  justify-content: center;
+  padding: 0.75rem;
   background: transparent;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--text-color);
-  font-size: 0.9375rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  min-width: 48px;
+  min-height: 48px;
   /* Prevent stuck tap highlight on mobile */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -34,6 +36,11 @@
 .back-button:hover {
   background: var(--hover-bg);
   border-color: var(--primary-color);
+  transform: translateX(-2px);
+}
+
+.back-button:active {
+  transform: translateX(0);
 }
 
 .back-button:focus-visible {
@@ -52,6 +59,7 @@
   gap: 0.75rem;
   flex: 1;
   justify-content: center;
+  margin-right: 48px; /* Balance the back button for centered title */
 }
 
 .practice-icon {
@@ -71,8 +79,10 @@
   }
 
   .back-button {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 0.625rem;
+    font-size: 1.25rem;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .practice-icon {
@@ -81,6 +91,10 @@
 
   .practice-name {
     font-size: 1.125rem;
+  }
+  
+  .practice-title {
+    margin-right: 44px; /* Balance for mobile */
   }
 }
 
