@@ -13,6 +13,10 @@ yarn-error.log*
 # Test coverage
 coverage/
 
+# Test results
+test-results/
+playwright-report/
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -30,9 +34,13 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# Jest
-jest.config.js
-jest.config.cjs
+# Development docs (keep only README and FEATURE_FLAGS)
+*_FIX.md
+*_SUMMARY.md
+*_PROPOSAL.md
+*_COMPLETE.md
+*_IMPROVEMENTS.md
+PWA_*.md
 
 # Misc
 *.log 

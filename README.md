@@ -10,22 +10,26 @@ A modern, professional web application for practicing and mastering the Tamariz,
 - **Clean Interface**: Centered, vertical list with smooth animations
 
 ### 🎯 **Practice Modes**
-- **Classic Quiz**: Card→Position & Position→Card training
+- **Card → Position**: Identify the position of a given card
+- **Position → Card**: Identify which card is at a given position
 - **One Ahead**: Practice predicting the next card in sequence
 - **Stack in Context**: Learn card relationships (previous/next)
-- **Cutting Estimation**: Calculate cuts needed to reach target cards
+- **First or Second Half**: Determine if a card is in the first or second half
+- **Quartet Position**: Locate all four cards of the same rank
+- **Cut to Position**: Calculate which card to cut to for a target position
+- **Cutting Estimation**: Calculate cuts needed to reach target cards (±8 cards)
 - **Custom Keyboard**: Seamless card input with rank/suit selection
 - **Audio Feedback**: Sound effects for correct/incorrect answers
 
 ### 📊 **Advanced Analytics**
-- **Accuracy Tracking**: Visual progress charts over time
-- **AI Suggestions**: Personalized recommendations based on performance
-- **Failure Analysis**: Most missed cards and positions
-- **Performance Trends**: Recent attempt visualization
-- **Session Statistics**: Comprehensive progress tracking
-- **Achievement System**: Badges and progress tracking (can be disabled)
+- **Overall Accuracy**: Track your success rate across all practice sessions
+- **Per-Mode Performance**: Monitor accuracy for each practice mode individually
+- **Recent Performance**: View last 10 attempts, current streak, and trends
+- **Mode-Specific Failures**: Track most missed cards/positions per practice mode
+- **Session Statistics**: Comprehensive progress tracking with persistent storage
+- **Achievement System**: Badges and progress tracking (can be enabled via feature flag)
 
-### ⚙️ **Comprehensive Settings**
+### ⚙️ **Settings & Customization**
 - **Stack Selection**: Switch between Tamariz, Aronson & 5th Faro stacks
 - **Feature Flags**: Control app features via URL parameters
   - `?enableBadges=true` - Enable the badges/achievement system (disabled by default)
@@ -35,23 +39,25 @@ A modern, professional web application for practicing and mastering the Tamariz,
 
 ```
 src/
-├── App.jsx                 # Main application with bottom navigation
-├── App.css                 # Global app styles with dark mode
-├── index.jsx               # Application entry point
-├── index.css               # Base styles and CSS variables
-└── components/
-    ├── Stack/
-    │   ├── StackView.jsx   # Stack display with blind mode
-    │   └── StackView.css   # Stack component styles
-    ├── Practice/
-    │   ├── PracticeView.jsx # All practice modes and custom keyboard
-    │   └── PracticeView.css # Practice component styles
-    ├── Stats/
-    │   ├── StatsView.jsx   # Analytics and AI suggestions
-    │   └── StatsView.css   # Stats component styles
-    └── Settings/
-        ├── SettingsView.jsx # App configuration and about
-        └── SettingsView.css # Settings component styles
+├── App.tsx                    # Main application component
+├── App.css                    # Global app styles
+├── index.tsx                  # Application entry point with routing
+├── index.css                  # Base styles and CSS variables
+├── components/
+│   ├── Navigation/            # Bottom navigation component
+│   ├── Practice/              # Practice mode components
+│   ├── Settings/              # Settings components
+│   ├── shared/                # Reusable UI components
+│   ├── Stack/                 # Stack display components
+│   └── Stats/                 # Analytics components
+├── constants/                 # App constants (stacks, timers, etc.)
+├── contexts/                  # React contexts for state management
+├── hooks/                     # Custom React hooks
+├── layouts/                   # Layout components
+├── pages/                     # Page-level components
+├── sounds/                    # Audio feedback system
+├── types/                     # TypeScript type definitions
+└── utils/                     # Utility functions
 ```
 
 ## 🎨 Design Philosophy
@@ -98,10 +104,13 @@ npm run build
 ## 🛠️ Technology Stack
 
 - **Framework**: SolidJS - Fast, reactive UI library
+- **Language**: TypeScript - Type-safe development
 - **Build Tool**: Vite - Lightning-fast development experience
+- **Router**: @solidjs/router - Client-side routing
 - **Styling**: Vanilla CSS with CSS custom properties
 - **Icons**: Unicode emojis for universal compatibility
 - **Audio**: Web Audio API for sound effects
+- **Testing**: Jest & Playwright for unit and E2E tests
 
 ## 📱 Usage
 
