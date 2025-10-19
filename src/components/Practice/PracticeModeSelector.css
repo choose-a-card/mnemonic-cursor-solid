@@ -1,0 +1,170 @@
+.practice-mode-selector {
+  width: 100%;
+}
+
+.selection-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.selection-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+}
+
+.selection-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
+}
+
+.badge-progress-indicator {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.badge-progress-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.badge-progress-icon {
+  font-size: 1.25rem;
+}
+
+.badge-progress-bar-mini {
+  width: 200px;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.badge-progress-fill-mini {
+  height: 100%;
+  background: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.mode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.mode-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.mode-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mode-card:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.mode-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.mode-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mode-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.mode-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.mode-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+}
+
+.mode-accuracy {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.mode-attempts {
+  color: var(--text-secondary);
+}
+
+.mode-arrow {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.mode-card:hover .mode-arrow {
+  transform: translateX(4px);
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .selection-title {
+    font-size: 1.5rem;
+  }
+
+  .selection-subtitle {
+    font-size: 1rem;
+  }
+
+  .mode-card {
+    padding: 1.25rem;
+  }
+
+  .mode-icon {
+    font-size: 1.75rem;
+  }
+
+  .mode-name {
+    font-size: 1rem;
+  }
+}
+

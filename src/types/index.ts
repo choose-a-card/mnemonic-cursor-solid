@@ -28,11 +28,14 @@ export interface ModeStats {
   total: number;
   correct: number;
   accuracy: number;
+  // Per-mode failure tracking (context-aware)
+  cardFails?: Record<string, number>;
+  posFails?: Record<string, number>;
+  lastAttempt?: number; // Timestamp of last attempt
 }
 
 export interface Stats {
-  cardFails: Record<string, number>;
-  posFails: Record<string, number>;
+  // REMOVED: Global cardFails and posFails (they mixed contexts)
   total: number;
   correct: number;
   history: AttemptHistory[];
@@ -72,4 +75,4 @@ export interface Badge {
 export interface BadgeProgress {
   badges: Badge[];
   lastUnlocked: Badge | null;
-} 
+}

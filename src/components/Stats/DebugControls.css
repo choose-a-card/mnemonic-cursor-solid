@@ -1,0 +1,8 @@
+.debug-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  text-align: center;
+}
+

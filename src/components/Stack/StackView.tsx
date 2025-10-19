@@ -1,6 +1,7 @@
 import { type Component, Index } from 'solid-js'
 import { useAppSettings } from '../../contexts/AppSettingsContext'
 import { getStack, getStackTitle } from '../../constants/stacks'
+import { getCardColorClass, getCardSuit, getCardValue } from '../../utils/cardHelpers'
 import './StackView.css'
 
 const StackView: Component = () => {
@@ -8,25 +9,6 @@ const StackView: Component = () => {
   const stack = () => getStack(stackType())
   const stackTitle = () => getStackTitle(stackType())
   const displayStack = () => stack().slice(cardInterval().start - 1, cardInterval().end)
-
-  function getCardColorClass(card: string): string {
-    if (card.includes('♥') || card.includes('♦')) {
-      return 'card-red'
-    }
-    return 'card-black'
-  }
-
-  function getCardSuit(card: string): string {
-    if (card.includes('♠')) return '♠'
-    if (card.includes('♥')) return '♥'
-    if (card.includes('♦')) return '♦'
-    if (card.includes('♣')) return '♣'
-    return ''
-  }
-
-  function getCardValue(card: string): string {
-    return card.replace(/[♠♥♦♣]/g, '').trim()
-  }
 
   return (
     <div class="stack-view">

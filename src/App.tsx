@@ -1,56 +1,27 @@
-import { createSignal, type Component, onMount } from 'solid-js'
+import { type Component } from 'solid-js'
 import { type RouteSectionProps } from '@solidjs/router'
-import { getStack, type StackType } from './constants/stacks'
 import { StatsProvider } from './contexts/StatsContext'
-import { AppSettingsProvider, useAppSettings } from './contexts/AppSettingsContext'
-import Navigation from './components/Navigation/Navigation'
+import { AppSettingsProvider } from './contexts/AppSettingsContext'
+import { useDebugMode } from './hooks/useDebugMode'
+import AppLayout from './layouts/AppLayout'
 import './App.css'
 
 const AppContent: Component<RouteSectionProps> = (props) => {
-  const { darkMode } = useAppSettings()
-  const [debugMode, setDebugMode] = createSignal<boolean>(false)
-  const [stackType] = createSignal<StackType>('tamariz')
-
-  const stack = (): string[] => getStack(stackType())
-
-  // Check for debug flag in URL on mount
-  onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const debugFlag = urlParams.get('debug')
-    if (debugFlag === 'true') {
-      setDebugMode(true)
-      console.log('Debug mode enabled via URL parameter')
-    }
-  })
-
   return (
-    <StatsProvider debugMode={debugMode()} stack={stack}>
-      <div class={`app-container ${darkMode() ? 'dark' : ''}`}>
-        <div class="main-content">
-          {props.children}
-        </div>
-        <Navigation />
-      </div>
-    </StatsProvider>
+    <AppLayout>
+      {props.children}
+    </AppLayout>
   )
 }
 
 const App: Component<RouteSectionProps> = (props) => {
-  const [debugMode, setDebugMode] = createSignal<boolean>(false)
-
-  // Check for debug flag in URL on mount
-  onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const debugFlag = urlParams.get('debug')
-    if (debugFlag === 'true') {
-      setDebugMode(true)
-      console.log('Debug mode enabled via URL parameter')
-    }
-  })
+  const { debugMode } = useDebugMode()
 
   return (
     <AppSettingsProvider debugMode={debugMode()}>
-      <AppContent {...props} />
+      <StatsProvider debugMode={debugMode()} stack={() => []}>
+        <AppContent {...props} />
+      </StatsProvider>
     </AppSettingsProvider>
   )
 }

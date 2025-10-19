@@ -1,19 +1,13 @@
 import { createSignal, onMount, createEffect } from 'solid-js'
-import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
+import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { RANKS, SUITS } from '../../constants/cards'
+import { usePractice } from '../../contexts/PracticeContext'
 
-interface QuartetPositionProps {
-  stack: string[];
-  practiceStack: string[];
-  cardInterval: CardInterval;
-  soundEnabled: boolean;
-  onResult: (result: QuizResult) => void;
-}
-
-export default function QuartetPosition(props: QuartetPositionProps) {
+export default function QuartetPosition() {
+  const { stack, soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [inputs, setInputs] = createSignal<string[]>(['', '', '', ''])
   const [feedback, setFeedback] = createSignal<string>('')
@@ -31,7 +25,7 @@ export default function QuartetPosition(props: QuartetPositionProps) {
     const rank = RANKS[rankIdx]
     // Find all cards of that rank in the stack
     const quartetCards = SUITS.map(suit => rank + suit.symbol)
-    const positions = props.stack.reduce((acc, current, index) => {
+    const positions = stack().reduce((acc, current, index) => {
         if(quartetCards.includes(current)) {
             acc.push(index + 1)
         }
@@ -78,10 +72,10 @@ export default function QuartetPosition(props: QuartetPositionProps) {
     } else {
       setWrongIndexes([])
     }
-    playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
+    playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'Correct! ✅' : `Wrong. Positions: ${correctPositions.join(', ')}`)
     setAnswered(true)
-    props.onResult({
+    onResult({
       correct,
       question: question(),
       input: inputs().join(','),

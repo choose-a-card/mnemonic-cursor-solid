@@ -1,0 +1,49 @@
+.overall-accuracy-card {
+  grid-column: span 1;
+}
+
+.accuracy-display {
+  text-align: center;
+}
+
+.accuracy-value {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.accuracy-details {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .accuracy-value {
+    font-size: 2.5rem;
+  }
+
+  .detail-value {
+    font-size: 1.25rem;
+  }
+}
+

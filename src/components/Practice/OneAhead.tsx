@@ -1,19 +1,13 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
+import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
+import { usePractice } from '../../contexts/PracticeContext'
 
-interface OneAheadProps {
-  stack: string[];
-  practiceStack: string[];
-  cardInterval: CardInterval;
-  soundEnabled: boolean;
-  onResult: (result: QuizResult) => void;
-}
-
-export default function OneAhead(props: OneAheadProps) {
+export default function OneAhead() {
+  const { practiceStack, soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string>('')
@@ -25,12 +19,12 @@ export default function OneAhead(props: OneAheadProps) {
     setShowKeyboard(true) // Keep keyboard open for next question
     
     // Pick a random card from the practice stack
-    const practiceIdx = getRandomInt(props.practiceStack.length)
-    const card = props.practiceStack[practiceIdx]
+    const practiceIdx = getRandomInt(practiceStack().length)
+    const card = practiceStack()[practiceIdx]
     
     // Calculate the next card position in the practice range
-    const nextPracticeIdx = (practiceIdx + 1) % props.practiceStack.length
-    const nextCard = props.practiceStack[nextPracticeIdx]
+    const nextPracticeIdx = (practiceIdx + 1) % practiceStack().length
+    const nextCard = practiceStack()[nextPracticeIdx]
     
     setQuestion({ card, answer: nextCard, type: 'one-ahead' })
   }
@@ -41,7 +35,7 @@ export default function OneAhead(props: OneAheadProps) {
     
     const correct = card.toUpperCase().replace(/\s+/g,'') === String(q.answer).replace(/\s+/g,'').toUpperCase()
     
-    playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
+    playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
     
     if (correct) {
       setFeedback('Correct! ✅')
@@ -49,7 +43,7 @@ export default function OneAhead(props: OneAheadProps) {
       setFeedback(`Wrong. Answer: ${q.answer}`)
     }
     
-    props.onResult({ 
+    onResult({ 
       correct, 
       question: q, 
       input: card, 

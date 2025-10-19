@@ -3,10 +3,10 @@ import { render } from 'solid-js/web'
 import './index.css'
 import App from './App'
 import { HashRouter, Navigate, Route } from '@solidjs/router'
-import PracticeView from './components/Practice/PracticeView'
-import SettingsView from './components/Settings/SettingsView'
-import StackView from './components/Stack/StackView'
-import StatsView from './components/Stats/StatsView'
+import StackPage from './pages/StackPage'
+import PracticePage from './pages/PracticePage'
+import StatsPage from './pages/StatsPage'
+import SettingsPage from './pages/SettingsPage'
 
 const root = document.getElementById('root')
 
@@ -19,9 +19,9 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(() => (
   <HashRouter root={App}>
     <Route path="/" component={() => <Navigate href="/stack" />} />
-            <Route path="/stack" component={StackView} />
-            <Route path="/practice" component={PracticeView} />
-            <Route path="/stats" component={StatsView} />
-            <Route path="/settings" component={SettingsView} />
+    <Route path="/stack" component={StackPage} />
+    <Route path="/practice" component={PracticePage} />
+    <Route path="/stats" component={StatsPage} />
+    <Route path="/settings" component={SettingsPage} />
   </HashRouter>
 ), root!)

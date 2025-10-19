@@ -24,8 +24,6 @@ interface StatsProviderProps {
 
 export const StatsProvider: Component<StatsProviderProps> = (props) => {
   const [stats, setStats] = createSignal<Stats>({
-    cardFails: {},
-    posFails: {},
     total: 0,
     correct: 0,
     history: [],
@@ -45,15 +43,23 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     onOnlineStatusChange(setOnlineStatus)
     
     // Load stats from localStorage
-    const savedStats = loadFromLocalStorage<Stats>('mnemonic-stats', {
-      cardFails: {},
-      posFails: {},
+    const savedStats = loadFromLocalStorage<any>('mnemonic-stats', {
       total: 0,
       correct: 0,
       history: [],
       modeStats: {}
     })
-    setStats(savedStats)
+
+    // MIGRATION: Remove old global cardFails/posFails if they exist
+    const migratedStats: Stats = {
+      total: savedStats.total || 0,
+      correct: savedStats.correct || 0,
+      history: savedStats.history || [],
+      modeStats: savedStats.modeStats || {}
+    }
+    // Ignore old cardFails and posFails fields
+    
+    setStats(migratedStats)
   })
 
   // Calculate badges from current stats (only if badges are enabled)
@@ -108,29 +114,40 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
       correct: currentStats.correct + (correct ? 1 : 0)
     }
     
-    // Update card failures
-    if (!correct && question.card) {
-      newStats.cardFails = {
-        ...newStats.cardFails,
-        [question.card]: (newStats.cardFails[question.card] || 0) + 1
+    // Initialize mode stats if not exists
+    if (!newStats.modeStats[mode]) {
+      newStats.modeStats[mode] = { 
+        total: 0, 
+        correct: 0, 
+        accuracy: 0,
+        cardFails: {},
+        posFails: {},
+        lastAttempt: Date.now()
       }
     }
     
-    // Update position failures
-    if (!correct && question.pos) {
-      newStats.posFails = {
-        ...newStats.posFails,
-        [question.pos.toString()]: (newStats.posFails[question.pos.toString()] || 0) + 1
+    // Update mode-specific failures (context-aware!)
+    const modeStats = newStats.modeStats[mode]
+    if (!correct) {
+      // Track card failures per mode
+      if (question.card) {
+        if (!modeStats.cardFails) modeStats.cardFails = {}
+        modeStats.cardFails[question.card] = (modeStats.cardFails[question.card] || 0) + 1
+      }
+      
+      // Track position failures per mode
+      if (question.pos) {
+        if (!modeStats.posFails) modeStats.posFails = {}
+        const posKey = question.pos.toString()
+        modeStats.posFails[posKey] = (modeStats.posFails[posKey] || 0) + 1
       }
     }
     
     // Update mode stats
-    if (!newStats.modeStats[mode]) {
-      newStats.modeStats[mode] = { total: 0, correct: 0, accuracy: 0 }
-    }
-    newStats.modeStats[mode].total++
-    if (correct) newStats.modeStats[mode].correct++
-    newStats.modeStats[mode].accuracy = Math.round((newStats.modeStats[mode].correct / newStats.modeStats[mode].total) * 100)
+    modeStats.total++
+    if (correct) modeStats.correct++
+    modeStats.accuracy = Math.round((modeStats.correct / modeStats.total) * 100)
+    modeStats.lastAttempt = Date.now()
     
     // Add to history
     newStats.history.push({
@@ -145,9 +162,7 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
   }
 
   const resetStats = () => {
-    const emptyStats = {
-      cardFails: {},
-      posFails: {},
+    const emptyStats: Stats = {
       total: 0,
       correct: 0,
       history: [],
@@ -160,10 +175,14 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
 
   const generateDebugStats = (): void => {
     console.log('StatsContext: generateDebugStats called')
-    console.log('StatsContext: current stack:', props.stack())
     const currentStack = props.stack()
     const modes = ['Card → Position', 'Position → Card', 'One Ahead', 'Stack Context', 'Cutting Estimation', 'First or Second Half', 'Quartet Position', 'Cut to Position']
-    const newStats: Stats = { cardFails: {}, posFails: {}, total: 0, correct: 0, history: [], modeStats: {} }
+    const newStats: Stats = { 
+      total: 0, 
+      correct: 0, 
+      history: [], 
+      modeStats: {} 
+    }
     
     console.log('StatsContext: Generating 10000 debug results...')
     for (let i = 0; i < 10000; i++) {
@@ -176,19 +195,33 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
       newStats.total++
       if (correct) {
         newStats.correct++
-      } else {
-        // Add failures to tracking
-        newStats.cardFails[card] = (newStats.cardFails[card] || 0) + 1
-        newStats.posFails[pos.toString()] = (newStats.posFails[pos.toString()] || 0) + 1
+      }
+      
+      // Initialize mode stats if not exists
+      if (!newStats.modeStats[mode]) {
+        newStats.modeStats[mode] = { 
+          total: 0, 
+          correct: 0, 
+          accuracy: 0,
+          cardFails: {},
+          posFails: {},
+          lastAttempt: Date.now()
+        }
+      }
+      
+      // Update mode-specific failures
+      const modeStats = newStats.modeStats[mode]
+      if (!correct) {
+        if (!modeStats.cardFails) modeStats.cardFails = {}
+        if (!modeStats.posFails) modeStats.posFails = {}
+        modeStats.cardFails[card] = (modeStats.cardFails[card] || 0) + 1
+        modeStats.posFails[pos.toString()] = (modeStats.posFails[pos.toString()] || 0) + 1
       }
       
       // Update mode stats
-      if (!newStats.modeStats[mode]) {
-        newStats.modeStats[mode] = { total: 0, correct: 0, accuracy: 0 }
-      }
-      newStats.modeStats[mode].total++
-      if (correct) newStats.modeStats[mode].correct++
-      newStats.modeStats[mode].accuracy = Math.round((newStats.modeStats[mode].correct / newStats.modeStats[mode].total) * 100)
+      modeStats.total++
+      if (correct) modeStats.correct++
+      modeStats.accuracy = Math.round((modeStats.correct / modeStats.total) * 100)
       
       // Add to history
       newStats.history.push({
@@ -228,4 +261,4 @@ export const useStats = () => {
     throw new Error('useStats must be used within a StatsProvider')
   }
   return context
-} 
+}

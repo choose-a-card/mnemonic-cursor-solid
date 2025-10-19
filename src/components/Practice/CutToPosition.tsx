@@ -1,21 +1,15 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
+import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import CardKeyboard from '../shared/CardKeyboard'
+import { usePractice } from '../../contexts/PracticeContext'
 
 import { calculateCutCard } from './cutToPositionUtils'
 
-interface CutToPositionProps {
-  stack: string[];
-  practiceStack: string[];
-  cardInterval: CardInterval;
-  soundEnabled: boolean;
-  onResult: (result: QuizResult) => void;
-}
-
-export default function CutToPosition(props: CutToPositionProps) {
+export default function CutToPosition() {
+  const { stack, soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string>('')
@@ -28,12 +22,12 @@ export default function CutToPosition(props: CutToPositionProps) {
     setInput('')
     setShowKeyboard(true) // Keep keyboard open for next question
     // Pick a random target card and position
-    const N = props.stack.length
+    const N = stack().length
     const targetIdx = getRandomInt(N)
-    const targetCard = props.stack[targetIdx]
+    const targetCard = stack()[targetIdx]
     const targetPos = getRandomInt(N) + 1 // 1-based
     // Calculate the cut card
-    const cutCard = calculateCutCard(props.stack, targetCard, targetPos)
+    const cutCard = calculateCutCard(stack(), targetCard, targetPos)
     setQuestion({
       answer: cutCard,
       type: 'cut-to-position',
@@ -48,10 +42,10 @@ export default function CutToPosition(props: CutToPositionProps) {
     setInput(card)
     const q = question()
     const correct = card.replace(/\s+/g, '').toUpperCase() === String(q.answer).replace(/\s+/g, '').toUpperCase()
-    playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
+    playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'Correct! ✅' : `Wrong. Answer: ${q.answer}`)
     setAnswered(true)
-    props.onResult({
+    onResult({
       correct,
       question: q,
       input: card,

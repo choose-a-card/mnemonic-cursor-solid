@@ -1,18 +1,12 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
+import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
+import { usePractice } from '../../contexts/PracticeContext'
 
-interface CuttingEstimationProps {
-  stack: string[];
-  practiceStack: string[];
-  cardInterval: CardInterval;
-  soundEnabled: boolean;
-  onResult: (result: QuizResult) => void;
-}
-
-export default function CuttingEstimation(props: CuttingEstimationProps) {
+export default function CuttingEstimation() {
+  const { practiceStack, cardInterval, soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string>('')
@@ -22,9 +16,9 @@ export default function CuttingEstimation(props: CuttingEstimationProps) {
     setInput('')
     
     // Randomly select a cut position (simulating a cut)
-    const N = props.practiceStack.length
+    const N = practiceStack().length
     const cutIdx = getRandomInt(N)
-    const cutCard = props.practiceStack[cutIdx]
+    const cutCard = practiceStack()[cutIdx]
     
     // Randomly select an offset between -8 and +8, excluding 0
     let offset = 0
@@ -33,15 +27,15 @@ export default function CuttingEstimation(props: CuttingEstimationProps) {
     }
     // Compute target position, wrapping around
     const targetIdx = (cutIdx + offset + N) % N
-    const targetCard = props.practiceStack[targetIdx]
+    const targetCard = practiceStack()[targetIdx]
     
     setQuestion({ 
       targetCard, 
       cutCard, 
       answer: offset, 
       type: 'cutting',
-      targetPos: props.cardInterval.start + targetIdx,
-      cutPos: props.cardInterval.start + cutIdx
+      targetPos: cardInterval().start + targetIdx,
+      cutPos: cardInterval().start + cutIdx
     })
   }
 
@@ -51,7 +45,7 @@ export default function CuttingEstimation(props: CuttingEstimationProps) {
     
     const correct = Number(input()) === q.answer
     
-    playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
+    playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
     
     if (correct) {
       setFeedback('Correct! ✅')
@@ -59,14 +53,14 @@ export default function CuttingEstimation(props: CuttingEstimationProps) {
       setFeedback(`Wrong. Answer: ${q.answer} cards`)
     }
     
-    props.onResult({ 
+    onResult({ 
       correct, 
       question: q, 
       input: input(), 
       mode: 'Cutting Estimation' 
     })
     
-            setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
+    setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
   }
 
   onMount(() => {

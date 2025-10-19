@@ -1,0 +1,40 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group-horizontal {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.form-group-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.form-group-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group-horizontal .form-group-control {
+  flex-shrink: 0;
+}
+

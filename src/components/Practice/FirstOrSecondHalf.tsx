@@ -1,18 +1,12 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult, CardInterval } from '../../types'
+import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
+import { usePractice } from '../../contexts/PracticeContext'
 
-interface FirstOrSecondHalfProps {
-  stack: string[];
-  practiceStack: string[];
-  cardInterval: CardInterval;
-  soundEnabled: boolean;
-  onResult: (result: QuizResult) => void;
-}
-
-export default function FirstOrSecondHalf(props: FirstOrSecondHalfProps) {
+export default function FirstOrSecondHalf() {
+  const { practiceStack, cardInterval, soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [feedback, setFeedback] = createSignal<string>('')
   const [answered, setAnswered] = createSignal<boolean>(false)
@@ -21,10 +15,10 @@ export default function FirstOrSecondHalf(props: FirstOrSecondHalfProps) {
     setFeedback('')
     setAnswered(false)
     // Pick a random card from the practice stack
-    const practiceIdx = getRandomInt(props.practiceStack.length)
-    const card = props.practiceStack[practiceIdx]
+    const practiceIdx = getRandomInt(practiceStack().length)
+    const card = practiceStack()[practiceIdx]
     // Calculate the actual position in the full stack
-    const actualPos = props.cardInterval.start + practiceIdx
+    const actualPos = cardInterval().start + practiceIdx
     const answer = actualPos <= 26 ? 'First Half' : 'Second Half'
     setQuestion({ card, pos: actualPos, answer, type: 'first-or-second-half' })
   }
@@ -35,10 +29,10 @@ export default function FirstOrSecondHalf(props: FirstOrSecondHalfProps) {
     const correct = (String(q.answer).toLowerCase().replace(/\s+/g, '') === userInput.toLowerCase().replace(/\s+/g, '')) ||
       (q.answer === 'First Half' && ['first', 'first half', '1', 'one'].includes(userInput.toLowerCase().replace(/\s+/g, '')))
       || (q.answer === 'Second Half' && ['second', 'second half', '2', 'two'].includes(userInput.toLowerCase().replace(/\s+/g, '')))
-    playSound(props.soundEnabled, correct ? 'correct' : 'incorrect')
+    playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'Correct! ✅' : `Wrong. Answer: ${q.answer}`)
     setAnswered(true)
-    props.onResult({ 
+    onResult({ 
       correct, 
       question: q, 
       input: userInput, 

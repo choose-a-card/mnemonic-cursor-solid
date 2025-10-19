@@ -1,0 +1,23 @@
+.about-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.app-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.app-version {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.app-description {
+  font-size: 0.9375rem;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
