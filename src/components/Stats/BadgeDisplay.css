@@ -155,6 +155,11 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .badge-item:hover {
@@ -163,10 +168,14 @@
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
 }
 
-.badge-item:focus {
+.badge-item:focus-visible {
   outline: none;
   border-color: var(--accent, #007aff);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.badge-item:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .badge-item.locked {

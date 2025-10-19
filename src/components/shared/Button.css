@@ -10,6 +10,11 @@
   transition: all 0.2s ease;
   font-family: inherit;
   outline: none;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .btn:disabled {
@@ -17,9 +22,15 @@
   cursor: not-allowed;
 }
 
+/* Only show focus outline for keyboard navigation */
 .btn:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* Prevent focus styles on touch devices */
+.btn:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Sizes */

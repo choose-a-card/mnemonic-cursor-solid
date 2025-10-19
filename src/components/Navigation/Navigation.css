@@ -161,6 +161,15 @@
   border-radius: 8px;
   position: relative;
   overflow: hidden;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.nav-item:focus:not(:focus-visible) {
+  outline: none;
 }
 
 

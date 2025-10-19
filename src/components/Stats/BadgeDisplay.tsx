@@ -37,7 +37,12 @@ const BadgeDisplay: Component<BadgeDisplayProps> = (props) => {
   const unlockedBadges = createMemo(() => props.badges.filter(b => b.unlocked).length)
   const completionPercentage = createMemo(() => Math.round((unlockedBadges() / totalBadges()) * 100))
 
-  const handleBadgeClick = (badge: Badge) => {
+  const handleBadgeClick = (badge: Badge, event?: MouseEvent) => {
+    // Remove focus on touch devices to prevent stuck hover state
+    if (event && 'ontouchstart' in window) {
+      const target = event.currentTarget as HTMLElement
+      target.blur()
+    }
     // Could add badge details modal here
     console.log('Badge clicked:', badge)
   }
@@ -106,7 +111,7 @@ const BadgeDisplay: Component<BadgeDisplayProps> = (props) => {
                 {badges.map((badge) => (
                   <div 
                     class={`badge-item ${badge.unlocked ? 'unlocked' : 'locked'} ${props.lastUnlockedBadge?.id === badge.id ? 'newly-unlocked' : ''}`}
-                    onClick={() => handleBadgeClick(badge)}
+                    onClick={(e) => handleBadgeClick(badge, e)}
                     onKeyDown={(e) => handleBadgeKeyDown(e, badge)}
                     tabindex={0}
                     role="button"

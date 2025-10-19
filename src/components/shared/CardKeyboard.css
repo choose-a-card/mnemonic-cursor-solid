@@ -1,16 +1,25 @@
 /* Card Keyboard */
 .card-keyboard {
   position: fixed;
-  bottom: 60px;
+  bottom: calc(60px + env(safe-area-inset-bottom) + 25px); /* Account for nav height + safe area + margin */
   left: 0;
   right: 0;
   background: var(--surface, #ffffff);
   border-top: 1px solid var(--border, #e5e5e7);
   border-radius: 20px 20px 0 0;
-  padding: 2rem 2rem 3rem 2rem;
+  padding: 1.5rem 2rem 1.5rem 2rem; /* Adjusted padding for better spacing */
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
   z-index: 50;
   min-height: 200px;
+  max-height: 60vh; /* Prevent keyboard from taking too much space */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.card-keyboard::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* Transition classes for solid-transition-group */
@@ -91,6 +100,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .rank-btn:hover,
@@ -99,6 +113,11 @@
   border-color: var(--accent, #007aff);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rank-btn:focus:not(:focus-visible),
+.suit-btn:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .rank-btn.selected,

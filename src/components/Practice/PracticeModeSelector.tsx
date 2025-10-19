@@ -23,7 +23,12 @@ export default function PracticeModeSelector(props: PracticeModeSelectorProps) {
     return { unlockedCount, totalCount, percentage }
   })
 
-  const handleModeClick = (modeId: string) => {
+  const handleModeClick = (modeId: string, event?: MouseEvent) => {
+    // Remove focus on touch devices to prevent stuck hover state
+    if (event && 'ontouchstart' in window) {
+      const target = event.currentTarget as HTMLButtonElement
+      target.blur()
+    }
     props.onModeSelect(modeId)
   }
 
@@ -60,7 +65,7 @@ export default function PracticeModeSelector(props: PracticeModeSelectorProps) {
             return (
               <button 
                 class="mode-card"
-                onClick={() => handleModeClick(mode.id)}
+                onClick={(e) => handleModeClick(mode.id, e)}
                 onKeyDown={createKeyboardHandler(() => handleModeClick(mode.id))}
                 type="button"
                 role="option"

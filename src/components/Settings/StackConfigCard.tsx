@@ -13,25 +13,34 @@ interface StackConfigCardProps {
 }
 
 export default function StackConfigCard(props: StackConfigCardProps) {
+  const handleStackChange = (type: StackType, event: MouseEvent) => {
+    // Remove focus on touch devices to prevent stuck hover state
+    if ('ontouchstart' in window) {
+      const target = event.currentTarget as HTMLButtonElement
+      target.blur()
+    }
+    props.onStackTypeChange(type)
+  }
+
   return (
     <Card icon="🎴" title="Stack Configuration" class="stack-config-card">
       <FormGroup label="Stack Type">
         <div class="stack-options">
           <button
             class={`stack-option ${props.stackType === 'tamariz' ? 'active' : ''}`}
-            onClick={() => props.onStackTypeChange('tamariz' as StackType)}
+            onClick={(e) => handleStackChange('tamariz' as StackType, e)}
           >
             <span class="option-name">Tamariz</span>
           </button>
           <button
             class={`stack-option ${props.stackType === 'aronson' ? 'active' : ''}`}
-            onClick={() => props.onStackTypeChange('aronson' as StackType)}
+            onClick={(e) => handleStackChange('aronson' as StackType, e)}
           >
             <span class="option-name">Aronson</span>
           </button>
           <button
             class={`stack-option ${props.stackType === 'faro' ? 'active' : ''}`}
-            onClick={() => props.onStackTypeChange('faro' as StackType)}
+            onClick={(e) => handleStackChange('faro' as StackType, e)}
           >
             <span class="option-name">5th Faro</span>
           </button>

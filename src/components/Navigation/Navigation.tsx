@@ -78,6 +78,13 @@ const Navigation: Component = () => {
               aria-selected={isActive(tab.path)}
               tabindex={isActive(tab.path) ? 0 : -1}
               aria-label={`${tab.label} tab`}
+              onClick={(e) => {
+                // Remove focus on touch devices to prevent stuck hover state
+                if ('ontouchstart' in window) {
+                  const target = e.currentTarget as HTMLAnchorElement
+                  setTimeout(() => target.blur(), 0)
+                }
+              }}
             >
               <span class="nav-icon" aria-hidden="true">{tab.icon}</span>
               <span class="nav-label">{tab.label}</span>

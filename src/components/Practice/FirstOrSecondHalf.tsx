@@ -23,8 +23,15 @@ export default function FirstOrSecondHalf() {
     setQuestion({ card, pos: actualPos, answer, type: 'first-or-second-half' })
   }
 
-  function handleAnswer(userInput: string): void {
+  function handleAnswer(userInput: string, event?: MouseEvent): void {
     if (answered()) return
+    
+    // Remove focus on touch devices to prevent stuck hover state
+    if (event && 'ontouchstart' in window) {
+      const target = event.currentTarget as HTMLButtonElement
+      target.blur()
+    }
+    
     const q = question()
     const correct = (String(q.answer).toLowerCase().replace(/\s+/g, '') === userInput.toLowerCase().replace(/\s+/g, '')) ||
       (q.answer === 'First Half' && ['first', 'first half', '1', 'one'].includes(userInput.toLowerCase().replace(/\s+/g, '')))
@@ -54,8 +61,8 @@ export default function FirstOrSecondHalf() {
         <div class={`quiz-card-large ${((question().card || '').includes('♥') || (question().card || '').includes('♦')) ? 'card-red' : 'card-black'}`}>{question().card}</div>
       {/* Answer Buttons */}
       <div class="answer-buttons">
-        <button class="answer-btn" onClick={() => handleAnswer('First Half')} disabled={answered()}>First Half</button>
-        <button class="answer-btn" onClick={() => handleAnswer('Second Half')} disabled={answered()}>Second Half</button>
+        <button class="answer-btn" onClick={(e) => handleAnswer('First Half', e)} disabled={answered()}>First Half</button>
+        <button class="answer-btn" onClick={(e) => handleAnswer('Second Half', e)} disabled={answered()}>Second Half</button>
       </div>
       <div class="feedback-area">
         {feedback() && (

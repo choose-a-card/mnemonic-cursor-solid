@@ -17,6 +17,15 @@
   transition: all 0.2s ease;
   font-family: inherit;
   font-size: 0.9375rem;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.stack-option:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .stack-option:hover {

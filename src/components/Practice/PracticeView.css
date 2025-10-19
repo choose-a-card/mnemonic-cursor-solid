@@ -347,6 +347,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 12px rgba(0, 122, 255, 0.25);
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .submit-btn:hover {
@@ -357,6 +362,10 @@
 
 .submit-btn:active {
   transform: translateY(0);
+}
+
+.submit-btn:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Dark Mode */
@@ -540,6 +549,11 @@
   color: #fff;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .answer-btn:disabled {
@@ -550,6 +564,10 @@
 .answer-btn:hover:not(:disabled) {
   background: #005bb5;
   transform: translateY(-2px);
+}
+
+.answer-btn:focus:not(:focus-visible) {
+  outline: none;
 } 
 
 .quiz-card-large {

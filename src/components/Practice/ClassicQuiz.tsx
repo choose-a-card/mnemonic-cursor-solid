@@ -27,6 +27,14 @@ export default function ClassicQuiz() {
 
   function handleSubmit(e: Event): void {
     e.preventDefault()
+    
+    // Remove focus on touch devices to prevent stuck hover state
+    if ('ontouchstart' in window) {
+      const target = e.target as HTMLFormElement
+      const submitBtn = target.querySelector('button[type="submit"]') as HTMLButtonElement
+      if (submitBtn) submitBtn.blur()
+    }
+    
     const q = question()
     const correct = Number(input()) === q.answer
 

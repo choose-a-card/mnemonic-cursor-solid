@@ -23,6 +23,11 @@ const Button: Component<ButtonProps> = (props) => {
   
   const handleClick = (e: MouseEvent) => {
     if (props.onClick && !props.disabled) {
+      // Remove focus on touch devices to prevent stuck hover state
+      const target = e.currentTarget as HTMLButtonElement
+      if ('ontouchstart' in window) {
+        target.blur()
+      }
       props.onClick(e)
     }
   }

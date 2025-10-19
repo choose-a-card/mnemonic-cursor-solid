@@ -74,11 +74,21 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
     props.onClose()
   }
 
-  const handleRankClick = (rank: string) => {
+  const handleRankClick = (rank: string, event?: MouseEvent) => {
+    // Remove focus on touch devices to prevent stuck hover state
+    if (event && 'ontouchstart' in window) {
+      const target = event.currentTarget as HTMLButtonElement
+      target.blur()
+    }
     setSelectedRank(rank)
   }
 
-  const handleSuitClick = (suit: string) => {
+  const handleSuitClick = (suit: string, event?: MouseEvent) => {
+    // Remove focus on touch devices to prevent stuck hover state
+    if (event && 'ontouchstart' in window) {
+      const target = event.currentTarget as HTMLButtonElement
+      target.blur()
+    }
     setSelectedSuit(suit)
   }
 
@@ -118,7 +128,7 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
                       <button 
                         type="button" 
                         class={`rank-btn ${selectedRank() === r ? 'selected' : ''}`}
-                        onClick={() => handleRankClick(r)}
+                        onClick={(e) => handleRankClick(r, e)}
                         onKeyDown={(e) => handleRankKeyDown(e, r)}
                         aria-label={`Select rank ${r}`}
                         aria-pressed={selectedRank() === r}
@@ -138,7 +148,7 @@ const CardKeyboard: Component<CardKeyboardProps> = (props) => {
                   <button 
                     type="button" 
                     class={`suit-btn ${s.name} ${selectedSuit() === s.symbol ? 'selected' : ''}`}
-                    onClick={() => handleSuitClick(s.symbol)}
+                    onClick={(e) => handleSuitClick(s.symbol, e)}
                     onKeyDown={(e) => handleSuitKeyDown(e, s.symbol)}
                     aria-label={`Select ${s.name} suit`}
                     aria-pressed={selectedSuit() === s.symbol}

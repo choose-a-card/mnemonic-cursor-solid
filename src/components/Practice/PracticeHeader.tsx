@@ -10,12 +10,21 @@ interface PracticeHeaderProps {
 
 export default function PracticeHeader(props: PracticeHeaderProps) {
   const currentModeInfo = () => PRACTICE_MODES.find(m => m.id === props.currentModeId)
+  
+  const handleBack = (e: MouseEvent) => {
+    // Remove focus on touch devices to prevent stuck hover state
+    if ('ontouchstart' in window) {
+      const target = e.currentTarget as HTMLButtonElement
+      target.blur()
+    }
+    props.onBack()
+  }
 
   return (
     <div class="practice-header">
       <button 
         class="back-button" 
-        onClick={props.onBack}
+        onClick={handleBack}
         onKeyDown={createKeyboardHandler(props.onBack)}
         type="button"
         aria-label="Go back to practice mode selection"

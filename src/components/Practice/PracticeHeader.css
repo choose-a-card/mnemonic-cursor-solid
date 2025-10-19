@@ -24,6 +24,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .back-button:hover {
@@ -31,10 +36,14 @@
   border-color: var(--primary-color);
 }
 
-.back-button:focus {
+.back-button:focus-visible {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.back-button:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .practice-title {

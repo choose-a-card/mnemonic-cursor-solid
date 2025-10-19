@@ -78,6 +78,11 @@
   transition: all 0.2s ease;
   text-align: left;
   font-family: inherit;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .mode-card:hover {
@@ -86,10 +91,14 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.mode-card:focus {
+.mode-card:focus-visible {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.mode-card:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .mode-icon {

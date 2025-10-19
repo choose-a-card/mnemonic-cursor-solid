@@ -55,8 +55,16 @@ export default function QuartetPosition() {
     }
   }
 
-  function handleSubmit() {
+  function handleSubmit(event?: Event) {
     if (answered()) return
+    
+    // Remove focus on touch devices to prevent stuck hover state
+    if (event && 'ontouchstart' in window) {
+      const target = event.target as HTMLFormElement
+      const submitBtn = target.querySelector('button[type="submit"]') as HTMLButtonElement
+      if (submitBtn) submitBtn.blur()
+    }
+    
     const userPositions = inputs().map(v => Number(v)).filter(Boolean)
     const correctPositions = String(question().answer).split(',').map((pos: string) => Number(pos))
     // Order must be ascending and all positions must match
@@ -109,7 +117,7 @@ export default function QuartetPosition() {
           Enter the positions of all the <b>{question().card}s</b> in the stack:
         </div>
       </div>
-      <form class="quartet-form" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
+      <form class="quartet-form" onSubmit={e => { e.preventDefault(); handleSubmit(e); }}>
         <div class="quartet-inputs">
           {[0,1,2,3].map(i => (
             <input
