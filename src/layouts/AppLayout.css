@@ -13,5 +13,9 @@
   padding-bottom: 80px;
 }
 
+.main-content.full-screen {
+  padding-bottom: 0;
+}
+
 /* Dark mode is handled through CSS variables in the parent */
 

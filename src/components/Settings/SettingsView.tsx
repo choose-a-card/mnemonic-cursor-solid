@@ -6,6 +6,7 @@ import { useAppSettings } from '../../contexts/AppSettingsContext'
 import { useStats } from '../../contexts/StatsContext'
 import Card from '../shared/Card'
 import StackConfigCard from './StackConfigCard'
+import CustomStacksCard from './CustomStacksCard'
 import PreferencesCard from './PreferencesCard'
 import DataManagementCard from './DataManagementCard'
 import AboutCard from './AboutCard'
@@ -129,6 +130,8 @@ export default function SettingsView() {
           onStackTypeChange={setStackType}
           onCardIntervalChange={setCardInterval}
         />
+
+        <CustomStacksCard />
 
         <PreferencesCard
           darkMode={darkMode()}

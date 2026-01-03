@@ -1,5 +1,5 @@
 import { createSignal, onMount } from 'solid-js'
-import type { QuizQuestion, QuizResult } from '../../types'
+import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'

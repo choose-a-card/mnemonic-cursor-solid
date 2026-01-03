@@ -65,6 +65,39 @@
   color: var(--text-secondary);
 }
 
+/* Custom Stacks Divider */
+.custom-stacks-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.custom-stacks-divider::before,
+.custom-stacks-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color, #e5e5e7);
+}
+
+.custom-stack-options {
+  margin-top: 0;
+}
+
+.stack-option.custom {
+  border-style: dashed;
+}
+
+.stack-option.custom.active {
+  border-style: solid;
+}
+
 @media (max-width: 768px) {
   .stack-options {
     grid-template-columns: 1fr;

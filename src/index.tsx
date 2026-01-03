@@ -7,6 +7,7 @@ import StackPage from './pages/StackPage'
 import PracticePage from './pages/PracticePage'
 import StatsPage from './pages/StatsPage'
 import SettingsPage from './pages/SettingsPage'
+import StackBuilderPage from './pages/StackBuilderPage'
 
 const root = document.getElementById('root')
 
@@ -23,5 +24,7 @@ render(() => (
     <Route path="/practice" component={PracticePage} />
     <Route path="/stats" component={StatsPage} />
     <Route path="/settings" component={SettingsPage} />
+    <Route path="/stack-builder" component={StackBuilderPage} />
+    <Route path="/stack-builder/:id" component={StackBuilderPage} />
   </HashRouter>
 ), root!)

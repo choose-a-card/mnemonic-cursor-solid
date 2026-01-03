@@ -1,6 +1,9 @@
+import type { CustomStack } from '../types';
+
 export type Card = string;
 
-export type StackType = 'tamariz' | 'aronson' | 'faro';
+export type PresetStackType = 'tamariz' | 'aronson' | 'faro';
+export type StackType = PresetStackType | `custom-${string}`;
 
 export interface StackInfo {
   name: string;
@@ -28,7 +31,7 @@ export const FARO_STACK: Card[] = [
   '5♦', 'K♦'
 ];
 
-export const STACKS: Record<StackType, StackInfo> = {
+export const STACKS: Record<PresetStackType, StackInfo> = {
   tamariz: {
     name: 'Tamariz Stack',
     description: 'The complete Juan Tamariz memorized deck order, widely used in professional magic.',
@@ -46,14 +49,53 @@ export const STACKS: Record<StackType, StackInfo> = {
   }
 };
 
-export const getStack = (stackType: StackType): Card[] => {
-  return STACKS[stackType].cards;
+export const PRESET_STACKS: PresetStackType[] = ['tamariz', 'aronson', 'faro'];
+
+export const isCustomStackType = (stackType: StackType): stackType is `custom-${string}` => {
+  return stackType.startsWith('custom-');
 };
 
-export const getStackTitle = (stackType: StackType): string => {
-  return STACKS[stackType].name;
+export const getCustomStackId = (stackType: StackType): string | null => {
+  if (!isCustomStackType(stackType)) return null;
+  return stackType.replace('custom-', '');
 };
 
-export const getStackDescription = (stackType: StackType): string => {
-  return STACKS[stackType].description;
-}; 
+export const createCustomStackType = (id: string): StackType => {
+  return `custom-${id}` as StackType;
+};
+
+export const getStack = (stackType: StackType, customStacks?: CustomStack[]): Card[] => {
+  if (isCustomStackType(stackType) && customStacks) {
+    const customId = getCustomStackId(stackType);
+    const customStack = customStacks.find(s => s.id === customId);
+    return customStack?.cards || [];
+  }
+  if (isCustomStackType(stackType)) {
+    return [];
+  }
+  return STACKS[stackType as PresetStackType].cards;
+};
+
+export const getStackTitle = (stackType: StackType, customStacks?: CustomStack[]): string => {
+  if (isCustomStackType(stackType) && customStacks) {
+    const customId = getCustomStackId(stackType);
+    const customStack = customStacks.find(s => s.id === customId);
+    return customStack?.name || 'Custom Stack';
+  }
+  if (isCustomStackType(stackType)) {
+    return 'Custom Stack';
+  }
+  return STACKS[stackType as PresetStackType].name;
+};
+
+export const getStackDescription = (stackType: StackType, customStacks?: CustomStack[]): string => {
+  if (isCustomStackType(stackType) && customStacks) {
+    const customId = getCustomStackId(stackType);
+    const customStack = customStacks.find(s => s.id === customId);
+    return customStack ? 'Your custom memorized deck order.' : 'Custom stack not found.';
+  }
+  if (isCustomStackType(stackType)) {
+    return 'Your custom memorized deck order.';
+  }
+  return STACKS[stackType as PresetStackType].description;
+};

@@ -76,3 +76,11 @@ export interface BadgeProgress {
   badges: Badge[];
   lastUnlocked: Badge | null;
 }
+
+export interface CustomStack {
+  id: string;
+  name: string;
+  cards: string[];
+  createdAt: number;
+  updatedAt: number;
+}

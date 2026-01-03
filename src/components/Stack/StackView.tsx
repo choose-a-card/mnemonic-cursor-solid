@@ -1,13 +1,15 @@
 import { type Component, Index } from 'solid-js'
 import { useAppSettings } from '../../contexts/AppSettingsContext'
+import { useCustomStacks } from '../../contexts/CustomStacksContext'
 import { getStack, getStackTitle } from '../../constants/stacks'
 import { getCardColorClass, getCardSuit, getCardValue } from '../../utils/cardHelpers'
 import './StackView.css'
 
 const StackView: Component = () => {
   const { stackType, cardInterval } = useAppSettings()
-  const stack = () => getStack(stackType())
-  const stackTitle = () => getStackTitle(stackType())
+  const { customStacks } = useCustomStacks()
+  const stack = () => getStack(stackType(), customStacks())
+  const stackTitle = () => getStackTitle(stackType(), customStacks())
   const displayStack = () => stack().slice(cardInterval().start - 1, cardInterval().end)
 
   return (

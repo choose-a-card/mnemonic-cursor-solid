@@ -1,6 +1,7 @@
 import { createContext, useContext, type Component, type JSX } from 'solid-js'
 import type { CardInterval, QuizResult } from '../types'
 import { useAppSettings } from './AppSettingsContext'
+import { useCustomStacks } from './CustomStacksContext'
 import { useStats } from './StatsContext'
 import { getStack } from '../constants/stacks'
 
@@ -20,9 +21,10 @@ interface PracticeProviderProps {
 
 export const PracticeProvider: Component<PracticeProviderProps> = (props) => {
   const { stackType, cardInterval, soundEnabled } = useAppSettings()
+  const { customStacks } = useCustomStacks()
   const { addResult } = useStats()
   
-  const stack = () => getStack(stackType())
+  const stack = () => getStack(stackType(), customStacks())
   const practiceStack = () => stack().slice(cardInterval().start - 1, cardInterval().end)
 
   const value: PracticeContextValue = {

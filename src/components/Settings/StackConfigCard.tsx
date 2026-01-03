@@ -1,7 +1,10 @@
+import { For, Show } from 'solid-js'
 import Card from '../shared/Card'
 import FormGroup from '../shared/FormGroup'
 import DualRangeSlider from './DualRangeSlider'
-import type { StackType } from '../../constants/stacks'
+import { useCustomStacks } from '../../contexts/CustomStacksContext'
+import { createCustomStackType, isCustomStackType, getCustomStackId } from '../../constants/stacks'
+import type { StackType, PresetStackType } from '../../constants/stacks'
 import type { CardInterval } from '../../types'
 import './StackConfigCard.css'
 
@@ -12,7 +15,15 @@ interface StackConfigCardProps {
   onCardIntervalChange: (interval: CardInterval) => void;
 }
 
+const PRESET_OPTIONS: { type: PresetStackType; label: string }[] = [
+  { type: 'tamariz', label: 'Tamariz' },
+  { type: 'aronson', label: 'Aronson' },
+  { type: 'faro', label: '5th Faro' },
+]
+
 export default function StackConfigCard(props: StackConfigCardProps) {
+  const { customStacks } = useCustomStacks()
+
   const handleStackChange = (type: StackType, event: MouseEvent) => {
     // Remove focus on touch devices to prevent stuck hover state
     if ('ontouchstart' in window) {
@@ -22,29 +33,52 @@ export default function StackConfigCard(props: StackConfigCardProps) {
     props.onStackTypeChange(type)
   }
 
+  const isPresetActive = (type: PresetStackType): boolean => {
+    return props.stackType === type
+  }
+
+  const isCustomActive = (stackId: string): boolean => {
+    if (!isCustomStackType(props.stackType)) return false
+    return getCustomStackId(props.stackType) === stackId
+  }
+
   return (
     <Card icon="🎴" title="Stack Configuration" class="stack-config-card">
       <FormGroup label="Stack Type">
         <div class="stack-options">
-          <button
-            class={`stack-option ${props.stackType === 'tamariz' ? 'active' : ''}`}
-            onClick={(e) => handleStackChange('tamariz' as StackType, e)}
-          >
-            <span class="option-name">Tamariz</span>
-          </button>
-          <button
-            class={`stack-option ${props.stackType === 'aronson' ? 'active' : ''}`}
-            onClick={(e) => handleStackChange('aronson' as StackType, e)}
-          >
-            <span class="option-name">Aronson</span>
-          </button>
-          <button
-            class={`stack-option ${props.stackType === 'faro' ? 'active' : ''}`}
-            onClick={(e) => handleStackChange('faro' as StackType, e)}
-          >
-            <span class="option-name">5th Faro</span>
-          </button>
+          <For each={PRESET_OPTIONS}>
+            {(option) => (
+              <button
+                class={`stack-option ${isPresetActive(option.type) ? 'active' : ''}`}
+                onClick={(e) => handleStackChange(option.type, e)}
+                aria-label={`Select ${option.label} stack`}
+                tabindex="0"
+              >
+                <span class="option-name">{option.label}</span>
+              </button>
+            )}
+          </For>
         </div>
+
+        <Show when={customStacks().length > 0}>
+          <div class="custom-stacks-divider">
+            <span>Custom Stacks</span>
+          </div>
+          <div class="stack-options custom-stack-options">
+            <For each={customStacks()}>
+              {(stack) => (
+                <button
+                  class={`stack-option custom ${isCustomActive(stack.id) ? 'active' : ''}`}
+                  onClick={(e) => handleStackChange(createCustomStackType(stack.id), e)}
+                  aria-label={`Select ${stack.name} custom stack`}
+                  tabindex="0"
+                >
+                  <span class="option-name">{stack.name}</span>
+                </button>
+              )}
+            </For>
+          </div>
+        </Show>
       </FormGroup>
 
       <FormGroup label="Practice Range">
@@ -68,4 +102,3 @@ export default function StackConfigCard(props: StackConfigCardProps) {
     </Card>
   )
 }
-

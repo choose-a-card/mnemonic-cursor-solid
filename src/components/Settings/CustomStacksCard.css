@@ -1,0 +1,175 @@
+.custom-stacks-card {
+  /* Card-specific styles */
+}
+
+.custom-stacks-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: var(--surface, #f8f9fa);
+  border-radius: 12px;
+  border: 1px dashed var(--border, #e5e5e7);
+}
+
+.empty-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text, #222);
+  margin: 0 0 0.25rem 0;
+}
+
+.empty-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+}
+
+.stacks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stack-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--background, #fff);
+  border: 1px solid var(--border-light, #f0f0f3);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.stack-item:hover {
+  border-color: var(--border, #e5e5e7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.stack-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.stack-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text, #222);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stack-date {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #666);
+}
+
+.stack-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid var(--accent, #007aff);
+  outline-offset: 2px;
+}
+
+.edit-btn {
+  background: var(--surface, #f8f9fa);
+  color: var(--text, #222);
+  border: 1px solid var(--border, #e5e5e7);
+}
+
+.edit-btn:hover {
+  background: var(--accent-light, #e3f2fd);
+  border-color: var(--accent, #007aff);
+  color: var(--accent, #007aff);
+}
+
+.delete-btn {
+  background: transparent;
+  color: var(--error, #dc2626);
+}
+
+.delete-btn:hover {
+  background: var(--error-light, #fef2f2);
+}
+
+.create-stack-btn {
+  width: 100%;
+}
+
+/* Dark mode */
+.app-container.dark .empty-state {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+.app-container.dark .stack-item {
+  background: var(--background);
+  border-color: var(--border);
+}
+
+.app-container.dark .stack-item:hover {
+  border-color: var(--border-light);
+}
+
+.app-container.dark .edit-btn {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.app-container.dark .edit-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.app-container.dark .delete-btn:hover {
+  background: rgba(220, 38, 38, 0.15);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .stack-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .stack-actions {
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
