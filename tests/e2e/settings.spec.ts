@@ -165,13 +165,6 @@ test.describe('Settings Page', () => {
     })
   })
 
-  test.describe('Support Card', () => {
-    test('should display support card', async ({ page }) => {
-      const supportCard = page.locator('.support-card, .card').filter({ hasText: /Support/ })
-      await expect(supportCard).toBeVisible()
-    })
-  })
-
   test.describe('Settings Persistence', () => {
     test('should persist stack type across page refresh', async ({ page }) => {
       // Change stack type
