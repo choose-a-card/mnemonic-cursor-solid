@@ -1,175 +1,187 @@
-# 🎴 Mnemonic Stack Trainer
+# Mnemonic Stack Trainer
 
-A modern, professional web application for practicing and mastering the Tamariz, Aronson, and 5th Faro card stacks used in magic performances.
+A modern web application for practicing and mastering memorized card stacks used in magic performances. Built with SolidJS for blazing-fast performance.
 
-## ✨ Features
+## Features
 
-### 📜 **Stack View**
-- **Study Mode**: Display complete stack order with position numbers
-- **Blind Mode**: Hide cards and reveal them by tapping for memory practice
-- **Clean Interface**: Centered, vertical list with smooth animations
+### Stack Reference
+- **Study Mode** — View complete stack order with position numbers
+- **Blind Mode** — Hide cards and reveal by tapping for memory practice
+- **Multiple Stacks** — Support for Tamariz, Aronson, and 5th Faro stacks
+- **Custom Stacks** — Create and manage your own memorized deck orders
 
-### 🎯 **Practice Modes**
-- **Card → Position**: Identify the position of a given card
-- **Position → Card**: Identify which card is at a given position
-- **One Ahead**: Practice predicting the next card in sequence
-- **Stack in Context**: Learn card relationships (previous/next)
-- **First or Second Half**: Determine if a card is in the first or second half
-- **Quartet Position**: Locate all four cards of the same rank
-- **Cut to Position**: Calculate which card to cut to for a target position
-- **Cutting Estimation**: Calculate cuts needed to reach target cards (±8 cards)
-- **Custom Keyboard**: Seamless card input with rank/suit selection
-- **Audio Feedback**: Sound effects for correct/incorrect answers
+### Practice Modes
+Eight specialized training exercises to master your stack:
 
-### 📊 **Advanced Analytics**
-- **Overall Accuracy**: Track your success rate across all practice sessions
-- **Per-Mode Performance**: Monitor accuracy for each practice mode individually
-- **Recent Performance**: View last 10 attempts, current streak, and trends
-- **Mode-Specific Failures**: Track most missed cards/positions per practice mode
-- **Session Statistics**: Comprehensive progress tracking with persistent storage
-- **Achievement System**: Badges and progress tracking (can be enabled via feature flag)
+| Mode | Description |
+|------|-------------|
+| **Card → Position** | Identify the position of a given card |
+| **Position → Card** | Identify which card is at a given position |
+| **One Ahead** | Practice predicting the next card in sequence |
+| **Stack in Context** | Learn card relationships (previous/next cards) |
+| **First or Second Half** | Determine if a card is in positions 1-26 or 27-52 |
+| **Quartet Position** | Locate all four cards of the same rank |
+| **Cut to Position** | Calculate which card to cut to for a target position |
+| **Cutting Estimation** | Calculate cuts needed to reach target cards (±8 tolerance) |
 
-### ⚙️ **Settings & Customization**
-- **Stack Selection**: Switch between Tamariz, Aronson & 5th Faro stacks
-- **Feature Flags**: Control app features via URL parameters
-  - `?enableBadges=true` - Enable the badges/achievement system (disabled by default)
-  - `?enablePWA=true` - Enable PWA installation functionality (disabled by default)
+### Analytics
+- **Overall Accuracy** — Track your success rate across all sessions
+- **Per-Mode Performance** — Monitor accuracy for each practice mode
+- **Recent Performance** — View last 10 attempts, current streak, and trends
+- **Failure Tracking** — Identify your most missed cards and positions
 
-## 🏗️ Project Structure
+### Settings
+- **Stack Selection** — Switch between preset and custom stacks
+- **Practice Range** — Focus on specific card positions (e.g., 1-26)
+- **Dark Mode** — Eye-friendly dark theme
+- **Sound Effects** — Audio feedback for correct/incorrect answers
 
-```
-src/
-├── App.tsx                    # Main application component
-├── App.css                    # Global app styles
-├── index.tsx                  # Application entry point with routing
-├── index.css                  # Base styles and CSS variables
-├── components/
-│   ├── Navigation/            # Bottom navigation component
-│   ├── Practice/              # Practice mode components
-│   ├── Settings/              # Settings components
-│   ├── shared/                # Reusable UI components
-│   ├── Stack/                 # Stack display components
-│   └── Stats/                 # Analytics components
-├── constants/                 # App constants (stacks, timers, etc.)
-├── contexts/                  # React contexts for state management
-├── hooks/                     # Custom React hooks
-├── layouts/                   # Layout components
-├── pages/                     # Page-level components
-├── sounds/                    # Audio feedback system
-├── types/                     # TypeScript type definitions
-└── utils/                     # Utility functions
-```
-
-## 🎨 Design Philosophy
-
-- **Apple-like UI**: Clean, minimal, professional aesthetic
-- **No Layout Shifts**: Reserved space prevents jarring content jumps
-- **Smooth Animations**: Subtle transitions throughout the interface
-- **Responsive Design**: Works seamlessly on all screen sizes
-- **Accessibility**: Proper contrast, focus states, and ARIA labels
-
-## 🚀 Getting Started
+## Quick Start
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd mnemonic-cursor-solid
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/mnemonic-stack-trainer.git
+cd mnemonic-stack-trainer
 
-2. **Install dependencies**
-   ```bash
-   npm install --legacy-peer-deps
-   ```
+# Install dependencies
+npm install --legacy-peer-deps
 
-3. **Start development server**
-   ```bash
-   npm run dev
-   ```
+# Start development server
+npm run dev
+```
 
-4. **Open in browser**
-   Navigate to `http://localhost:5173`
+Open `http://localhost:5173` in your browser.
 
 ### Build for Production
 
 ```bash
 npm run build
+npm run preview  # Preview production build locally
 ```
 
-## 🛠️ Technology Stack
+## Deployment
 
-- **Framework**: SolidJS - Fast, reactive UI library
-- **Language**: TypeScript - Type-safe development
-- **Build Tool**: Vite - Lightning-fast development experience
-- **Router**: @solidjs/router - Client-side routing
-- **Styling**: Vanilla CSS with CSS custom properties
-- **Icons**: Unicode emojis for universal compatibility
-- **Audio**: Web Audio API for sound effects
-- **Testing**: Jest & Playwright for unit and E2E tests
+The app builds to static files in the `dist/` directory. Deploy to any static hosting:
 
-## 📱 Usage
+**Vercel:**
+```bash
+npm i -g vercel
+vercel --prod
+```
 
-### Stack Practice
-1. Select your preferred stack (Tamariz, Aronson, or 5th Faro)
-2. Use **Stack** tab to study the order
-3. Toggle **Blind Mode** to test your memory
+**Netlify:**
+```bash
+npm run build
+# Drag dist/ folder to Netlify, or connect your repo
+```
 
-### Training
-1. Go to **Practice** tab
-2. Choose from 4 different training modes
-3. Use the custom keyboard for card input
-4. Track your progress in real-time
+**GitHub Pages:**
+```bash
+npm run build
+# Push dist/ contents to gh-pages branch
+```
 
-### Analytics
-1. View your **Stats** tab for detailed analysis
-2. Follow AI suggestions for improvement
-3. Monitor accuracy trends over time
+## Technology Stack
 
-### Configuration
-1. Access **Settings** tab for customization
-2. Switch stacks, adjust practice size
-3. Enable dark mode and sound effects
+| Technology | Purpose |
+|------------|---------|
+| **SolidJS** | Reactive UI framework |
+| **TypeScript** | Type-safe development |
+| **Vite** | Build tool & dev server |
+| **Playwright** | End-to-end testing |
+| **CSS Variables** | Theming & dark mode |
 
-## 🎯 Card Stacks
+## Project Structure
 
-### Tamariz Stack (52 cards)
-The complete Juan Tamariz memorized deck order, widely used in professional magic.
+```
+src/
+├── components/
+│   ├── Navigation/     # Bottom tab navigation
+│   ├── Practice/       # All practice mode components
+│   ├── Settings/       # Configuration cards
+│   ├── shared/         # Reusable UI (Button, Card, etc.)
+│   ├── Stack/          # Stack display view
+│   └── Stats/          # Analytics dashboard
+├── contexts/           # Global state (Settings, Stats, CustomStacks)
+├── constants/          # Stack data and app constants
+├── hooks/              # Custom hooks (keyboard, debug mode)
+├── layouts/            # App shell and navigation
+├── pages/              # Route-level components
+├── types/              # TypeScript interfaces
+└── utils/              # Helpers (cards, calculations, logger)
+```
 
-### Aronson Stack (52 cards)
-Simon Aronson's "Aronson Stack" - another popular memorized deck system.
+## Testing
 
-### 5th Faro Stack (52 cards)
-A mathematically derived stack based on the 5th perfect faro shuffle, creating a unique memorized order.
+```bash
+# Run all E2E tests
+npm run test:e2e
 
-## 🔧 Development
+# Run specific test file
+npx playwright test settings.spec.ts
 
-### Code Organization
-- **Components**: Modular, reusable UI components
-- **Separation of Concerns**: Logic, styling, and markup clearly separated
-- **Clean Architecture**: Easy to maintain and extend
+# Run with UI
+npx playwright test --ui
+```
 
-### Performance
-- **Lazy Loading**: Components load only when needed
-- **Optimized Rendering**: Minimal re-renders with SolidJS
-- **Efficient State**: Granular reactivity system
+## Feature Flags
 
-## 📄 License
+Optional features can be enabled via URL parameters:
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+| Parameter | Description |
+|-----------|-------------|
+| `?enableBadges=true` | Enable achievement badges system |
+| `?enablePWA=true` | Enable PWA installation prompt |
+| `?debug=true` | Enable debug controls in stats view |
 
-## 🤝 Contributing
+Example: `https://yourapp.com/#/stats?enableBadges=true`
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Card Stacks
 
-## 📞 Support
+### Tamariz Stack
+Juan Tamariz's "Mnemonica" — the most widely used memorized deck in professional magic.
 
-For questions or support, please open an issue in the repository.
+### Aronson Stack
+Simon Aronson's memorized deck system with powerful built-in tricks.
+
+### 5th Faro Stack
+A mathematically derived stack from five perfect faro shuffles.
+
+### Custom Stacks
+Create your own 52-card memorized orders through the visual stack builder in Settings.
+
+## Browser Support
+
+- Chrome/Edge 90+
+- Firefox 90+
+- Safari 14+
+- Mobile browsers (iOS Safari, Chrome for Android)
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/yourusername/mnemonic-stack-trainer/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/mnemonic-stack-trainer/discussions)
 
 ---
 
-**Built with ❤️ for the magic community**
+**Built for the magic community**
