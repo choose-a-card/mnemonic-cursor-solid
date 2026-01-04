@@ -125,19 +125,18 @@ export const navigateTo = async (page: Page, route: keyof typeof ROUTES): Promis
 }
 
 /**
- * Navigate using the bottom navigation bar (mobile) or menu (desktop)
+ * Navigate using the bottom navigation bar (mobile) or sidebar (desktop)
  */
 export const clickNavTab = async (page: Page, tabName: string): Promise<void> => {
-  // Try mobile bottom nav first, then desktop menu
+  // Try mobile bottom nav first, then desktop sidebar
   const bottomNav = page.locator('.bottom-nav')
   const isBottomNavVisible = await bottomNav.isVisible()
   
   if (isBottomNavVisible) {
     await page.locator(`.nav-item`).filter({ hasText: tabName }).click()
   } else {
-    // Desktop: Open hamburger menu first
-    await page.locator('.hamburger-button').click()
-    await page.locator('.menu-item').filter({ hasText: tabName }).click()
+    // Desktop/Tablet: Use permanent sidebar
+    await page.locator('.sidebar-item').filter({ hasText: tabName }).click()
   }
   
   await page.waitForLoadState('domcontentloaded')
@@ -154,10 +153,9 @@ export const isNavTabActive = async (page: Page, tabName: string): Promise<boole
     const tab = page.locator('.nav-item.active').filter({ hasText: tabName })
     return tab.isVisible()
   } else {
-    // For desktop, check if we're on the right URL
-    const currentPath = page.url()
-    const tabPath = tabName.toLowerCase()
-    return currentPath.includes(tabPath)
+    // Desktop/Tablet: Check sidebar active state
+    const tab = page.locator('.sidebar-item.active').filter({ hasText: tabName })
+    return tab.isVisible()
   }
 }
 

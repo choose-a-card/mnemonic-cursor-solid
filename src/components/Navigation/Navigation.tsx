@@ -1,4 +1,4 @@
-import { type Component, createSignal, For, Show } from 'solid-js'
+import { type Component, For } from 'solid-js'
 import { useLocation, A } from '@solidjs/router'
 import './Navigation.css'
 
@@ -11,61 +11,32 @@ const TABS = [
 
 const Navigation: Component = () => {
   const location = useLocation()
-  const [isMenuOpen, setIsMenuOpen] = createSignal(false)
 
   const isActive = (path: string) => {
     return location.pathname === path
   }
 
-  const handleToggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen())
-  }
-
-  const handleCloseMenu = () => {
-    setIsMenuOpen(false)
-  }
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      setIsMenuOpen(false)
-    }
-  }
-
   return (
     <>
-      {/* Desktop Hamburger Menu */}
-      <div class="desktop-menu">
-        <button
-          class="hamburger-button"
-          onClick={handleToggleMenu}
-          onKeyDown={handleKeyDown}
-          aria-label="Toggle navigation menu"
-          aria-expanded={isMenuOpen()}
-          tabindex={0}
-        >
-          <span class="hamburger-icon" aria-hidden="true">☰</span>
-        </button>
-        
-        <Show when={isMenuOpen()}>
-          <div class="menu-overlay" onClick={handleCloseMenu} />
-          <nav class="desktop-nav" role="navigation" aria-label="Desktop navigation">
-            <For each={TABS}>
-              {(tab) => (
-                <A
-                  href={tab.path}
-                  class={isActive(tab.path) ? 'menu-item active' : 'menu-item'}
-                  onClick={handleCloseMenu}
-                  tabindex={0}
-                  aria-label={`${tab.label} tab`}
-                >
-                  <span class="menu-icon" aria-hidden="true">{tab.icon}</span>
-                  <span class="menu-label">{tab.label}</span>
-                </A>
-              )}
-            </For>
-          </nav>
-        </Show>
-      </div>
+      {/* Desktop Permanent Sidebar */}
+      <nav class="desktop-sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-content">
+          <For each={TABS}>
+            {(tab) => (
+              <A
+                href={tab.path}
+                class={isActive(tab.path) ? 'sidebar-item active' : 'sidebar-item'}
+                tabindex={0}
+                aria-label={`${tab.label} tab`}
+                aria-current={isActive(tab.path) ? 'page' : undefined}
+              >
+                <span class="sidebar-icon" aria-hidden="true">{tab.icon}</span>
+                <span class="sidebar-label">{tab.label}</span>
+              </A>
+            )}
+          </For>
+        </div>
+      </nav>
 
       {/* Mobile Bottom Navigation */}
       <nav class="bottom-nav" role="tablist" aria-label="Main navigation">

@@ -73,35 +73,35 @@
   scroll-behavior: smooth; /* Smooth scrolling */
 }
 
-/* Desktop layout improvements */
-/* Large screens and up */
-@media (min-width: 1024px) {
+/* Mobile: Bottom nav needs extra padding */
+@media (max-width: 767px) {
+  .main-content {
+    padding: 1rem;
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav */
+  }
+}
+
+/* Tablet: Sidebar visible, no bottom nav padding needed */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .main-content {
+    padding: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+/* Desktop: Full sidebar, more generous padding */
+@media (min-width: 1200px) {
   .main-content {
     padding: 2rem;
-    padding-bottom: 2rem; /* No need for bottom nav padding on desktop */
+    padding-bottom: 2rem;
   }
 }
 
-/* Extra large screens and up */
-@media (min-width: 1280px) {
-  .main-content {
-    padding: 2.5rem;
-    padding-bottom: 2.5rem; /* No need for bottom nav padding on desktop */
-  }
-}
-
-/* 2XL screens and up */
+/* Extra large screens */
 @media (min-width: 1536px) {
   .main-content {
-    padding: 3rem;
-    padding-bottom: 3rem;
-  }
-}
-
-/* Mobile and tablet improvements */
-@media (max-width: 1023px) {
-  .main-content {
-    padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem); /* Extra padding for bottom nav */
+    padding: 2.5rem;
+    padding-bottom: 2.5rem;
   }
 }
 

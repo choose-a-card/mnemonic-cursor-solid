@@ -14,7 +14,7 @@ test.describe('Navigation', () => {
   })
 
   test('should display main navigation tabs', async ({ page }) => {
-    // Check that all navigation tabs are visible (mobile bottom nav or desktop)
+    // Check that all navigation tabs are visible (mobile bottom nav or desktop sidebar)
     const bottomNav = page.locator('.bottom-nav')
     const bottomNavVisible = await bottomNav.isVisible()
 
@@ -25,8 +25,15 @@ test.describe('Navigation', () => {
         await expect(navItem).toBeVisible()
       }
     } else {
-      // Desktop view - check hamburger menu exists
-      await expect(page.locator('.hamburger-button')).toBeVisible()
+      // Desktop/Tablet view - check permanent sidebar exists
+      const sidebar = page.locator('.desktop-sidebar')
+      await expect(sidebar).toBeVisible()
+      
+      // Verify all tabs are in the sidebar
+      for (const tab of NAV_TABS) {
+        const sidebarItem = page.locator('.sidebar-item').filter({ hasText: tab })
+        await expect(sidebarItem).toBeVisible()
+      }
     }
   })
 
@@ -88,6 +95,11 @@ test.describe('Navigation', () => {
         const activeItem = page.locator('.nav-item.active')
         await expect(activeItem).toBeVisible()
         await expect(activeItem).toContainText(route.tab)
+      } else {
+        // Desktop/Tablet: Check sidebar active state
+        const activeItem = page.locator('.sidebar-item.active')
+        await expect(activeItem).toBeVisible()
+        await expect(activeItem).toHaveAttribute('aria-current', 'page')
       }
     }
   })
@@ -112,12 +124,23 @@ test.describe('Navigation', () => {
     const bottomNavVisible = await bottomNav.isVisible()
 
     if (bottomNavVisible) {
-      // Focus on first nav item
+      // Mobile: Focus on first nav item
       const firstNavItem = page.locator('.nav-item').first()
       await firstNavItem.focus()
       
       // Verify it can receive focus
       await expect(firstNavItem).toBeFocused()
+      
+      // Press Enter to activate
+      await page.keyboard.press('Enter')
+      await page.waitForLoadState('domcontentloaded')
+    } else {
+      // Desktop/Tablet: Focus on first sidebar item
+      const firstSidebarItem = page.locator('.sidebar-item').first()
+      await firstSidebarItem.focus()
+      
+      // Verify it can receive focus
+      await expect(firstSidebarItem).toBeFocused()
       
       // Press Enter to activate
       await page.keyboard.press('Enter')
@@ -130,7 +153,7 @@ test.describe('Navigation', () => {
     const bottomNavVisible = await bottomNav.isVisible()
 
     if (bottomNavVisible) {
-      // Check nav has proper role
+      // Mobile: Check bottom nav has proper role
       await expect(bottomNav).toHaveAttribute('role', 'tablist')
       await expect(bottomNav).toHaveAttribute('aria-label')
 
@@ -141,6 +164,20 @@ test.describe('Navigation', () => {
       for (let i = 0; i < count; i++) {
         const item = navItems.nth(i)
         await expect(item).toHaveAttribute('role', 'tab')
+        await expect(item).toHaveAttribute('aria-label')
+      }
+    } else {
+      // Desktop/Tablet: Check sidebar has proper attributes
+      const sidebar = page.locator('.desktop-sidebar')
+      await expect(sidebar).toHaveAttribute('role', 'navigation')
+      await expect(sidebar).toHaveAttribute('aria-label')
+
+      // Check sidebar items have aria-label
+      const sidebarItems = page.locator('.sidebar-item')
+      const count = await sidebarItems.count()
+      
+      for (let i = 0; i < count; i++) {
+        const item = sidebarItems.nth(i)
         await expect(item).toHaveAttribute('aria-label')
       }
     }

@@ -1,21 +1,36 @@
-/* AppLayout styles - moved from App.css */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: var(--background);
-  color: var(--text-color);
-}
+/* AppLayout styles - sidebar-specific layout adjustments */
+/* Note: Base .main-content styles (padding, scroll, height) are in App.css */
 
+/* Add transition for sidebar margin changes */
 .main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding-bottom: 80px;
+  transition: margin-left 0.3s ease;
 }
 
+/* Full-screen routes (e.g., stack-builder) hide sidebar, so no margin needed */
 .main-content.full-screen {
-  padding-bottom: 0;
+  margin-left: 0 !important;
 }
 
-/* Dark mode is handled through CSS variables in the parent */
+/* Responsive layout adjustments for sidebar */
+
+/* Mobile (<768px): No sidebar, uses bottom nav - no margin needed */
+@media (max-width: 767px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Tablet/Medium (768px-1199px): Collapsed sidebar (icons only) - 72px wide */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .main-content {
+    margin-left: 72px;
+  }
+}
+
+/* Desktop (≥1200px): Full sidebar with labels - 200px wide */
+@media (min-width: 1200px) {
+  .main-content {
+    margin-left: 200px;
+  }
+}
 
