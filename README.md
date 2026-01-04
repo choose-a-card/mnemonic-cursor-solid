@@ -2,6 +2,8 @@
 
 A modern web application for practicing and mastering memorized card stacks used in magic performances. Built with SolidJS for blazing-fast performance.
 
+> 🎨 **Vibe coded** — This project was built entirely through AI-assisted development using Cursor.
+
 ## Features
 
 ### Stack Reference
