@@ -563,6 +563,11 @@
   color: var(--text);
 }
 
+.stack-builder-page.dark .suit-symbol.hearts,
+.stack-builder-page.dark .suit-symbol.diamonds {
+  color: #ef4444;
+}
+
 .stack-builder-page.dark .clear-all-btn,
 .stack-builder-page.dark .clear-btn {
   border-color: var(--border);

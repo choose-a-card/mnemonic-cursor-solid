@@ -1,0 +1,112 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 2rem;
+}
+
+.error-boundary-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-boundary-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-boundary-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--color-text);
+}
+
+.error-boundary-message {
+  color: var(--color-text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.error-boundary-details {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.error-boundary-details summary {
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-boundary-details summary:hover {
+  color: var(--color-text);
+}
+
+.error-boundary-stack {
+  background: var(--color-surface-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: var(--color-danger, #ef4444);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-boundary-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 0.875rem;
+}
+
+.error-boundary-btn:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.error-boundary-btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.error-boundary-btn-primary:hover {
+  background: var(--color-primary-hover, #4f46e5);
+}
+
+.error-boundary-btn-secondary {
+  background: var(--color-surface-secondary);
+  color: var(--color-text);
+}
+
+.error-boundary-btn-secondary:hover {
+  background: var(--color-surface-hover, #e5e7eb);
+}
+
+/* Dark mode adjustments */
+:root.dark .error-boundary-stack {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+:root.dark .error-boundary-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:root.dark .error-boundary-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+

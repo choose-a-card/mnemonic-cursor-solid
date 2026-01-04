@@ -1,6 +1,7 @@
 import { Show } from 'solid-js'
 import Button from '../shared/Button'
 import { createKeyboardHandler } from '../../hooks/useKeyboardHandler'
+import { logger } from '../../utils/logger'
 import './DebugControls.css'
 
 interface DebugControlsProps {
@@ -10,12 +11,12 @@ interface DebugControlsProps {
 
 export default function DebugControls(props: DebugControlsProps) {
   const handleDebugClick = () => {
-    console.log('Debug button clicked, debugMode:', props.debugMode)
+    logger.log('Debug button clicked, debugMode:', props.debugMode)
     if (props.debugMode && props.onGenerateDebugStats) {
-      console.log('Calling generateDebugStats')
+      logger.log('Calling generateDebugStats')
       props.onGenerateDebugStats()
     } else {
-      console.log('generateDebugStats is not available')
+      logger.log('generateDebugStats is not available')
     }
   }
 
@@ -34,4 +35,3 @@ export default function DebugControls(props: DebugControlsProps) {
     </Show>
   )
 }
-

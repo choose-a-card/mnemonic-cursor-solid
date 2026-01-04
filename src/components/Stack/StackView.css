@@ -162,6 +162,11 @@
   border-color: var(--border, #404040);
 }
 
+.app-container.dark .playing-card.card-red .card-value,
+.app-container.dark .playing-card.card-red .card-suit {
+  color: #ef4444;
+}
+
 .app-container.dark .playing-card.card-black .card-value,
 .app-container.dark .playing-card.card-black .card-suit {
   color: #ffffff;

@@ -184,6 +184,11 @@
   color: var(--text);
 }
 
+.app-container.dark .suit-btn.hearts,
+.app-container.dark .suit-btn.diamonds {
+  color: #ef4444;
+}
+
 .app-container.dark .rank-btn:hover,
 .app-container.dark .suit-btn:hover:not(.disabled) {
   background: var(--accent-light, #1a365d);

@@ -2,6 +2,7 @@ import { createMemo, type Component } from 'solid-js'
 import type { Badge } from '../../types'
 import { getCategoryInfo } from '../../utils/badges'
 import { isFeatureEnabled } from '../../utils/featureFlags'
+import { logger } from '../../utils/logger'
 import './BadgeDisplay.css'
 
 interface BadgeDisplayProps {
@@ -44,7 +45,7 @@ const BadgeDisplay: Component<BadgeDisplayProps> = (props) => {
       target.blur()
     }
     // Could add badge details modal here
-    console.log('Badge clicked:', badge)
+    logger.log('Badge clicked:', badge)
   }
 
   const handleBadgeKeyDown = (event: KeyboardEvent, badge: Badge) => {
@@ -168,4 +169,4 @@ const BadgeDisplay: Component<BadgeDisplayProps> = (props) => {
   )
 }
 
-export default BadgeDisplay 
+export default BadgeDisplay

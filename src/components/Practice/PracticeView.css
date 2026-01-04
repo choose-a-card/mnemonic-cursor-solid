@@ -608,6 +608,10 @@
 }
 
 /* Dark mode adjustments */
+.app-container.dark .quiz-card-large.card-red {
+  color: #ef4444;
+}
+
 .app-container.dark .quiz-card-large.card-black {
   color: #ffffff;
 } 

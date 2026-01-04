@@ -1,4 +1,5 @@
 import { createSignal, onMount } from 'solid-js'
+import { logger } from '../utils/logger'
 
 export const useDebugMode = () => {
   const [debugMode, setDebugMode] = createSignal<boolean>(false)
@@ -8,10 +9,9 @@ export const useDebugMode = () => {
     const debugFlag = urlParams.get('debug')
     if (debugFlag === 'true') {
       setDebugMode(true)
-      console.log('Debug mode enabled via URL parameter')
+      logger.log('Debug mode enabled via URL parameter')
     }
   })
 
   return { debugMode, setDebugMode }
 }
-

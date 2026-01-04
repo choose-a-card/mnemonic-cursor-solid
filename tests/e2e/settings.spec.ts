@@ -16,12 +16,16 @@ test.describe('Settings Page', () => {
       await expect(stackCard).toBeVisible()
     })
 
-    test('should display all stack type options', async ({ page }) => {
-      const stackOptions = page.locator('.stack-option')
-      const count = await stackOptions.count()
+    test('should display all preset stack type options', async ({ page }) => {
+      // Should have at least 3 preset stack types: Tamariz, Aronson, 5th Faro
+      // Custom stacks may also appear if created previously
+      const tamarizOption = page.locator('.stack-option').filter({ hasText: 'Tamariz' })
+      const aronsonOption = page.locator('.stack-option').filter({ hasText: 'Aronson' })
+      const faroOption = page.locator('.stack-option').filter({ hasText: /Faro/ })
       
-      // Should have 3 stack types: Tamariz, Aronson, 5th Faro
-      expect(count).toBe(3)
+      await expect(tamarizOption).toBeVisible()
+      await expect(aronsonOption).toBeVisible()
+      await expect(faroOption).toBeVisible()
     })
 
     test('should display Tamariz option', async ({ page }) => {

@@ -1,12 +1,16 @@
 import { createContext, useContext, createSignal, createMemo, createEffect, onMount, type Component, type JSX } from 'solid-js'
-import type { Stats, Badge } from '../types'
+import type { Stats, Badge, QuizResult } from '../types'
 import { calculateBadgeProgress } from '../utils/badges'
 import { initializePWA, saveToLocalStorage, loadFromLocalStorage, isOnline, onOnlineStatusChange } from '../utils/pwa'
 import { isFeatureEnabled } from '../utils/featureFlags'
+import { logger } from '../utils/logger'
+
+// Maximum history entries to prevent unbounded growth
+const MAX_HISTORY_ENTRIES = 100000
 
 interface StatsContextValue {
   stats: () => Stats
-  addResult: (result: any) => void
+  addResult: (result: QuizResult) => void
   resetStats: () => void
   generateDebugStats: () => void
   badges: () => Badge[]
@@ -103,15 +107,17 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     saveToLocalStorage('mnemonic-stats', currentStats)
   })
 
-  const addResult = (result: any) => {
+  const addResult = (result: QuizResult) => {
     const currentStats = stats()
     const { correct, question, input, mode } = result
     
     // Update basic stats
-    const newStats = {
+    const newStats: Stats = {
       ...currentStats,
       total: currentStats.total + 1,
-      correct: currentStats.correct + (correct ? 1 : 0)
+      correct: currentStats.correct + (correct ? 1 : 0),
+      history: [...currentStats.history],
+      modeStats: { ...currentStats.modeStats }
     }
     
     // Initialize mode stats if not exists
@@ -127,7 +133,7 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     }
     
     // Update mode-specific failures (context-aware!)
-    const modeStats = newStats.modeStats[mode]
+    const modeStats = { ...newStats.modeStats[mode] }
     if (!correct) {
       // Track card failures per mode
       if (question.card) {
@@ -148,8 +154,9 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
     if (correct) modeStats.correct++
     modeStats.accuracy = Math.round((modeStats.correct / modeStats.total) * 100)
     modeStats.lastAttempt = Date.now()
+    newStats.modeStats[mode] = modeStats
     
-    // Add to history
+    // Add to history (with limit to prevent unbounded growth)
     newStats.history.push({
       timestamp: Date.now(),
       correct,
@@ -157,6 +164,11 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
       question,
       input
     })
+    
+    // Trim history if it exceeds the maximum
+    if (newStats.history.length > MAX_HISTORY_ENTRIES) {
+      newStats.history = newStats.history.slice(-MAX_HISTORY_ENTRIES)
+    }
     
     setStats(newStats)
   }
@@ -174,7 +186,7 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
   }
 
   const generateDebugStats = (): void => {
-    console.log('StatsContext: generateDebugStats called')
+    logger.log('StatsContext: generateDebugStats called')
     const currentStack = props.stack()
     const modes = ['Card → Position', 'Position → Card', 'One Ahead', 'Stack Context', 'Cutting Estimation', 'First or Second Half', 'Quartet Position', 'Cut to Position']
     const newStats: Stats = { 
@@ -184,7 +196,7 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
       modeStats: {} 
     }
     
-    console.log('StatsContext: Generating 10000 debug results...')
+    logger.log('StatsContext: Generating 10000 debug results...')
     for (let i = 0; i < 10000; i++) {
       const mode = modes[Math.floor(Math.random() * modes.length)]
       const correct = Math.random() > 0.3 // 70% accuracy for realistic data
@@ -233,9 +245,9 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
       })
     }
     
-    console.log('StatsContext: Setting new stats:', newStats)
+    logger.log('StatsContext: Setting new stats:', newStats)
     setStats(newStats)
-    console.log('StatsContext: Stats updated successfully')
+    logger.log('StatsContext: Stats updated successfully')
   }
 
   const value: StatsContextValue = {

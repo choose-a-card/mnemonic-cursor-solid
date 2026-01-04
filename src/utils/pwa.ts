@@ -1,4 +1,5 @@
 // PWA Utility Functions
+import { logger } from './logger'
 
 export interface PWAInstallPrompt {
   prompt: () => Promise<void>;
@@ -7,7 +8,6 @@ export interface PWAInstallPrompt {
 
 // Check if PWA is installable
 export const isPWAInstallable = (): boolean => {
-  // Check for basic PWA support
   const hasServiceWorker = 'serviceWorker' in navigator;
   const hasBeforeInstallPrompt = 'BeforeInstallPromptEvent' in window;
   const hasManifest = !!document.querySelector('link[rel="manifest"]');
@@ -15,7 +15,7 @@ export const isPWAInstallable = (): boolean => {
   const isChrome = /Chrome/.test(navigator.userAgent) && !/Edge/.test(navigator.userAgent);
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
   
-  console.log('PWA Support Check:', {
+  logger.log('PWA Support Check:', {
     hasServiceWorker,
     hasBeforeInstallPrompt,
     hasManifest,
@@ -24,11 +24,9 @@ export const isPWAInstallable = (): boolean => {
     isStandalone,
     userAgent: navigator.userAgent,
     displayMode: window.matchMedia('(display-mode: standalone)').matches,
-    standalone: (window.navigator as any).standalone
+    standalone: (window.navigator as unknown as { standalone?: boolean }).standalone
   });
   
-  // For mobile Chrome, we need service worker and manifest
-  // For desktop, we also need the beforeinstallprompt event
   if (isMobile && isChrome) {
     return hasServiceWorker && hasManifest && !isStandalone;
   }
@@ -39,10 +37,10 @@ export const isPWAInstallable = (): boolean => {
 // Check if PWA is already installed
 export const isPWAInstalled = (): boolean => {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-  const isIOSStandalone = (window.navigator as any).standalone === true;
+  const isIOSStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone === true;
   const isAndroidStandalone = window.matchMedia('(display-mode: standalone)').matches;
   
-  console.log('PWA Installation Check:', {
+  logger.log('PWA Installation Check:', {
     isStandalone,
     isIOSStandalone,
     isAndroidStandalone,
@@ -55,8 +53,8 @@ export const isPWAInstalled = (): boolean => {
 
 // Get PWA install prompt
 export const getPWAInstallPrompt = (): PWAInstallPrompt | null => {
-  const prompt = (window as any).deferredPrompt;
-  console.log('PWA Install Prompt:', {
+  const prompt = (window as unknown as { deferredPrompt?: PWAInstallPrompt }).deferredPrompt;
+  logger.log('PWA Install Prompt:', {
     hasPrompt: !!prompt,
     promptType: prompt ? prompt.constructor.name : 'none'
   });
@@ -71,7 +69,7 @@ export const canShowInstallPrompt = (): boolean => {
   const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const isChrome = /Chrome/.test(navigator.userAgent) && !/Edge/.test(navigator.userAgent);
   
-  console.log('Can Show Install Prompt:', {
+  logger.log('Can Show Install Prompt:', {
     hasPrompt: !!prompt,
     notInstalled,
     hasBasicSupport,
@@ -80,8 +78,6 @@ export const canShowInstallPrompt = (): boolean => {
     result: !!prompt && notInstalled && hasBasicSupport
   });
   
-  // For mobile Chrome, we might not need the beforeinstallprompt event
-  // as Chrome can show the install banner automatically
   if (isMobile && isChrome) {
     return notInstalled && hasBasicSupport;
   }
@@ -91,14 +87,14 @@ export const canShowInstallPrompt = (): boolean => {
 
 // Clear PWA install prompt
 export const clearPWAInstallPrompt = (): void => {
-  (window as any).deferredPrompt = null;
+  (window as unknown as { deferredPrompt?: PWAInstallPrompt }).deferredPrompt = undefined;
 };
 
 // Install PWA
 export const installPWA = async (): Promise<boolean> => {
   const prompt = getPWAInstallPrompt();
   if (!prompt) {
-    console.log('No install prompt available');
+    logger.log('No install prompt available');
     return false;
   }
 
@@ -108,14 +104,14 @@ export const installPWA = async (): Promise<boolean> => {
     clearPWAInstallPrompt();
     
     if (choiceResult.outcome === 'accepted') {
-      console.log('PWA installed successfully');
+      logger.log('PWA installed successfully');
       return true;
     } else {
-      console.log('PWA installation dismissed');
+      logger.log('PWA installation dismissed');
       return false;
     }
   } catch (error) {
-    console.error('Error installing PWA:', error);
+    logger.error('Error installing PWA:', error);
     return false;
   }
 };
@@ -136,7 +132,6 @@ export const handleSWUpdate = (registration: ServiceWorkerRegistration): void =>
   if (newWorker) {
     newWorker.addEventListener('statechange', () => {
       if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-        // New version available
         showUpdateNotification();
       }
     });
@@ -145,7 +140,6 @@ export const handleSWUpdate = (registration: ServiceWorkerRegistration): void =>
 
 // Show update notification
 export const showUpdateNotification = (): void => {
-  // You can implement a custom update notification UI here
   if (confirm('A new version is available! Would you like to update?')) {
     updateApp();
   }
@@ -169,25 +163,20 @@ export const reloadAfterUpdate = (): void => {
 
 // Initialize PWA features
 export const initializePWA = (): void => {
-  // Listen for beforeinstallprompt event
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    (window as any).deferredPrompt = e;
-    console.log('PWA install prompt ready');
+    (window as unknown as { deferredPrompt?: Event }).deferredPrompt = e;
+    logger.log('PWA install prompt ready');
   });
 
-  // Listen for appinstalled event
   window.addEventListener('appinstalled', () => {
-    console.log('PWA installed successfully');
+    logger.log('PWA installed successfully');
     clearPWAInstallPrompt();
   });
 
-  // Listen for service worker updates
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('New service worker activated');
-      // Optionally reload the page to use the new service worker
-      // reloadAfterUpdate();
+      logger.log('New service worker activated');
     });
   }
 };
@@ -203,11 +192,11 @@ export const onOnlineStatusChange = (callback: (online: boolean) => void): void 
 };
 
 // Local storage utilities for offline data
-export const saveToLocalStorage = (key: string, data: any): void => {
+export const saveToLocalStorage = <T>(key: string, data: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
-    console.error('Error saving to localStorage:', error);
+    logger.error('Error saving to localStorage:', error);
   }
 };
 
@@ -216,19 +205,28 @@ export const loadFromLocalStorage = <T>(key: string, defaultValue: T): T => {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
   } catch (error) {
-    console.error('Error loading from localStorage:', error);
+    logger.error('Error loading from localStorage:', error);
     return defaultValue;
   }
 };
 
 // Sync data when coming back online
 export const syncOfflineData = (): void => {
-  // Implement data synchronization logic here
-  console.log('Syncing offline data...');
+  logger.log('Syncing offline data...');
 }; 
 
+// Service Worker status type
+interface ServiceWorkerStatus {
+  registered: boolean;
+  active?: boolean;
+  state?: string;
+  scriptURL?: string;
+  scope?: string;
+  error?: string;
+}
+
 // Check service worker registration status
-export const checkServiceWorkerStatus = async (): Promise<any> => {
+export const checkServiceWorkerStatus = async (): Promise<ServiceWorkerStatus> => {
   if (!('serviceWorker' in navigator)) {
     return { registered: false, error: 'Service Worker not supported' };
   }
@@ -237,7 +235,7 @@ export const checkServiceWorkerStatus = async (): Promise<any> => {
     const registration = await navigator.serviceWorker.getRegistration();
     const sw = registration?.active;
     
-    const status = {
+    const status: ServiceWorkerStatus = {
       registered: !!registration,
       active: !!sw,
       state: sw?.state || 'none',
@@ -245,10 +243,10 @@ export const checkServiceWorkerStatus = async (): Promise<any> => {
       scope: registration?.scope || 'none'
     };
     
-    console.log('Service Worker Status:', status);
+    logger.log('Service Worker Status:', status);
     return status;
   } catch (error) {
-    console.error('Error checking service worker:', error);
+    logger.error('Error checking service worker:', error);
     return { registered: false, error: (error as Error).message };
   }
 };
@@ -256,7 +254,7 @@ export const checkServiceWorkerStatus = async (): Promise<any> => {
 // Force service worker registration (for debugging)
 export const forceServiceWorkerRegistration = async (): Promise<boolean> => {
   if (!('serviceWorker' in navigator)) {
-    console.log('Service Worker not supported');
+    logger.log('Service Worker not supported');
     return false;
   }
 
@@ -264,10 +262,10 @@ export const forceServiceWorkerRegistration = async (): Promise<boolean> => {
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/'
     });
-    console.log('Service Worker registered successfully:', registration);
+    logger.log('Service Worker registered successfully:', registration);
     return true;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    logger.error('Service Worker registration failed:', error);
     return false;
   }
-}; 
+};

@@ -1,4 +1,4 @@
-import { createContext, useContext, createSignal, type Component, onMount, createEffect } from 'solid-js'
+import { createContext, useContext, createSignal, type Component, onMount, createEffect, type JSX } from 'solid-js'
 import type { CardInterval } from '../types'
 import type { StackType } from '../constants/stacks'
 import { saveToLocalStorage, loadFromLocalStorage } from '../utils/pwa'
@@ -15,9 +15,14 @@ interface AppSettingsContextType {
   debugMode: boolean
 }
 
+interface AppSettingsProviderProps {
+  children: JSX.Element
+  debugMode: boolean
+}
+
 const AppSettingsContext = createContext<AppSettingsContextType>()
 
-export const AppSettingsProvider: Component<{ children: any; debugMode: boolean }> = (props) => {
+export const AppSettingsProvider: Component<AppSettingsProviderProps> = (props) => {
   const [stackType, setStackType] = createSignal<StackType>('tamariz')
   const [cardInterval, setCardInterval] = createSignal<CardInterval>({ start: 1, end: 52 })
   const [darkMode, setDarkMode] = createSignal<boolean>(false)

@@ -4,6 +4,7 @@ import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallP
 import { isFeatureEnabled } from '../../utils/featureFlags'
 import { useAppSettings } from '../../contexts/AppSettingsContext'
 import { useStats } from '../../contexts/StatsContext'
+import { logger } from '../../utils/logger'
 import Card from '../shared/Card'
 import StackConfigCard from './StackConfigCard'
 import CustomStacksCard from './CustomStacksCard'
@@ -42,7 +43,7 @@ export default function SettingsView() {
         
 
         
-        console.log('PWA Status Check:', {
+        logger.log('PWA Status Check:', {
           installed,
           installable,
           hasPrompt,
@@ -68,13 +69,13 @@ export default function SettingsView() {
 
       // Listen for beforeinstallprompt event
       window.addEventListener('beforeinstallprompt', () => {
-        console.log('beforeinstallprompt event fired!')
+        logger.log('beforeinstallprompt event fired!')
         checkPWAStatus()
       })
 
       // Listen for appinstalled event
       window.addEventListener('appinstalled', () => {
-        console.log('appinstalled event fired!')
+        logger.log('appinstalled event fired!')
         checkPWAStatus()
       })
 
@@ -94,7 +95,7 @@ export default function SettingsView() {
         setCanInstall(false)
       }
     } catch (error) {
-      console.error('Installation failed:', error)
+      logger.error('Installation failed:', error)
     } finally {
       setInstalling(false)
     }
@@ -106,7 +107,7 @@ export default function SettingsView() {
     // For mobile Chrome, try to trigger the install banner
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then(() => {
-        console.log('Service Worker ready, trying to trigger install banner')
+        logger.log('Service Worker ready, trying to trigger install banner')
         // This might trigger the install banner on mobile Chrome
         window.dispatchEvent(new Event('beforeinstallprompt'))
       })

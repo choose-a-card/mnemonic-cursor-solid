@@ -1,7 +1,17 @@
+import { logger } from '../utils/logger'
+
+// Type for cross-browser AudioContext support
+interface WindowWithWebkitAudioContext extends Window {
+  webkitAudioContext?: typeof AudioContext
+}
+
 export function playSound(soundEnabled: boolean, type: string): void {
     if (!soundEnabled) return
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const AudioContextClass = window.AudioContext || (window as WindowWithWebkitAudioContext).webkitAudioContext
+      if (!AudioContextClass) return
+      
+      const audioContext = new AudioContextClass()
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
       
@@ -21,7 +31,6 @@ export function playSound(soundEnabled: boolean, type: string): void {
       oscillator.start()
       oscillator.stop(audioContext.currentTime + 0.3)
     } catch (error) {
-      console.warn('Audio playback failed:', error)
+      logger.warn('Audio playback failed:', error)
     }
   }
-  
