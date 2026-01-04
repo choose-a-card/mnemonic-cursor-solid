@@ -11,7 +11,6 @@ import CustomStacksCard from './CustomStacksCard'
 import PreferencesCard from './PreferencesCard'
 import DataManagementCard from './DataManagementCard'
 import AboutCard from './AboutCard'
-import SupportCard from './SupportCard'
 
 export default function SettingsView() {
   const { 
@@ -198,7 +197,6 @@ export default function SettingsView() {
 
         <DataManagementCard onResetStats={resetStats} />
         <AboutCard />
-        <SupportCard />
       </div>
     </div>
   )
