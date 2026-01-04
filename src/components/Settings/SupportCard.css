@@ -1,0 +1,64 @@
+/* Support Info */
+.support-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.support-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  line-height: 1.5;
+}
+
+.support-button {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.support-button:hover,
+.support-button:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  outline: none;
+}
+
+.support-button:focus-visible {
+  outline: 2px solid var(--accent, #007aff);
+  outline-offset: 2px;
+}
+
+.support-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Dark Mode Adjustments */
+.app-container.dark .support-text,
+.app-container.dark .support-hint {
+  color: var(--text-secondary, #999);
+}
+
+/* Small screens and down */
+@media (max-width: 640px) {
+  .support-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
