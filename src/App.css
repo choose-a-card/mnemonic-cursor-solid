@@ -2,6 +2,7 @@
   --primary: #1a1a1a;
   --primary-light: #333;
   --primary-color: #007aff;
+  --primary-hover: #0056cc;
   --text-primary: #1a1a1a;
   --text-secondary: #666;
   --text: #222;
@@ -58,6 +59,7 @@
   --accent-hover: #0056cc;
   --accent-light: #1a3a5a;
   --primary-color: #0A84FF;
+  --primary-hover: #0066d6;
 }
 
 .main-content {
