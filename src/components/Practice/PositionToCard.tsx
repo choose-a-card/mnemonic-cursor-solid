@@ -1,6 +1,7 @@
 import { onMount } from 'solid-js'
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
+import CardText from '../shared/CardText'
 import { useCardQuiz } from '../../hooks/useCardQuiz'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
@@ -80,7 +81,10 @@ export default function PositionToCard() {
 
         <div class="feedback-area">
           {quiz.feedback() && (
-            <div class="feedback-message">{quiz.feedback()}</div>
+            <div class="feedback-message">
+              {quiz.feedback()}
+              {quiz.feedbackCard() && <CardText card={quiz.feedbackCard()!} />}
+            </div>
           )}
         </div>
       </form>

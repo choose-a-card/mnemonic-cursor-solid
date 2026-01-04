@@ -1,6 +1,7 @@
 import { onMount } from 'solid-js'
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
+import CardText from '../shared/CardText'
 import { useCardQuiz } from '../../hooks/useCardQuiz'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
@@ -56,13 +57,9 @@ export default function StackContext() {
     quiz.setInput(partial)
   }
 
-  function getQuestionText(): string {
+  const questionPrefix = () => {
     const q = quiz.question()
-    if (q.type === 'context-prev') {
-      return `What card comes before ${q.card}?`
-    } else {
-      return `What card comes after ${q.card}?`
-    }
+    return q.type === 'context-prev' ? 'What card comes before' : 'What card comes after'
   }
 
   onMount(() => {
@@ -73,7 +70,7 @@ export default function StackContext() {
     <div class="practice-mode">
       {/* Question */}
       <div class="question-card">
-        <div class="question-text">{getQuestionText()}</div>
+        <div class="question-text">{questionPrefix()} <CardText card={quiz.question().card || ''} />?</div>
       </div>
       
       {/* Answer Form */}
@@ -101,7 +98,10 @@ export default function StackContext() {
 
         <div class="feedback-area">
           {quiz.feedback() && (
-            <div class="feedback-message">{quiz.feedback()}</div>
+            <div class="feedback-message">
+              {quiz.feedback()}
+              {quiz.feedbackCard() && <CardText card={quiz.feedbackCard()!} />}
+            </div>
           )}
         </div>
       </form>

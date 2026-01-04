@@ -4,6 +4,7 @@ import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
+import CardText from '../shared/CardText'
 
 export default function ClassicQuiz() {
   const { practiceStack, cardInterval, soundEnabled, onResult } = usePractice()
@@ -64,7 +65,7 @@ export default function ClassicQuiz() {
     <div class="practice-mode">
       {/* Question */}
       <div class="question-card">
-        <div class="question-text">What position is {question().card}?</div>
+        <div class="question-text">What position is <CardText card={question().card || ''} />?</div>
       </div>
 
       {/* Answer Form */}

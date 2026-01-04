@@ -3,6 +3,7 @@ import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import CardKeyboard from '../shared/CardKeyboard'
+import CardText from '../shared/CardText'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
 
@@ -10,11 +11,13 @@ export default function OneAhead() {
   const { practiceStack, soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [input, setInput] = createSignal<string>('')
-  const [feedback, setFeedback] = createSignal<string>('')
+  const [feedback, setFeedback] = createSignal<string | null>(null)
+  const [feedbackCard, setFeedbackCard] = createSignal<string | null>(null)
   const [showKeyboard, setShowKeyboard] = createSignal<boolean>(false)
   
   function nextQuestion(): void {
-    setFeedback('')
+    setFeedback(null)
+    setFeedbackCard(null)
     setInput('')
     setShowKeyboard(true) // Keep keyboard open for next question
     
@@ -39,8 +42,10 @@ export default function OneAhead() {
     
     if (correct) {
       setFeedback('Correct! ✅')
+      setFeedbackCard(null)
     } else {
-      setFeedback(`Wrong. Answer: ${q.answer}`)
+      setFeedback('Wrong. Answer: ')
+      setFeedbackCard(String(q.answer))
     }
     
     onResult({ 
@@ -65,7 +70,7 @@ export default function OneAhead() {
     <div class="practice-mode">
       {/* Question */}
       <div class="question-card">
-        <div class="question-text">What card comes after {question().card}?</div>
+        <div class="question-text">What card comes after <CardText card={question().card || ''} />?</div>
       </div>
       
       {/* Answer Form */}
@@ -93,7 +98,10 @@ export default function OneAhead() {
 
         <div class="feedback-area">
           {feedback() && (
-            <div class="feedback-message">{feedback()}</div>
+            <div class="feedback-message">
+              {feedback()}
+              {feedbackCard() && <CardText card={feedbackCard()!} />}
+            </div>
           )}
         </div>
       </div>

@@ -12,11 +12,13 @@ interface UseCardQuizOptions {
 export function useCardQuiz(options: UseCardQuizOptions) {
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [input, setInput] = createSignal<string>('')
-  const [feedback, setFeedback] = createSignal<string>('')
+  const [feedback, setFeedback] = createSignal<string | null>(null)
+  const [feedbackCard, setFeedbackCard] = createSignal<string | null>(null)
   const [showKeyboard, setShowKeyboard] = createSignal<boolean>(false)
 
   function updateQuestion(newQuestion: QuizQuestion): void {
-    setFeedback('')
+    setFeedback(null)
+    setFeedbackCard(null)
     setInput('')
     setQuestion(newQuestion)
   }
@@ -42,8 +44,19 @@ export function useCardQuiz(options: UseCardQuizOptions) {
     
     if (correct) {
       setFeedback('Correct! ✅')
+      setFeedbackCard(null)
     } else {
-      setFeedback(`Wrong. Answer: ${q.answer}`)
+      // Check if answer is a card (contains suit symbol)
+      const answerStr = String(q.answer)
+      const isCardAnswer = answerStr.includes('♥') || answerStr.includes('♦') || 
+                           answerStr.includes('♠') || answerStr.includes('♣')
+      if (isCardAnswer) {
+        setFeedback('Wrong. Answer: ')
+        setFeedbackCard(answerStr)
+      } else {
+        setFeedback(`Wrong. Answer: ${q.answer}`)
+        setFeedbackCard(null)
+      }
     }
     
     options.onResult({ 
@@ -58,10 +71,11 @@ export function useCardQuiz(options: UseCardQuizOptions) {
     question,
     input,
     feedback,
+    feedbackCard,
     showKeyboard,
     setInput,
     setShowKeyboard,
     updateQuestion,
     submitAnswer
   }
-} 
+}

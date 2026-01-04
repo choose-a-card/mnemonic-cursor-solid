@@ -5,6 +5,7 @@ import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { RANKS, SUITS } from '../../constants/cards'
 import { usePractice } from '../../contexts/PracticeContext'
+import CardText from '../shared/CardText'
 
 export default function QuartetPosition() {
   const { stack, soundEnabled, onResult } = usePractice()
@@ -114,7 +115,7 @@ export default function QuartetPosition() {
     <div class="practice-mode">
       <div class="question-card">
         <div class="question-text">
-          Enter the positions of all the <b>{question().card}s</b> in the stack:
+          Enter the positions of all the <b><CardText card={question().card || ''} />s</b> in the stack:
         </div>
       </div>
       <form class="quartet-form" onSubmit={e => { e.preventDefault(); handleSubmit(e); }}>

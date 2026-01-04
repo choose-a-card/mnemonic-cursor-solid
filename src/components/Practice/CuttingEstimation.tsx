@@ -4,6 +4,7 @@ import { playSound } from '../../sounds/sounds';
 import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
+import CardText from '../shared/CardText'
 
 export default function CuttingEstimation() {
   const { practiceStack, cardInterval, soundEnabled, onResult } = usePractice()
@@ -80,8 +81,8 @@ export default function CuttingEstimation() {
       {/* Question */}
       <div class="question-card">
         <div class="question-text">
-          <div><b>Bottom card:</b> {question().cutCard}</div>
-          <div><b>Target card:</b> {question().targetCard}</div>
+          <div><b>Bottom card:</b> <CardText card={question().cutCard || ''} /></div>
+          <div><b>Target card:</b> <CardText card={question().targetCard || ''} /></div>
           <div style={{'margin-top': '1rem'}}>How many cards (±8) to cut to bring the target to the top? <br/>(+ = forward, – = backward)</div>
         </div>
       </div>

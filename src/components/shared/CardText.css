@@ -1,0 +1,17 @@
+.card-text {
+  font-weight: 600;
+}
+
+.card-text-red {
+  color: #dc2626;
+}
+
+.card-text-black {
+  color: inherit;
+}
+
+/* Dark mode - keep red cards red */
+.app-container.dark .card-text-red {
+  color: #ef4444;
+}
+
