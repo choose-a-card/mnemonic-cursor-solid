@@ -3,6 +3,7 @@ import solid from 'vite-plugin-solid'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/mnemonic-cursor-solid/',
   plugins: [
     solid(),
     // PWA plugin disabled by default - enable with ?enablePWA=true
