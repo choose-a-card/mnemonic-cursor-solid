@@ -4,14 +4,14 @@ import {
   selectPracticeMode, 
   goBackFromPractice, 
   PRACTICE_MODES, 
-  waitForTransition,
   parseCardFromQuestion,
   parsePositionFromQuestion,
   getCardPosition,
   getCardAtPosition,
   getNextCard,
-  TAMARIZ_STACK,
-  ensureStackType
+  getQuartetPositions,
+  parseRankFromQuartetQuestion,
+  TAMARIZ_STACK
 } from './utils/test-helpers'
 
 /**
@@ -490,6 +490,139 @@ test.describe('Practice Page', () => {
 
     test('should display quartet position header', async ({ page }) => {
       await expect(page.locator('.practice-name')).toContainText('Quartet Position')
+    })
+
+    test('should display 4 input fields', async ({ page }) => {
+      const inputs = page.locator('.quartet-input')
+      await expect(inputs).toHaveCount(4)
+    })
+
+    test('should show "Correct" feedback for right answer in ascending order', async ({ page }) => {
+      // Get the question text to find the rank
+      const questionText = await page.locator('.question-text').textContent()
+      const rank = parseRankFromQuartetQuestion(questionText || '')
+      
+      if (rank) {
+        const correctPositions = getQuartetPositions(rank)
+        const inputs = page.locator('.quartet-input')
+        
+        // Enter positions in ascending order
+        for (let i = 0; i < 4; i++) {
+          await inputs.nth(i).fill(String(correctPositions[i]))
+        }
+        
+        await page.locator('.submit-btn').click()
+        
+        // Verify correct feedback
+        const feedback = page.locator('.feedback-message')
+        await expect(feedback).toBeVisible({ timeout: 1000 })
+        await expect(feedback).toContainText('Correct')
+      }
+    })
+
+    test('should show "Correct" feedback for right answer in descending order', async ({ page }) => {
+      // Get the question text to find the rank
+      const questionText = await page.locator('.question-text').textContent()
+      const rank = parseRankFromQuartetQuestion(questionText || '')
+      
+      if (rank) {
+        const correctPositions = getQuartetPositions(rank)
+        const inputs = page.locator('.quartet-input')
+        
+        // Enter positions in descending order
+        for (let i = 0; i < 4; i++) {
+          await inputs.nth(i).fill(String(correctPositions[3 - i]))
+        }
+        
+        await page.locator('.submit-btn').click()
+        
+        // Verify correct feedback
+        const feedback = page.locator('.feedback-message')
+        await expect(feedback).toBeVisible({ timeout: 1000 })
+        await expect(feedback).toContainText('Correct')
+      }
+    })
+
+    test('should show "Correct" feedback for right answer in random order', async ({ page }) => {
+      // Get the question text to find the rank
+      const questionText = await page.locator('.question-text').textContent()
+      const rank = parseRankFromQuartetQuestion(questionText || '')
+      
+      if (rank) {
+        const correctPositions = getQuartetPositions(rank)
+        const inputs = page.locator('.quartet-input')
+        
+        // Enter positions in random order: [3, 0, 2, 1]
+        await inputs.nth(0).fill(String(correctPositions[2]))
+        await inputs.nth(1).fill(String(correctPositions[0]))
+        await inputs.nth(2).fill(String(correctPositions[3]))
+        await inputs.nth(3).fill(String(correctPositions[1]))
+        
+        await page.locator('.submit-btn').click()
+        
+        // Verify correct feedback
+        const feedback = page.locator('.feedback-message')
+        await expect(feedback).toBeVisible({ timeout: 1000 })
+        await expect(feedback).toContainText('Correct')
+      }
+    })
+
+    test('should show "Wrong" feedback for incorrect answer', async ({ page }) => {
+      // Get the question text to find the rank
+      const questionText = await page.locator('.question-text').textContent()
+      const rank = parseRankFromQuartetQuestion(questionText || '')
+      
+      if (rank) {
+        const correctPositions = getQuartetPositions(rank)
+        const inputs = page.locator('.quartet-input')
+        
+        // Enter wrong positions (shift all by 1, but ensure they're different)
+        const wrongPositions = correctPositions.map(pos => pos === 52 ? 1 : pos + 1)
+        
+        for (let i = 0; i < 4; i++) {
+          await inputs.nth(i).fill(String(wrongPositions[i]))
+        }
+        
+        await page.locator('.submit-btn').click()
+        
+        // Verify wrong feedback with correct positions shown
+        const feedback = page.locator('.feedback-message')
+        await expect(feedback).toBeVisible({ timeout: 1000 })
+        await expect(feedback).toContainText('Wrong')
+        await expect(feedback).toContainText(correctPositions.join(', '))
+      }
+    })
+
+    test('should mark wrong input fields when answer is incorrect', async ({ page }) => {
+      // Get the question text to find the rank
+      const questionText = await page.locator('.question-text').textContent()
+      const rank = parseRankFromQuartetQuestion(questionText || '')
+      
+      if (rank) {
+        const correctPositions = getQuartetPositions(rank)
+        const inputs = page.locator('.quartet-input')
+        
+        // Find valid wrong positions (1-52) that are not in the correct positions
+        const wrongPositions: number[] = []
+        for (let pos = 1; pos <= 52 && wrongPositions.length < 2; pos++) {
+          if (!correctPositions.includes(pos)) {
+            wrongPositions.push(pos)
+          }
+        }
+        
+        // Enter mix of correct and wrong positions
+        await inputs.nth(0).fill(String(correctPositions[0])) // correct
+        await inputs.nth(1).fill(String(wrongPositions[0])) // wrong
+        await inputs.nth(2).fill(String(correctPositions[2])) // correct
+        await inputs.nth(3).fill(String(wrongPositions[1])) // wrong
+        
+        await page.locator('.submit-btn').click()
+        
+        // Wait for feedback to appear
+        const feedback = page.locator('.feedback-message')
+        await expect(feedback).toBeVisible({ timeout: 1000 })
+        await expect(feedback).toContainText('Wrong')
+      }
     })
 
     test('should have back button functionality', async ({ page }) => {

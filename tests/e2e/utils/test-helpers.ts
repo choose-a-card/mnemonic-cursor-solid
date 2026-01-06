@@ -297,3 +297,34 @@ export const checkAccessibility = async (page: Page, selector: string): Promise<
   }
 }
 
+/**
+ * Get the positions of all four cards of a given rank in a stack (1-indexed)
+ * Returns an array of 4 positions
+ */
+export const getQuartetPositions = (rank: string, stack: string[] = TAMARIZ_STACK): number[] => {
+  const positions: number[] = []
+  const suits = ['♠', '♥', '♣', '♦']
+  
+  for (let i = 0; i < stack.length; i++) {
+    const card = stack[i]
+    if (suits.some(suit => card === rank + suit)) {
+      positions.push(i + 1) // 1-indexed
+    }
+  }
+  
+  return positions.sort((a, b) => a - b) // Return sorted for consistency
+}
+
+/**
+ * Parse the rank from a Quartet Position question
+ * Example: "Enter the positions of all the 4s in the stack:" => "4"
+ */
+export const parseRankFromQuartetQuestion = (questionText: string): string | null => {
+  // Match rank patterns like "4s", "As", "10s", "Js", "Qs", "Ks"
+  const match = questionText.match(/\b([AKQJ]|10|[2-9])s\b/i)
+  if (match) {
+    return match[1].toUpperCase()
+  }
+  return null
+}
+

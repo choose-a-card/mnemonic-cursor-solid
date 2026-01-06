@@ -68,15 +68,21 @@ export default function QuartetPosition() {
     
     const userPositions = inputs().map(v => Number(v)).filter(Boolean)
     const correctPositions = String(question().answer).split(',').map((pos: string) => Number(pos))
-    // Order must be ascending and all positions must match
+    // Sort both arrays to compare sets (order doesn't matter)
+    const sortedUserPositions = [...userPositions].sort((a, b) => a - b)
+    const sortedCorrectPositions = [...correctPositions].sort((a, b) => a - b)
+    // Check if all 4 positions match (order independent)
     const correct =
       userPositions.length === 4 &&
-      userPositions.every((pos, i) => pos === correctPositions[i]) &&
-      userPositions.every((_pos, i, arr) => i === 0 || arr[i] > arr[i - 1])
+      sortedUserPositions.length === sortedCorrectPositions.length &&
+      sortedUserPositions.every((pos, i) => pos === sortedCorrectPositions[i])
     let wrongs: number[] = []
     if (!correct) {
-      // Mark wrong inputs
-      wrongs = inputs().map((v, i) => !correctPositions.includes(Number(v)) ? i : -1).filter(i => i !== -1)
+      // Mark wrong inputs - check if each input value is in the correct positions set
+      wrongs = inputs().map((v, i) => {
+        const numValue = Number(v)
+        return numValue && !correctPositions.includes(numValue) ? i : -1
+      }).filter(i => i !== -1)
       setWrongIndexes(wrongs)
     } else {
       setWrongIndexes([])
