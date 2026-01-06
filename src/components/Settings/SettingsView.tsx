@@ -41,8 +41,6 @@ export default function SettingsView() {
         setIsInstalled(installed)
         setCanInstall(canShow)
         
-
-        
         logger.log('PWA Status Check:', {
           installed,
           installable,
@@ -113,8 +111,6 @@ export default function SettingsView() {
       })
     }
   }
-
-
 
   const isMobileChrome = () => {
     const userAgent = navigator.userAgent

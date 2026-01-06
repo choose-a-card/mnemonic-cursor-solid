@@ -74,7 +74,6 @@ export default function QuartetPosition() {
     // Check if all 4 positions match (order independent)
     const correct =
       userPositions.length === 4 &&
-      sortedUserPositions.length === sortedCorrectPositions.length &&
       sortedUserPositions.every((pos, i) => pos === sortedCorrectPositions[i])
     let wrongs: number[] = []
     if (!correct) {
