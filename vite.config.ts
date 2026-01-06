@@ -62,6 +62,7 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
   resolve: {
     alias: {
