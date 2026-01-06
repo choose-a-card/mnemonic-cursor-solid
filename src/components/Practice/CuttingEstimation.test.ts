@@ -148,7 +148,6 @@ describe('Cutting Estimation Utils', () => {
       // So answer = 0 or 52, normalized = 0 or -52, but since we want shortest path:
       // Actually, if 4♣ is bottom and we want it on top, we cut backward 1 card
       // (so 9♦ becomes bottom, making 4♣ the top)
-      const cardIdx = tamariz.indexOf(card)
       // When card is bottom, top is (cardIdx + 1) % N
       // To get card on top: cardIdx = (newBottomIdx + 1 + answer) % N
       // newBottomIdx = (cardIdx - 1 + N) % N (the card before)

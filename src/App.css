@@ -39,7 +39,19 @@
   background: var(--background, #fff);
   color: var(--text, #222);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow: hidden; /* Prevent body scroll */
+  overflow: hidden; /* Prevent body scroll on desktop */
+}
+
+/* On mobile, allow overscroll to pass through for native pull-to-refresh */
+@media (max-width: 767px) {
+  .app-container {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible; /* Remove overflow: hidden to allow overscroll to pass through */
+    /* Container won't scroll because content fits exactly */
+  }
 }
 
 .app-container.dark {
@@ -71,6 +83,14 @@
   min-height: 0; /* Allow flex item to shrink */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   scroll-behavior: smooth; /* Smooth scrolling */
+  overscroll-behavior-y: contain; /* Contain overscroll within this element */
+}
+
+/* Enable pull-to-refresh on mobile when at top of scroll */
+@media (max-width: 767px) {
+  .main-content {
+    overscroll-behavior-y: auto; /* Allow pull-to-refresh to bubble up on mobile */
+  }
 }
 
 /* Mobile: Bottom nav needs extra padding */

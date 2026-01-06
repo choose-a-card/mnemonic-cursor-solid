@@ -31,7 +31,21 @@ body {
   min-width: 320px;
   height: 100vh; /* Use fixed height instead of min-height */
   height: 100dvh; /* Use dynamic viewport height for mobile */
-  overflow: hidden; /* Prevent body scroll */
+  overflow: hidden; /* Prevent body scroll on desktop */
+}
+
+/* Enable native pull-to-refresh on mobile */
+@media (max-width: 767px) {
+  html {
+    overflow-y: auto; /* Allow html to scroll for pull-to-refresh */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body {
+    overflow-y: auto; /* Allow body to scroll for pull-to-refresh */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto; /* Allow native pull-to-refresh */
+  }
 }
 
 h1 {
