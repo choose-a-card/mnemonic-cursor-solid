@@ -5,6 +5,7 @@ import { getRandomInt } from '../../utils/utils';
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
 import CardText from '../shared/CardText'
+import { calculateCutAnswer } from './cuttingEstimationUtils'
 
 export default function CuttingEstimation() {
   const { practiceStack, cardInterval, soundEnabled, onResult } = usePractice()
@@ -16,24 +17,44 @@ export default function CuttingEstimation() {
     setFeedback('')
     setInput('')
     
-    // Randomly select a cut position (simulating a cut)
     const N = practiceStack().length
+    
+    // Randomly select a bottom card (cut position)
     const cutIdx = getRandomInt(N)
     const cutCard = practiceStack()[cutIdx]
     
+    // When a card is at the bottom (cutIdx), the top card is at (cutIdx + 1) % N
+    // To bring a target card to the top, we need to calculate how many cards to cut
+    
     // Randomly select an offset between -8 and +8, excluding 0
+    // This offset represents how many positions away from the current top the target should be
     let offset = 0
     while (offset === 0) {
       offset = getRandomInt(17) - 8 // -8 to +8
     }
-    // Compute target position, wrapping around
-    const targetIdx = (cutIdx + offset + N) % N
+    
+    // Calculate target position: if bottom is at cutIdx, top is at (cutIdx + 1) % N
+    // Target should be offset positions from the top: targetIdx = (cutIdx + 1 + offset + N) % N
+    const targetIdx = (cutIdx + 1 + offset + N) % N
     const targetCard = practiceStack()[targetIdx]
+    
+    // Calculate the correct answer using the utility function
+    // This ensures consistency and allows for proper testing
+    // We calculate from actual card positions rather than using offset directly
+    // to ensure correctness even if there are any edge cases
+    const answer = calculateCutAnswer(practiceStack(), cutCard, targetCard)
+    
+    // Verify that the answer matches the offset we used to generate the question
+    // (after normalization). This is a sanity check - they should always match.
+    if (answer !== offset) {
+      console.error(`Answer mismatch: calculated ${answer}, expected ${offset}. This should not happen!`)
+      // Use the calculated answer (from actual positions) as it's more reliable
+    }
     
     setQuestion({ 
       targetCard, 
       cutCard, 
-      answer: offset, 
+      answer: answer, 
       type: 'cutting',
       targetPos: cardInterval().start + targetIdx,
       cutPos: cardInterval().start + cutIdx

@@ -54,4 +54,70 @@ describe('Cut to Position', () => {
     const expected = tamariz[(51 - 1 + 52) % 52]
     expect(calculateCutCard(tamariz, tamariz[51], 1)).toBe(expected)
   })
+
+  it('should verify the formula: when cut card is bottom, target appears at correct position', () => {
+    // Comprehensive test: verify that when the calculated cut card is on bottom,
+    // the target card actually appears at the specified position
+    const testCases = [
+      { target: '4♣', pos: 1 },
+      { target: '3♠', pos: 10 },
+      { target: 'K♠', pos: 5 },
+      { target: 'A♣', pos: 44 },
+      { target: '7♥', pos: 26 },
+    ]
+
+    testCases.forEach(({ target, pos }) => {
+      const cutCard = calculateCutCard(tamariz, target, pos)
+      const cutIdx = tamariz.indexOf(cutCard)
+      const targetIdx = tamariz.indexOf(target)
+      
+      // When cutCard is bottom, position pos should be at index (cutIdx + pos) % N
+      const actualIdxAtPos = (cutIdx + pos) % tamariz.length
+      expect(actualIdxAtPos).toBe(targetIdx)
+    })
+  })
+
+  it('should handle edge case: target at its current position', () => {
+    // If target is already at the desired position, the cut card should be
+    // the card that makes that position the top
+    const target = '4♣' // at index 0, position 1
+    const pos = 1 // top position
+    const cutCard = calculateCutCard(tamariz, target, pos)
+    const cutIdx = tamariz.indexOf(cutCard)
+    
+    // When cutCard is bottom, position 1 should be the target
+    const topCard = tamariz[(cutIdx + 1) % tamariz.length]
+    expect(topCard).toBe(target)
+  })
+
+  it('should throw error for invalid target card', () => {
+    expect(() => {
+      calculateCutCard(tamariz, 'INVALID', 1)
+    }).toThrow('Target card INVALID not found in stack')
+  })
+
+  it('should throw error for position out of range', () => {
+    expect(() => {
+      calculateCutCard(tamariz, '4♣', 0)
+    }).toThrow('Target position 0 is out of range [1, 52]')
+    
+    expect(() => {
+      calculateCutCard(tamariz, '4♣', 53)
+    }).toThrow('Target position 53 is out of range [1, 52]')
+  })
+
+  it('should work correctly for all positions 1-52', () => {
+    // Test that the formula works for every position
+    const target = '3♠'
+    const targetIdx = tamariz.indexOf(target)
+    
+    for (let pos = 1; pos <= 52; pos++) {
+      const cutCard = calculateCutCard(tamariz, target, pos)
+      const cutIdx = tamariz.indexOf(cutCard)
+      
+      // Verify: when cutCard is bottom, position pos should be the target
+      const actualIdxAtPos = (cutIdx + pos) % tamariz.length
+      expect(actualIdxAtPos).toBe(targetIdx)
+    }
+  })
 }) 

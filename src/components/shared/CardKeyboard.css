@@ -40,6 +40,8 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 .rank-selection,
@@ -192,6 +194,30 @@
 .app-container.dark .rank-btn:hover,
 .app-container.dark .suit-btn:hover:not(.disabled) {
   background: var(--accent-light, #1a365d);
+}
+
+/* Desktop layout adjustments for sidebar */
+/* Tablet/Medium (768px-1199px): Collapsed sidebar (icons only) - 72px wide */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .card-keyboard {
+    left: 72px;
+    width: calc(100% - 72px);
+    right: auto;
+  }
+}
+
+/* Desktop (≥1200px): Full sidebar with labels - 200px wide */
+@media (min-width: 1200px) {
+  .card-keyboard {
+    left: 200px;
+    width: calc(100% - 200px);
+    right: auto;
+    bottom: calc(env(safe-area-inset-bottom) + 25px); /* No bottom nav on desktop, just safe area + margin */
+  }
+  
+  .keyboard-content {
+    max-width: 600px; /* Wider on desktop for better spacing */
+  }
 }
 
 /* Responsive Design */
