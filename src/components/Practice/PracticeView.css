@@ -333,6 +333,14 @@
   color: var(--success, #28a745);
 }
 
+.feedback-message.feedback-correct {
+  color: var(--success, #28a745);
+}
+
+.feedback-message.feedback-error {
+  color: var(--error, #dc2626);
+}
+
 /* Submit Button */
 .submit-btn {
   width: 100%;
@@ -418,6 +426,14 @@
 .app-container.dark .feedback-message {
   background: var(--surface);
   border-color: var(--border);
+}
+
+.app-container.dark .feedback-message.feedback-correct {
+  color: var(--success, #28a745);
+}
+
+.app-container.dark .feedback-message.feedback-error {
+  color: var(--error, #dc2626);
 }
 
 /* Responsive Design */
@@ -582,11 +598,63 @@
   outline: none;
 } 
 
-.quiz-card-large {
+/* Swipeable Card Container */
+.swipeable-card-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem auto;
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+}
+
+/* Swipe Labels */
+.swipe-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeInLabel 0.2s ease forwards;
+}
+
+.swipe-label-left {
+  left: 1rem;
+  background: var(--accent, #007aff);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.swipe-label-right {
+  right: 1rem;
+  background: var(--accent, #007aff);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+@keyframes fadeInLabel {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.quiz-card-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
   width: 120px;
   height: 170px;
   font-size: 2.2rem;
@@ -597,6 +665,24 @@
   border: 2px solid var(--border, #e5e5e7);
   letter-spacing: 0.04em;
   transition: box-shadow 0.2s;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.swipeable-card {
+  position: relative;
+  z-index: 2;
+  touch-action: none;
+}
+
+.swipeable-card.dragging {
+  cursor: grabbing;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.swipeable-card:not(.dragging) {
+  cursor: grab;
 }
 
 .quiz-card-large.card-red {
@@ -614,6 +700,12 @@
 
 .app-container.dark .quiz-card-large.card-black {
   color: #ffffff;
+}
+
+.app-container.dark .swipe-label-left,
+.app-container.dark .swipe-label-right {
+  background: var(--accent, #007aff);
+  color: white;
 } 
 
 .quiz-question-text {

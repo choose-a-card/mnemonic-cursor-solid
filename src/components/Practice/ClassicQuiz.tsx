@@ -11,10 +11,12 @@ export default function ClassicQuiz() {
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string>('')
+  const [isCorrect, setIsCorrect] = createSignal<boolean>(false)
 
   function nextQuestion(): void {
     setFeedback('')
     setInput('')
+    setIsCorrect(false)
 
     // Pick a random card from the practice stack
     const practiceIdx = getRandomInt(practiceStack().length)
@@ -40,6 +42,7 @@ export default function ClassicQuiz() {
     const correct = Number(input()) === q.answer
 
     playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
+    setIsCorrect(correct)
 
     if (correct) {
       setFeedback('Correct! ✅')
@@ -84,7 +87,15 @@ export default function ClassicQuiz() {
 
         <div class="feedback-area">
           {feedback() && (
-            <div class="feedback-message">{feedback()}</div>
+            <div 
+              class="feedback-message"
+              classList={{ 
+                'feedback-correct': isCorrect(),
+                'feedback-error': !isCorrect()
+              }}
+            >
+              {feedback()}
+            </div>
           )}
         </div>
 

@@ -14,11 +14,13 @@ export function useCardQuiz(options: UseCardQuizOptions) {
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string | null>(null)
   const [feedbackCard, setFeedbackCard] = createSignal<string | null>(null)
+  const [isCorrect, setIsCorrect] = createSignal<boolean>(false)
   const [showKeyboard, setShowKeyboard] = createSignal<boolean>(false)
 
   function updateQuestion(newQuestion: QuizQuestion): void {
     setFeedback(null)
     setFeedbackCard(null)
+    setIsCorrect(false)
     setInput('')
     setQuestion(newQuestion)
   }
@@ -41,6 +43,7 @@ export function useCardQuiz(options: UseCardQuizOptions) {
     }
     
     playSound(options.soundEnabled, correct ? 'correct' : 'incorrect')
+    setIsCorrect(correct)
     
     if (correct) {
       setFeedback('Correct! ✅')
@@ -72,6 +75,7 @@ export function useCardQuiz(options: UseCardQuizOptions) {
     input,
     feedback,
     feedbackCard,
+    isCorrect,
     showKeyboard,
     setInput,
     setShowKeyboard,

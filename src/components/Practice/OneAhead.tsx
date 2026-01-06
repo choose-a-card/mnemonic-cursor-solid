@@ -13,11 +13,13 @@ export default function OneAhead() {
   const [input, setInput] = createSignal<string>('')
   const [feedback, setFeedback] = createSignal<string | null>(null)
   const [feedbackCard, setFeedbackCard] = createSignal<string | null>(null)
+  const [isCorrect, setIsCorrect] = createSignal<boolean>(false)
   const [showKeyboard, setShowKeyboard] = createSignal<boolean>(false)
   
   function nextQuestion(): void {
     setFeedback(null)
     setFeedbackCard(null)
+    setIsCorrect(false)
     setInput('')
     setShowKeyboard(true) // Keep keyboard open for next question
     
@@ -39,6 +41,7 @@ export default function OneAhead() {
     const correct = card.toUpperCase().replace(/\s+/g,'') === String(q.answer).replace(/\s+/g,'').toUpperCase()
     
     playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
+    setIsCorrect(correct)
     
     if (correct) {
       setFeedback('Correct! ✅')
@@ -98,7 +101,13 @@ export default function OneAhead() {
 
         <div class="feedback-area">
           {feedback() && (
-            <div class="feedback-message">
+            <div 
+              class="feedback-message"
+              classList={{ 
+                'feedback-correct': isCorrect(),
+                'feedback-error': !isCorrect()
+              }}
+            >
               {feedback()}
               {feedbackCard() && <CardText card={feedbackCard()!} />}
             </div>

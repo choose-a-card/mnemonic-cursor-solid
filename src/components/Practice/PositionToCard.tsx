@@ -81,7 +81,13 @@ export default function PositionToCard() {
 
         <div class="feedback-area">
           {quiz.feedback() && (
-            <div class="feedback-message">
+            <div 
+              class="feedback-message"
+              classList={{ 
+                'feedback-correct': quiz.isCorrect(),
+                'feedback-error': !quiz.isCorrect()
+              }}
+            >
               {quiz.feedback()}
               {quiz.feedbackCard() && <CardText card={quiz.feedbackCard()!} />}
             </div>

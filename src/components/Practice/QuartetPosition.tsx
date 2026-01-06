@@ -12,12 +12,14 @@ export default function QuartetPosition() {
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
   const [inputs, setInputs] = createSignal<string[]>(['', '', '', ''])
   const [feedback, setFeedback] = createSignal<string>('')
+  const [isCorrect, setIsCorrect] = createSignal<boolean>(false)
   const [answered, setAnswered] = createSignal<boolean>(false)
   const [wrongIndexes, setWrongIndexes] = createSignal<number[]>([])
   let inputRefs: HTMLInputElement[] = []
 
   function nextQuestion(): void {
     setFeedback('')
+    setIsCorrect(false)
     setAnswered(false)
     setInputs(['', '', '', ''])
     setWrongIndexes([])
@@ -87,6 +89,7 @@ export default function QuartetPosition() {
       setWrongIndexes([])
     }
     playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
+    setIsCorrect(correct)
     setFeedback(correct ? 'Correct! ✅' : `Wrong. Positions: ${correctPositions.join(', ')}`)
     setAnswered(true)
     onResult({
@@ -142,7 +145,15 @@ export default function QuartetPosition() {
         </div>
         <div class="feedback-area">
           {feedback() && (
-            <div class="feedback-message">{feedback()}</div>
+            <div 
+              class="feedback-message"
+              classList={{ 
+                'feedback-correct': isCorrect(),
+                'feedback-error': !isCorrect()
+              }}
+            >
+              {feedback()}
+            </div>
           )}
         </div>
         <button class="submit-btn" type="submit" disabled={answered()}>
