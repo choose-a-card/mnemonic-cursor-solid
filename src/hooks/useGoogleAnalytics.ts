@@ -14,6 +14,7 @@ export const useGoogleAnalytics = () => {
   })
 
   // Track page views on route changes
+  // The dataLayer pattern ensures events are queued even if GA script hasn't loaded yet
   createEffect(() => {
     const path = location.pathname
     if (path) {

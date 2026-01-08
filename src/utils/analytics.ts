@@ -25,31 +25,30 @@ const isEnabled = Boolean(GA_MEASUREMENT_ID && isProduction)
  * Should be called once when the app loads
  */
 export const initGoogleAnalytics = (): void => {
-  if (!isEnabled) {
-    if (import.meta.env.DEV) {
-      console.log('[Analytics] Disabled in development mode')
-    }
-    return
-  }
+  if (!isEnabled) return
 
-  // Initialize dataLayer
-  window.dataLayer = window.dataLayer || []
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer?.push(args)
-  }
-
-  // Configure GA
   if (!GA_MEASUREMENT_ID) return
-  
-  window.gtag('js', new Date())
-  window.gtag('config', GA_MEASUREMENT_ID, {
-    send_page_view: false, // We'll handle page views manually for SPA routing
-  })
 
-  // Load the GA script
+  // Use the standard GA4 initialization pattern
+  // Initialize dataLayer and gtag function inline (as Google recommends)
+  const inlineScript = document.createElement('script')
+  inlineScript.textContent = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${GA_MEASUREMENT_ID}', {
+      send_page_view: false
+    });
+  `
+  document.head.appendChild(inlineScript)
+
+  // Load the external GA script
   const script = document.createElement('script')
   script.async = true
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`
+  script.onerror = () => {
+    // Silent error handling in production
+  }
   document.head.appendChild(script)
 }
 
@@ -61,9 +60,23 @@ export const initGoogleAnalytics = (): void => {
 export const trackPageView = (path: string, title?: string): void => {
   if (!isEnabled || !GA_MEASUREMENT_ID) return
 
-  window.gtag?.('config', GA_MEASUREMENT_ID, {
+  if (!window.gtag) return
+
+  // Use 'config' command to update page path
+  // This will send a page_view event to GA
+  // If the real GA script hasn't loaded yet, this will queue in dataLayer
+  // The real script will process it when it loads
+  window.gtag('config', GA_MEASUREMENT_ID, {
     page_path: path,
     page_title: title || document.title,
+    page_location: window.location.href,
+  })
+  
+  // Also explicitly send a page_view event to ensure it's tracked
+  window.gtag('event', 'page_view', {
+    page_path: path,
+    page_title: title || document.title,
+    page_location: window.location.href,
   })
 }
 
@@ -78,7 +91,9 @@ export const trackEvent = (
 ): void => {
   if (!isEnabled) return
 
-  window.gtag?.('event', eventName, eventParams)
+  if (!window.gtag) return
+
+  window.gtag('event', eventName, eventParams)
 }
 
 /**
@@ -87,4 +102,5 @@ export const trackEvent = (
 export const isAnalyticsEnabled = (): boolean => {
   return isEnabled
 }
+
 
