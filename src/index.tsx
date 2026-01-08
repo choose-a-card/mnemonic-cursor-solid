@@ -22,6 +22,7 @@ render(() => (
     <Route path="/" component={() => <Navigate href="/stack" />} />
     <Route path="/stack" component={StackPage} />
     <Route path="/practice" component={PracticePage} />
+    <Route path="/practice/:modeId" component={PracticePage} />
     <Route path="/stats" component={StatsPage} />
     <Route path="/settings" component={SettingsPage} />
     <Route path="/stack-builder" component={StackBuilderPage} />

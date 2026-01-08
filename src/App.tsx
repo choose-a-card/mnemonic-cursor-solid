@@ -4,6 +4,7 @@ import { StatsProvider } from './contexts/StatsContext'
 import { AppSettingsProvider } from './contexts/AppSettingsContext'
 import { CustomStacksProvider } from './contexts/CustomStacksContext'
 import { useDebugMode } from './hooks/useDebugMode'
+import { useGoogleAnalytics } from './hooks/useGoogleAnalytics'
 import AppLayout from './layouts/AppLayout'
 import ErrorBoundary from './components/shared/ErrorBoundary'
 import './App.css'
@@ -18,6 +19,7 @@ const AppContent: Component<RouteSectionProps> = (props) => {
 
 const App: Component<RouteSectionProps> = (props) => {
   const { debugMode } = useDebugMode()
+  useGoogleAnalytics()
 
   return (
     <ErrorBoundary>

@@ -54,6 +54,10 @@ cd mnemonic-stack-trainer
 # Install dependencies
 npm install --legacy-peer-deps
 
+# (Optional) Set up Google Analytics
+# Create a .env file and add your GA4 Measurement ID:
+# VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
 # Start development server
 npm run dev
 ```
@@ -130,6 +134,38 @@ npx playwright test settings.spec.ts
 
 # Run with UI
 npx playwright test --ui
+```
+
+## Google Analytics
+
+The app includes Google Analytics 4 (GA4) integration for tracking page views and custom events.
+
+### Setup
+
+1. Create a `.env` file in the project root
+2. Add your GA4 Measurement ID:
+   ```
+   VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+   ```
+3. Get your Measurement ID from [Google Analytics](https://analytics.google.com/)
+
+### Features
+
+- **Automatic page view tracking** — Tracks route changes automatically
+- **Custom event tracking** — Use `trackEvent()` in components for custom analytics
+- **Development mode disabled** — Analytics only run in production builds
+- **Privacy-friendly** — Only loads when a measurement ID is provided
+
+### Usage in Components
+
+```typescript
+import { trackEvent } from '../utils/analytics'
+
+// Track a custom event
+trackEvent('practice_started', {
+  mode: 'card_to_position',
+  stack: 'tamariz'
+})
 ```
 
 ## Feature Flags

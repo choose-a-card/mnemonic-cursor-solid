@@ -1,4 +1,5 @@
-import { createSignal, Show } from 'solid-js'
+import { Show, createMemo } from 'solid-js'
+import { useNavigate } from '@solidjs/router'
 import './PracticeView.css'
 import ClassicQuiz from './ClassicQuiz'
 import PositionToCard from './PositionToCard'
@@ -11,16 +12,50 @@ import CutToPosition from './CutToPosition'
 import PracticeModeSelector from './PracticeModeSelector'
 import PracticeHeader from './PracticeHeader'
 import { PracticeProvider } from '../../contexts/PracticeContext'
+import { trackEvent } from '../../utils/analytics'
+import { PRACTICE_MODES } from '../../constants/practiceModes'
 
-export default function PracticeView() {
-  const [currentMode, setCurrentMode] = createSignal<string>('selection')
+interface PracticeViewProps {
+  modeId?: string
+}
+
+export default function PracticeView(props: PracticeViewProps) {
+  const navigate = useNavigate()
+  
+  // Determine current mode from URL parameter
+  const currentMode = createMemo(() => {
+    const modeId = props.modeId
+    if (!modeId) return 'selection'
+    
+    // Validate that the modeId exists in our practice modes
+    const isValidMode = PRACTICE_MODES.some(m => m.id === modeId)
+    return isValidMode ? modeId : 'selection'
+  })
 
   const selectMode = (modeId: string): void => {
-    setCurrentMode(modeId)
+    // Navigate to the practice mode URL - this will trigger automatic route tracking
+    navigate(`/practice/${modeId}`)
+    
+    // Track practice mode selection as a custom event
+    const mode = PRACTICE_MODES.find(m => m.id === modeId)
+    if (mode) {
+      trackEvent('practice_mode_selected', {
+        mode_id: modeId,
+        mode_name: mode.name,
+      })
+    }
   }
 
   const goBack = (): void => {
-    setCurrentMode('selection')
+    const previousMode = currentMode()
+    
+    // Navigate back to practice selector - this will trigger automatic route tracking
+    navigate('/practice')
+    
+    // Track returning to mode selector
+    trackEvent('practice_mode_exited', {
+      previous_mode: previousMode,
+    })
   }
 
   return (

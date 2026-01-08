@@ -13,6 +13,10 @@ const Navigation: Component = () => {
   const location = useLocation()
 
   const isActive = (path: string) => {
+    // For practice route, also match sub-routes like /practice/card-to-pos
+    if (path === '/practice') {
+      return location.pathname === path || location.pathname.startsWith('/practice/')
+    }
     return location.pathname === path
   }
 
