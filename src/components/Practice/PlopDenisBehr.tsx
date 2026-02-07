@@ -1,4 +1,4 @@
-import { createSignal, onMount, For } from 'solid-js'
+import { createSignal, onMount, Show, For } from 'solid-js'
 import type { QuizQuestion } from '../../types'
 import { playSound } from '../../sounds/sounds'
 import { getRandomInt } from '../../utils/utils'
@@ -8,11 +8,15 @@ import { PLOP_DATA } from '../../constants/plopData'
 import { usePractice } from '../../contexts/PracticeContext'
 import CardText from '../shared/CardText'
 
+const TRIPLE_CLICK_THRESHOLD_MS = 600
+
 const SUIT_SYMBOLS = SUITS.map(s => s.symbol)
 
 export default function PlopDenisBehr() {
   const { soundEnabled, onResult } = usePractice()
   const [question, setQuestion] = createSignal<QuizQuestion>({} as QuizQuestion)
+  const [showCheatSheet, setShowCheatSheet] = createSignal<boolean>(false)
+  let clickTimestamps: number[] = []
   const [selectedSuit, setSelectedSuit] = createSignal<string>('')
   const [inputs, setInputs] = createSignal<string[]>(['', '', ''])
   const [feedback, setFeedback] = createSignal<string>('')
@@ -125,13 +129,54 @@ export default function PlopDenisBehr() {
     nextQuestion()
   })
 
+  const handleQuestionClick = (): void => {
+    const now = Date.now()
+    clickTimestamps = [...clickTimestamps, now].filter(
+      timestamp => now - timestamp < TRIPLE_CLICK_THRESHOLD_MS
+    )
+    if (clickTimestamps.length >= 3) {
+      setShowCheatSheet(prev => !prev)
+      clickTimestamps = []
+    }
+  }
+
   return (
     <div class="practice-mode">
-      <div class="question-card">
+      <div class="question-card" onClick={handleQuestionClick}>
         <div class="question-text">
           For all the <b><CardText card={question().card || ''} />s</b>, enter the cut card and the relative distances:
         </div>
       </div>
+
+      {/* Cheat sheet panel */}
+      <Show when={showCheatSheet()}>
+        <div class="plop-cheatsheet">
+          <div class="plop-cheatsheet-title">PLOP Cheat Sheet</div>
+          <table class="plop-cheatsheet-table">
+            <thead>
+              <tr>
+                <th>Value</th>
+                <th>Cut</th>
+                <th>Distances</th>
+              </tr>
+            </thead>
+            <tbody>
+              <For each={RANKS}>
+                {(rank) => {
+                  const entry = PLOP_DATA[rank]
+                  return (
+                    <tr classList={{ 'plop-cheatsheet-highlight': question().card === rank }}>
+                      <td class="plop-cheatsheet-rank">{rank}</td>
+                      <td><CardText card={entry.cutCard} /></td>
+                      <td class="plop-cheatsheet-distances">{entry.distances.join(', ')}</td>
+                    </tr>
+                  )
+                }}
+              </For>
+            </tbody>
+          </table>
+        </div>
+      </Show>
       <form class="quartet-form" onSubmit={event => { event.preventDefault(); handleSubmit(event); }}>
         {/* Suit selector */}
         <div class="plop-section">

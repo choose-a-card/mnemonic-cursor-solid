@@ -953,3 +953,89 @@
 .app-container.dark .mode-stack-badge {
   background: var(--accent-light, #1a365d);
 }
+
+/* PLOP cheat sheet (hidden feature — triple-click question text) */
+.plop-cheatsheet {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e5e7);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  animation: plopCheatsheetIn 0.2s ease;
+  overflow-x: auto;
+}
+
+@keyframes plopCheatsheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plop-cheatsheet-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text, #222);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.plop-cheatsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.plop-cheatsheet-table th {
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  padding: 0.4rem 0.6rem;
+  border-bottom: 2px solid var(--border, #e5e5e7);
+  text-align: center;
+}
+
+.plop-cheatsheet-table td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--border, #f0f0f0);
+  text-align: center;
+  color: var(--text, #222);
+}
+
+.plop-cheatsheet-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.plop-cheatsheet-rank {
+  font-weight: 700;
+}
+
+.plop-cheatsheet-distances {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.plop-cheatsheet-highlight {
+  background: var(--accent-light, #e3f2fd);
+}
+
+.plop-cheatsheet-highlight td {
+  font-weight: 600;
+}
+
+/* Dark mode cheat sheet */
+.app-container.dark .plop-cheatsheet {
+  background: var(--surface, #2a2a2a);
+  border-color: var(--border, #404040);
+}
+
+.app-container.dark .plop-cheatsheet-table td {
+  border-bottom-color: var(--border, #333);
+}
+
+.app-container.dark .plop-cheatsheet-highlight {
+  background: var(--accent-light, #1a365d);
+}
