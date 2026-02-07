@@ -41,8 +41,8 @@ test.describe('Practice Page', () => {
       const modeCards = page.locator('.mode-card')
       const count = await modeCards.count()
       
-      // Should have 8 practice modes
-      expect(count).toBe(8)
+      // Should have 9 practice modes
+      expect(count).toBe(9)
     })
 
     test('should display mode names and descriptions', async ({ page }) => {
