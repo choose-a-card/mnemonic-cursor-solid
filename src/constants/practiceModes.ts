@@ -3,6 +3,8 @@ export interface PracticeMode {
   name: string;
   icon: string;
   description: string;
+  /** When set, only show this mode for the specified preset stack type. */
+  stackOnly?: string;
 }
 
 export const PRACTICE_MODES: PracticeMode[] = [
@@ -53,6 +55,13 @@ export const PRACTICE_MODES: PracticeMode[] = [
     name: 'Cut to Position', 
     icon: '🔀', 
     description: 'Given a target card and position, enter the cut card needed to put the target at that position'
+  },
+  { 
+    id: 'plop-denis-behr', 
+    name: 'PLOP - Denis Behr', 
+    icon: '🎩', 
+    description: 'Given a value, enter the suit to cut to the bottom and the three relative distances',
+    stackOnly: 'tamariz'
   },
 ]
 

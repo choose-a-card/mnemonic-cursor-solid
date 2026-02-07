@@ -824,4 +824,132 @@
 .app-container.dark .badge-progress-indicator {
   background: var(--accent-light, #1a365d);
   border-color: var(--accent, #007aff);
-} 
+}
+
+/* PLOP - Denis Behr mode */
+.plop-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.plop-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+}
+
+.plop-suit-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.plop-suit-btn {
+  width: 56px;
+  height: 56px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  border: 2px solid var(--border, #e5e5e7);
+  border-radius: 12px;
+  background: var(--surface, #ffffff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Prevent stuck tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.plop-suit-btn-red {
+  color: #dc2626;
+}
+
+.plop-suit-btn-black {
+  color: #1a1a1a;
+}
+
+.plop-suit-btn:hover:not(:disabled) {
+  border-color: var(--accent, #007aff);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.15);
+}
+
+.plop-suit-btn-selected {
+  border-color: var(--accent, #007aff);
+  background: var(--accent-light, #e3f2fd);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.plop-suit-btn-wrong {
+  border-color: #e11d48 !important;
+  box-shadow: 0 0 0 3px #fecdd3 !important;
+  background: #fff1f2;
+}
+
+.plop-suit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.plop-distance-labels {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+}
+
+.plop-distance-label {
+  width: 60px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary, #888);
+}
+
+/* Dark mode PLOP adjustments */
+.app-container.dark .plop-suit-btn {
+  background: var(--surface, #2a2a2a);
+  border-color: var(--border, #404040);
+}
+
+.app-container.dark .plop-suit-btn-red {
+  color: #ef4444;
+}
+
+.app-container.dark .plop-suit-btn-black {
+  color: #ffffff;
+}
+
+.app-container.dark .plop-suit-btn-selected {
+  background: var(--accent-light, #1a365d);
+  border-color: var(--accent, #007aff);
+}
+
+.app-container.dark .plop-suit-btn-wrong {
+  background: #4c0519;
+  border-color: #e11d48 !important;
+}
+
+/* Stack-only mode badge in selector */
+.mode-stack-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: var(--accent-light, #e3f2fd);
+  color: var(--accent, #007aff);
+  white-space: nowrap;
+}
+
+.app-container.dark .mode-stack-badge {
+  background: var(--accent-light, #1a365d);
+}

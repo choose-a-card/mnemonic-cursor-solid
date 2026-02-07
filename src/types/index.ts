@@ -2,7 +2,7 @@ export interface QuizQuestion {
   card?: string;
   pos?: number;
   answer: string | number;
-  type: 'card-to-pos' | 'pos-to-card' | 'one-ahead' | 'context-prev' | 'context-next' | 'cutting' | 'first-or-second-half' | 'quartet-position' | 'cut-to-position';
+  type: 'card-to-pos' | 'pos-to-card' | 'one-ahead' | 'context-prev' | 'context-next' | 'cutting' | 'first-or-second-half' | 'quartet-position' | 'cut-to-position' | 'plop-denis-behr';
   targetCard?: string;
   cutCard?: string;
   targetPos?: number;

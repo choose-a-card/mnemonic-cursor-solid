@@ -108,6 +108,7 @@ export const PRACTICE_MODES = {
   'first-or-second-half': 'First or Second Half',
   'quartet-position': 'Quartet Position',
   'cut-to-position': 'Cut to Position',
+  'plop-denis-behr': 'PLOP - Denis Behr',
 } as const
 
 // Stack types

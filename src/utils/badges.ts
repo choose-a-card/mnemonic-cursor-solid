@@ -107,10 +107,10 @@ export const BADGE_DEFINITIONS: Omit<Badge, 'unlocked' | 'unlockedAt' | 'progres
   {
     id: 'mode-master',
     name: 'Mode Master',
-    description: 'Try all 8 practice modes',
+    description: 'Try all 9 practice modes',
     icon: '🎭',
     category: 'modes',
-    requirement: 8
+    requirement: 9
   },
   {
     id: 'card-to-position-expert',
@@ -330,7 +330,7 @@ export const calculateBadgeProgress = (stats: Stats): Badge[] => {
         break
       case 'mode-master':
         progress = uniqueModes
-        unlocked = uniqueModes >= 8
+        unlocked = uniqueModes >= 9
         break
       case 'card-to-position-expert':
         progress = modeStats['Card → Position']?.accuracy || 0

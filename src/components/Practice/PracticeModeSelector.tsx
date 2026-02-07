@@ -1,6 +1,7 @@
 import { For, Show, createMemo } from 'solid-js'
 import { PRACTICE_MODES, type PracticeMode } from '../../constants/practiceModes'
 import { useStats } from '../../contexts/StatsContext'
+import { useAppSettings } from '../../contexts/AppSettingsContext'
 import { isFeatureEnabled } from '../../utils/featureFlags'
 import { createKeyboardHandler } from '../../hooks/useKeyboardHandler'
 import { getModeStats } from '../../utils/statsCalculations'
@@ -12,6 +13,12 @@ interface PracticeModeSelectorProps {
 
 export default function PracticeModeSelector(props: PracticeModeSelectorProps) {
   const { stats, badges } = useStats()
+  const { stackType } = useAppSettings()
+
+  // Filter modes based on the current stack type
+  const availableModes = createMemo(() =>
+    PRACTICE_MODES.filter(mode => !mode.stackOnly || mode.stackOnly === stackType())
+  )
 
   // Calculate badge progress for motivation
   const badgeProgress = createMemo(() => {
@@ -58,7 +65,7 @@ export default function PracticeModeSelector(props: PracticeModeSelectorProps) {
       </div>
       
       <div class="mode-list" role="listbox" aria-label="Practice modes">
-        <For each={PRACTICE_MODES}>
+        <For each={availableModes()}>
           {(mode: PracticeMode) => {
             const modeStats = getModeStats(stats(), mode.name)
             
