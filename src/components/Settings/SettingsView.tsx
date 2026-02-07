@@ -9,6 +9,7 @@ import Card from '../shared/Card'
 import StackConfigCard from './StackConfigCard'
 import CustomStacksCard from './CustomStacksCard'
 import PreferencesCard from './PreferencesCard'
+import CookiePreferencesCard from './CookiePreferencesCard'
 import DataManagementCard from './DataManagementCard'
 import AboutCard from './AboutCard'
 import SupportCard from './SupportCard'
@@ -194,6 +195,7 @@ export default function SettingsView() {
 
         <DataManagementCard onResetStats={resetStats} />
         <SupportCard />
+        <CookiePreferencesCard />
         <AboutCard />
       </div>
     </div>
