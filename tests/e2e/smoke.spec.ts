@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { clickNavTab, navigateTo } from './utils/test-helpers'
+import { clickNavTab, navigateTo, setCookieConsent } from './utils/test-helpers'
 
 /**
  * Smoke tests - High-level tests that verify the critical user flows work end-to-end.
@@ -83,6 +83,7 @@ test.describe('Smoke Tests', () => {
     // 1. Clear storage for clean state
     await page.goto('/')
     await page.evaluate(() => localStorage.clear())
+    await setCookieConsent(page)
     await page.reload()
     
     // 2. Practice multiple questions

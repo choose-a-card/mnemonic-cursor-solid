@@ -35,6 +35,22 @@ export default defineConfig({
     
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Pre-set cookie consent so the overlay doesn't block interactions */
+    storageState: {
+      cookies: [],
+      origins: [{
+        origin: 'http://localhost:5173',
+        localStorage: [{
+          name: 'mnemonic-cookie-consent',
+          value: JSON.stringify({
+            preferences: { essential: true, analytics: false },
+            timestamp: Date.now(),
+            version: 1
+          })
+        }]
+      }]
+    },
   },
 
   /* Configure projects for major browsers */

@@ -3,7 +3,8 @@ import {
   navigateTo, 
   waitForTransition,
   selectPracticeMode,
-  parseCardFromQuestion
+  parseCardFromQuestion,
+  setCookieConsent
 } from './utils/test-helpers'
 import { RANKS, SUITS } from '../../src/constants/cards'
 
@@ -51,6 +52,7 @@ test.describe('Custom Stacks Feature', () => {
   test('should display correct UI elements', async ({ page }) => {
     await page.goto('/#/settings')
     await page.evaluate(() => localStorage.clear())
+    await setCookieConsent(page)
     await page.reload()
     
     // Verify Custom Stacks Card with empty state
@@ -88,6 +90,7 @@ test.describe('Custom Stacks Feature', () => {
     
     await page.goto('/#/settings')
     await page.evaluate(() => localStorage.clear())
+    await setCookieConsent(page)
     await page.reload()
     
     // ========== CREATE STACK ==========

@@ -186,6 +186,32 @@ export const goBackFromPractice = async (page: Page): Promise<void> => {
 }
 
 /**
+ * Set cookie consent in localStorage to prevent the cookie dialog from appearing.
+ * Call this after localStorage.clear() and before page.reload() to keep consent valid.
+ */
+export const setCookieConsent = async (page: Page): Promise<void> => {
+  await page.evaluate(() => {
+    localStorage.setItem('mnemonic-cookie-consent', JSON.stringify({
+      preferences: { essential: true, analytics: false },
+      timestamp: Date.now(),
+      version: 1
+    }))
+  })
+}
+
+/**
+ * Dismiss the cookie consent dialog if it is currently visible.
+ */
+export const dismissCookieConsent = async (page: Page): Promise<void> => {
+  const overlay = page.locator('.cookie-consent-overlay')
+  const isVisible = await overlay.isVisible()
+  if (isVisible) {
+    await overlay.locator('button').filter({ hasText: 'Essential Only' }).click({ timeout: 2000 })
+    await overlay.waitFor({ state: 'hidden', timeout: 2000 })
+  }
+}
+
+/**
  * Clear localStorage to reset app state
  * Must be called after page.goto()
  */
@@ -193,6 +219,7 @@ export const clearAppStorage = async (page: Page): Promise<void> => {
   await page.evaluate(() => {
     localStorage.clear()
   })
+  await setCookieConsent(page)
   await page.reload()
   await page.waitForLoadState('domcontentloaded')
 }

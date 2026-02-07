@@ -77,7 +77,7 @@ test.describe('Settings Page', () => {
 
   test.describe('Preferences Card', () => {
     test('should display preferences card', async ({ page }) => {
-      const preferencesCard = page.locator('.preferences-card, .card').filter({ hasText: /Preferences/ })
+      const preferencesCard = page.locator('.card').filter({ hasText: 'Dark Mode' })
       await expect(preferencesCard).toBeVisible()
     })
 
