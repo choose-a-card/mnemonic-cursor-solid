@@ -1,9 +1,11 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (DISABLED)
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+# Disabled — migrated to Cloudflare Pages (mem-deck.com)
+# on:
+#   push:
+#     branches: [main]
+#   workflow_dispatch:
+on: workflow_dispatch
 
 permissions:
   contents: read
