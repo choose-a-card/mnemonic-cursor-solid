@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mem-deck.com/sitemap.xml
