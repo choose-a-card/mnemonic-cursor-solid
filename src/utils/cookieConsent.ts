@@ -33,24 +33,25 @@ export const DEFAULT_PREFERENCES: CookiePreferences = {
  */
 export const hasConsentBeenGiven = (): boolean => {
   try {
-    const stored = loadFromLocalStorage<StoredConsent>(COOKIE_CONSENT_KEY, null)
+    const stored = loadFromLocalStorage<StoredConsent | null>(COOKIE_CONSENT_KEY, null)
     return stored !== null && stored.preferences !== undefined
   } catch (error) {
     logger.error('Error checking consent:', error)
     return false
   }
 }
+  
 
 /**
  * Get current cookie preferences
  */
 export const getCookiePreferences = (): CookiePreferences => {
   try {
-    const stored = loadFromLocalStorage<StoredConsent>(COOKIE_CONSENT_KEY, null)
-    
+    const stored = loadFromLocalStorage<StoredConsent | null>(COOKIE_CONSENT_KEY, null)
     // If no stored consent or version mismatch, return defaults
     if (!stored || stored.version !== COOKIE_CONSENT_VERSION) {
       return { ...DEFAULT_PREFERENCES }
+    
     }
     
     return {
