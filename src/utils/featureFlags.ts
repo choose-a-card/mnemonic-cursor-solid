@@ -15,8 +15,8 @@ const parseFeatureFlags = (urlParser: URLParser): FeatureFlags => {
     badgesEnabled: urlParams.get('enableBadges') === 'true',
     // PWA infrastructure (service worker, manifest, caching) is always active.
     // This flag controls only the in-app install prompt UI.
-    // To permanently enable: change to `urlParams.get('enablePWA') !== 'false'`
-    pwaEnabled: urlParams.get('enablePWA') === 'true'
+    // Enabled by default; disable with ?enablePWA=false
+    pwaEnabled: urlParams.get('enablePWA') !== 'false'
   }
 }
 
