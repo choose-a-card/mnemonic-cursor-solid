@@ -3,6 +3,8 @@ import type { Stats, Badge, QuizResult } from '../types'
 import { calculateBadgeProgress } from '../utils/badges'
 import { initializePWA, saveToLocalStorage, loadFromLocalStorage, isOnline, onOnlineStatusChange } from '../utils/pwa'
 import { isFeatureEnabled } from '../utils/featureFlags'
+import { trackEvent } from '../utils/analytics'
+import { PRACTICE_ANSWER_SUBMITTED, STATS_RESET } from '../constants/analyticsEvents'
 import { logger } from '../utils/logger'
 
 // Maximum history entries to prevent unbounded growth
@@ -110,6 +112,14 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
   const addResult = (result: QuizResult) => {
     const currentStats = stats()
     const { correct, question, input, mode } = result
+
+    // Track every answer in GA for usage & accuracy insights.
+    // `correct` is sent as 1/0 so it can be registered as a GA4 custom metric —
+    // the average of this value across events IS the accuracy percentage.
+    trackEvent(PRACTICE_ANSWER_SUBMITTED, {
+      mode,
+      correct: correct ? 1 : 0,
+    })
     
     // Update basic stats
     const newStats: Stats = {
@@ -174,6 +184,11 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
   }
 
   const resetStats = () => {
+    const currentStats = stats()
+    trackEvent(STATS_RESET, {
+      total_answers_before_reset: currentStats.total,
+    })
+
     const emptyStats: Stats = {
       total: 0,
       correct: 0,

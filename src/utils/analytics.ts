@@ -190,7 +190,7 @@ export const trackEvent = (
       return
     }
 
-    devLog('Tracking event:', eventName, eventParams)
+    devLog('Tracking event:', eventName, eventParams ?? '(no params)')
     window.gtag('event', eventName, eventParams)
   } catch (error) {
     devLog('Error tracking event:', error)

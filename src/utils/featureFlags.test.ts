@@ -50,7 +50,7 @@ describe('Feature Flags', () => {
     const flags = getFeatureFlags()
     expect(flags).toEqual({
       badgesEnabled: true,
-      pwaEnabled: false
+      pwaEnabled: true
     })
   })
 
@@ -72,13 +72,13 @@ describe('Feature Flags', () => {
     expect(isFeatureEnabled('badgesEnabled')).toBe(false)
   })
 
-  it('should disable PWA by default', () => {
+  it('should enable PWA by default', () => {
     testParser.updateSearch('')
     refreshFeatureFlags()
-    expect(isFeatureEnabled('pwaEnabled')).toBe(false)
+    expect(isFeatureEnabled('pwaEnabled')).toBe(true)
   })
 
-  it('should enable PWA when enablePWA=true', () => {
+  it('should keep PWA enabled when enablePWA=true', () => {
     testParser.updateSearch('?enablePWA=true')
     refreshFeatureFlags()
     expect(isFeatureEnabled('pwaEnabled')).toBe(true)

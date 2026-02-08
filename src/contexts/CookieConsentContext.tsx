@@ -7,7 +7,8 @@ import {
   resetCookieConsent as resetStoredConsent,
   DEFAULT_PREFERENCES
 } from '../utils/cookieConsent'
-import { initializeAnalyticsAfterConsent, disableAnalytics } from '../utils/analytics'
+import { initializeAnalyticsAfterConsent, disableAnalytics, trackEvent } from '../utils/analytics'
+import { CONSENT_GRANTED } from '../constants/analyticsEvents'
 
 interface CookieConsentContextValue {
   preferences: () => CookiePreferences
@@ -64,6 +65,7 @@ export const CookieConsentProvider: Component<CookieConsentProviderProps> = (pro
   })
 
   const acceptAllCookies = () => {
+    const hadConsentBefore = hasConsent()
     const currentPrefs = preferences()
     const updated = {
       ...currentPrefs,
@@ -72,6 +74,13 @@ export const CookieConsentProvider: Component<CookieConsentProviderProps> = (pro
     }
     setPreferences(updated)
     setHasConsent(true)
+
+    // Track consent grant — fires after GA initializes in the createEffect above.
+    // Only fires on first-time acceptance, not on returning visitors who already consented.
+    if (!hadConsentBefore) {
+      // Small delay to let GA initialize before sending the event
+      setTimeout(() => trackEvent(CONSENT_GRANTED), 100)
+    }
   }
 
   const rejectNonEssentialCookies = () => {

@@ -213,13 +213,13 @@ test.describe('Settings Page', () => {
   })
 
   test.describe('PWA Installation (Feature Flagged)', () => {
-    test('should not show PWA card when feature disabled', async ({ page }) => {
-      // By default, PWA feature is disabled
+    test('should show PWA card when feature enabled by default', async ({ page }) => {
+      // By default, PWA feature is enabled
       const pwaCard = page.locator('.pwa-card, .card').filter({ hasText: /App Installation/ })
       
-      // PWA card should not be visible by default
+      // PWA card should be visible by default
       const isVisible = await pwaCard.isVisible().catch(() => false)
-      expect(isVisible).toBe(false)
+      expect(isVisible).toBe(true)
     })
 
     test('should show PWA card when feature enabled via URL', async ({ page }) => {

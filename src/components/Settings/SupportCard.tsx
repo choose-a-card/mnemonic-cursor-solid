@@ -1,8 +1,11 @@
 import Card from '../shared/Card'
+import { trackEvent } from '../../utils/analytics'
+import { SUPPORT_CLICKED } from '../../constants/analyticsEvents'
 import './SupportCard.css'
 
 export default function SupportCard() {
   const handleSupportClick = () => {
+    trackEvent(SUPPORT_CLICKED)
     window.open('https://buymeacoffee.com/jcvaleravl', '_blank', 'noopener,noreferrer')
   }
 

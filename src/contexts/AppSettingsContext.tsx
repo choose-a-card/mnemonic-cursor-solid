@@ -2,6 +2,13 @@ import { createContext, useContext, createSignal, type Component, onMount, creat
 import type { CardInterval } from '../types'
 import type { StackType } from '../constants/stacks'
 import { saveToLocalStorage, loadFromLocalStorage } from '../utils/pwa'
+import { trackEvent } from '../utils/analytics'
+import {
+  STACK_TYPE_CHANGED,
+  CARD_INTERVAL_CHANGED,
+  SETTING_DARK_MODE_CHANGED,
+  SETTING_SOUND_CHANGED,
+} from '../constants/analyticsEvents'
 
 interface AppSettingsContextType {
   stackType: () => StackType
@@ -65,15 +72,44 @@ export const AppSettingsProvider: Component<AppSettingsProviderProps> = (props) 
     setCardInterval({ start: Math.min(start, end), end: Math.max(start, end) })
   }
 
+  // Tracked setters — only fire events for user-initiated changes (after mount)
+  const handleSetStackType = (type: StackType) => {
+    const previous = stackType()
+    setStackType(type)
+    trackEvent(STACK_TYPE_CHANGED, {
+      from_stack: previous,
+      to_stack: type,
+    })
+  }
+
+  const handleSetCardInterval = (interval: CardInterval) => {
+    setCardIntervalClamped(interval)
+    trackEvent(CARD_INTERVAL_CHANGED, {
+      range_start: interval.start,
+      range_end: interval.end,
+      range_size: interval.end - interval.start + 1,
+    })
+  }
+
+  const handleSetDarkMode = (mode: boolean) => {
+    setDarkMode(mode)
+    trackEvent(SETTING_DARK_MODE_CHANGED, { enabled: mode })
+  }
+
+  const handleSetSoundEnabled = (enabled: boolean) => {
+    setSoundEnabled(enabled)
+    trackEvent(SETTING_SOUND_CHANGED, { enabled })
+  }
+
   const contextValue: AppSettingsContextType = {
     stackType,
-    setStackType,
+    setStackType: handleSetStackType,
     cardInterval,
-    setCardInterval: setCardIntervalClamped,
+    setCardInterval: handleSetCardInterval,
     darkMode,
-    setDarkMode,
+    setDarkMode: handleSetDarkMode,
     soundEnabled,
-    setSoundEnabled,
+    setSoundEnabled: handleSetSoundEnabled,
     debugMode: props.debugMode
   }
 

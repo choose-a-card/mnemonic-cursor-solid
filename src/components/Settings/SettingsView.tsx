@@ -4,6 +4,8 @@ import { isPWAInstalled, installPWA, isOnline, getPWAInstallPrompt, checkService
 import { isFeatureEnabled } from '../../utils/featureFlags'
 import { useAppSettings } from '../../contexts/AppSettingsContext'
 import { useStats } from '../../contexts/StatsContext'
+import { trackEvent } from '../../utils/analytics'
+import { PWA_INSTALL_CLICKED, PWA_INSTALL_SUCCESS, PWA_INSTALL_DISMISSED } from '../../constants/analyticsEvents'
 import { logger } from '../../utils/logger'
 import Card from '../shared/Card'
 import StackConfigCard from './StackConfigCard'
@@ -90,12 +92,16 @@ export default function SettingsView() {
   const handleInstall = async () => {
     if (!isFeatureEnabled('pwaEnabled')) return
     
+    trackEvent(PWA_INSTALL_CLICKED)
     setInstalling(true)
     try {
       const success = await installPWA()
       if (success) {
+        trackEvent(PWA_INSTALL_SUCCESS)
         setIsInstalled(true)
         setHasPrompt(false)
+      } else {
+        trackEvent(PWA_INSTALL_DISMISSED)
       }
     } catch (error) {
       logger.error('Installation failed:', error)

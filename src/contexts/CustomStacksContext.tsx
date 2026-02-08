@@ -1,6 +1,8 @@
 import { createContext, useContext, createSignal, type Component, onMount, createEffect, type JSX } from 'solid-js'
 import type { CustomStack } from '../types'
 import { saveToLocalStorage, loadFromLocalStorage } from '../utils/pwa'
+import { trackEvent } from '../utils/analytics'
+import { CUSTOM_STACK_CREATED, CUSTOM_STACK_EDITED, CUSTOM_STACK_DELETED } from '../constants/analyticsEvents'
 
 interface CustomStacksContextType {
   customStacks: () => CustomStack[]
@@ -37,6 +39,12 @@ export const CustomStacksProvider: Component<{ children: JSX.Element }> = (props
       updatedAt: now
     }
     setCustomStacks(prev => [...prev, newStack])
+
+    trackEvent(CUSTOM_STACK_CREATED, {
+      card_count: newStack.cards.length,
+      total_custom_stacks: customStacks().length,
+    })
+
     return newStack
   }
 
@@ -49,10 +57,18 @@ export const CustomStacksProvider: Component<{ children: JSX.Element }> = (props
         updatedAt: Date.now()
       }
     }))
+
+    trackEvent(CUSTOM_STACK_EDITED, {
+      card_count: updates.cards?.length,
+    })
   }
 
   const deleteStack = (id: string) => {
     setCustomStacks(prev => prev.filter(stack => stack.id !== id))
+
+    trackEvent(CUSTOM_STACK_DELETED, {
+      remaining_custom_stacks: customStacks().length,
+    })
   }
 
   const getStackById = (id: string): CustomStack | undefined => {

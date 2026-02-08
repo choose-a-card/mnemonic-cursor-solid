@@ -1,4 +1,4 @@
-import { Show, createMemo } from 'solid-js'
+import { Show, createMemo, createEffect, onCleanup } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 import './PracticeView.css'
 import ClassicQuiz from './ClassicQuiz'
@@ -14,6 +14,7 @@ import PracticeModeSelector from './PracticeModeSelector'
 import PracticeHeader from './PracticeHeader'
 import { PracticeProvider } from '../../contexts/PracticeContext'
 import { trackEvent } from '../../utils/analytics'
+import { PRACTICE_SESSION_ENDED } from '../../constants/analyticsEvents'
 import { PRACTICE_MODES } from '../../constants/practiceModes'
 
 interface PracticeViewProps {
@@ -22,6 +23,23 @@ interface PracticeViewProps {
 
 export default function PracticeView(props: PracticeViewProps) {
   const navigate = useNavigate()
+
+  // Track practice session duration per mode
+  let sessionStartTime: number | null = null
+  let sessionMode: string | null = null
+
+  const endSession = (): void => {
+    if (!sessionStartTime || !sessionMode) return
+
+    const durationSeconds = Math.round((Date.now() - sessionStartTime) / 1000)
+    trackEvent(PRACTICE_SESSION_ENDED, {
+      mode: sessionMode,
+      duration_seconds: durationSeconds,
+    })
+
+    sessionStartTime = null
+    sessionMode = null
+  }
   
   // Determine current mode from URL parameter
   const currentMode = createMemo(() => {
@@ -33,30 +51,33 @@ export default function PracticeView(props: PracticeViewProps) {
     return isValidMode ? modeId : 'selection'
   })
 
-  const selectMode = (modeId: string): void => {
-    // Navigate to the practice mode URL - this will trigger automatic route tracking
-    navigate(`/practice/${modeId}`)
-    
-    // Track practice mode selection as a custom event
-    const mode = PRACTICE_MODES.find(m => m.id === modeId)
-    if (mode) {
-      trackEvent('practice_mode_selected', {
-        mode_id: modeId,
-        mode_name: mode.name,
-      })
+  // Start/end session timer when mode changes
+  createEffect(() => {
+    const mode = currentMode()
+
+    // End previous session if there was one
+    endSession()
+
+    // Start new session if entering a practice mode
+    if (mode !== 'selection') {
+      sessionStartTime = Date.now()
+      sessionMode = mode
     }
+  })
+
+  // End session if the component unmounts (user navigates away entirely)
+  onCleanup(() => {
+    endSession()
+  })
+
+  const selectMode = (modeId: string): void => {
+    // Navigate to the practice mode URL — page view tracking handles analytics automatically
+    navigate(`/practice/${modeId}`)
   }
 
   const goBack = (): void => {
-    const previousMode = currentMode()
-    
-    // Navigate back to practice selector - this will trigger automatic route tracking
+    // Navigate back to practice selector — page view tracking handles analytics automatically
     navigate('/practice')
-    
-    // Track returning to mode selector
-    trackEvent('practice_mode_exited', {
-      previous_mode: previousMode,
-    })
   }
 
   return (
