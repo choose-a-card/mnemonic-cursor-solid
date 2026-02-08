@@ -25,6 +25,7 @@ export default function PlopDenisBehr() {
   const [wrongSuit, setWrongSuit] = createSignal<boolean>(false)
   const [wrongIndexes, setWrongIndexes] = createSignal<number[]>([])
   let inputRefs: HTMLInputElement[] = []
+  let questionRef: HTMLDivElement | undefined
 
   const nextQuestion = (): void => {
     setFeedback('')
@@ -68,6 +69,15 @@ export default function PlopDenisBehr() {
         handleSubmit()
       }
     }
+  }
+
+  /** Keep the question visible when an input is focused and the keyboard pushes content */
+  const handleInputFocus = (): void => {
+    if (!questionRef) return
+    // Wait for the keyboard animation to settle, then scroll question into view
+    setTimeout(() => {
+      questionRef?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 350)
   }
 
   const handleSubmit = (event?: Event): void => {
@@ -141,8 +151,8 @@ export default function PlopDenisBehr() {
   }
 
   return (
-    <div class="practice-mode">
-      <div class="question-card" onClick={handleQuestionClick}>
+    <div class="practice-mode plop-mode">
+      <div class="question-card plop-question-card" ref={questionRef} onClick={handleQuestionClick}>
         <div class="question-text">
           For all the <b><CardText card={question().card || ''} />s</b>, enter the cut card and the relative distances:
         </div>
@@ -177,10 +187,10 @@ export default function PlopDenisBehr() {
           </table>
         </div>
       </Show>
-      <form class="quartet-form" onSubmit={event => { event.preventDefault(); handleSubmit(event); }}>
+      <form class="quartet-form plop-form" onSubmit={event => { event.preventDefault(); handleSubmit(event); }}>
         {/* Suit selector */}
         <div class="plop-section">
-          <label class="plop-label">Cut to bottom:</label>
+          <label class="plop-label">Cut suit:</label>
           <div class="plop-suit-buttons" role="radiogroup" aria-label="Select suit to cut to bottom">
             <For each={SUIT_SYMBOLS}>
               {(suit) => {
@@ -212,22 +222,18 @@ export default function PlopDenisBehr() {
 
         {/* Distance inputs */}
         <div class="plop-section">
-          <label class="plop-label">Relative distances:</label>
-          <div class="plop-distance-labels">
-            <span class="plop-distance-label">1st from top</span>
-            <span class="plop-distance-label">1st → 2nd</span>
-            <span class="plop-distance-label">2nd → 3rd</span>
-          </div>
-          <div class="quartet-inputs">
+          <label class="plop-label">Distances:</label>
+          <div class="quartet-inputs plop-inputs">
             {[0, 1, 2].map(index => (
               <input
                 class={`quartet-input${wrongIndexes().includes(index) ? ' quartet-input-wrong' : ''}`}
-                type="number"
-                min="1"
-                max="52"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={inputs()[index]}
                 onInput={event => handleInput(index, (event.target as HTMLInputElement).value)}
                 onKeyDown={event => handleKeyDown(event as KeyboardEvent, index)}
+                onFocus={handleInputFocus}
                 ref={element => inputRefs[index] = element as HTMLInputElement}
                 required
                 aria-label={
@@ -242,10 +248,10 @@ export default function PlopDenisBehr() {
           </div>
         </div>
 
-        <div class="feedback-area">
-          {feedback() && (
+        <div class="plop-feedback-wrapper">
+          <Show when={feedback()}>
             <div
-              class="feedback-message"
+              class="feedback-message plop-feedback"
               classList={{
                 'feedback-correct': isCorrect(),
                 'feedback-error': !isCorrect()
@@ -253,8 +259,9 @@ export default function PlopDenisBehr() {
             >
               {feedback()}
             </div>
-          )}
+          </Show>
         </div>
+
         <button class="submit-btn" type="submit" disabled={answered()}>
           Submit
         </button>

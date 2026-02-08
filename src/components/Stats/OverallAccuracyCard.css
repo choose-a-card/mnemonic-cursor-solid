@@ -1,5 +1,6 @@
 .overall-accuracy-card {
   grid-column: span 1;
+  align-self: start;
 }
 
 .accuracy-display {

@@ -1,5 +1,5 @@
 // Feature flags utility for controlling app features via URL parameters
-// Usage: ?disableBadges=true to disable the badges system
+// Usage: ?enableBadges=true to enable badges, ?enablePWA=true to enable PWA install UI
 import { WindowURLParser, type URLParser } from './urlParsers'
 
 interface FeatureFlags {
@@ -13,6 +13,9 @@ const parseFeatureFlags = (urlParser: URLParser): FeatureFlags => {
   
   return {
     badgesEnabled: urlParams.get('enableBadges') === 'true',
+    // PWA infrastructure (service worker, manifest, caching) is always active.
+    // This flag controls only the in-app install prompt UI.
+    // To permanently enable: change to `urlParams.get('enablePWA') !== 'false'`
     pwaEnabled: urlParams.get('enablePWA') === 'true'
   }
 }

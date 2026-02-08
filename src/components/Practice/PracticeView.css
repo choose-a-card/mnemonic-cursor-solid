@@ -1039,3 +1039,122 @@
 .app-container.dark .plop-cheatsheet-highlight {
   background: var(--accent-light, #1a365d);
 }
+
+/* ─── PLOP Layout ────────────────────────────────────────────────────────────
+   Feedback uses absolute positioning so it doesn't push the submit button.
+   Mobile styles make everything compact enough for the virtual keyboard.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* PLOP feedback: reserves enough height so the submit button never jumps.
+   .feedback-message has ~0.75rem padding top/bottom + ~1.5rem line + 2px border ≈ 3.1rem */
+.plop-feedback-wrapper {
+  min-height: 3.25rem;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plop-feedback {
+  text-align: center;
+}
+
+/* PLOP submit: sits right below the feedback wrapper */
+.plop-form .submit-btn {
+  margin: 0.5rem auto 0;
+}
+
+/* ─── PLOP: Mobile compact ──────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .plop-mode {
+    gap: 0.35rem;
+  }
+
+  .plop-question-card {
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+  }
+
+  .plop-question-card .question-text {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .plop-form .plop-section {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
+    gap: 0.5rem;
+  }
+
+  .plop-form .plop-label {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  .plop-form .plop-suit-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+  }
+
+  .plop-form .plop-suit-buttons {
+    gap: 0.4rem;
+  }
+
+  .plop-form .plop-inputs {
+    margin: 0;
+    gap: 0.6rem;
+  }
+
+  .plop-form .quartet-input {
+    width: 50px;
+    padding: 0.5rem 0.3rem;
+    font-size: 1.05rem;
+  }
+
+  .plop-feedback-wrapper {
+    min-height: 2.5rem;
+    margin-top: 0.35rem;
+  }
+
+  .plop-feedback {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .plop-form .submit-btn {
+    margin: 0.5rem auto 0;
+    padding: 0.7rem 1.25rem;
+    max-width: 200px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+  }
+}
+
+/* ─── PLOP: Extra small screens (iPhone SE, etc.) ───────────────────────── */
+@media (max-width: 380px) {
+  .plop-form .plop-section {
+    gap: 0.35rem;
+  }
+
+  .plop-form .plop-suit-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.15rem;
+    border-radius: 8px;
+  }
+
+  .plop-form .quartet-input {
+    width: 44px;
+    padding: 0.4rem 0.25rem;
+    font-size: 1rem;
+  }
+
+  .plop-form .plop-label {
+    font-size: 0.75rem;
+  }
+}

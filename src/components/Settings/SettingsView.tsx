@@ -1,6 +1,6 @@
 import './SettingsView.css'
 import { createSignal, onMount, Show } from 'solid-js'
-import { isPWAInstallable, isPWAInstalled, installPWA, isOnline, canShowInstallPrompt, getPWAInstallPrompt, checkServiceWorkerStatus } from '../../utils/pwa'
+import { isPWAInstalled, installPWA, isOnline, getPWAInstallPrompt, checkServiceWorkerStatus } from '../../utils/pwa'
 import { isFeatureEnabled } from '../../utils/featureFlags'
 import { useAppSettings } from '../../contexts/AppSettingsContext'
 import { useStats } from '../../contexts/StatsContext'
@@ -14,6 +14,16 @@ import DataManagementCard from './DataManagementCard'
 import AboutCard from './AboutCard'
 import SupportCard from './SupportCard'
 
+const isIOS = (): boolean => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+}
+
+const isAndroidChrome = (): boolean => {
+  const userAgent = navigator.userAgent
+  return /Android/.test(userAgent) && /Chrome/.test(userAgent) && !/Edge/.test(userAgent)
+}
+
 export default function SettingsView() {
   const { 
     stackType, setStackType, 
@@ -22,65 +32,59 @@ export default function SettingsView() {
     soundEnabled, setSoundEnabled 
   } = useAppSettings()
   const { resetStats } = useStats()
-  const [canInstall, setCanInstall] = createSignal(false)
   const [isInstalled, setIsInstalled] = createSignal(false)
+  const [hasPrompt, setHasPrompt] = createSignal(false)
   const [onlineStatus, setOnlineStatus] = createSignal(true)
   const [installing, setInstalling] = createSignal(false)
 
-
   onMount(() => {
-    // Only run PWA logic if the feature is enabled
-    if (isFeatureEnabled('pwaEnabled')) {
-      // Initial checks
-      const checkPWAStatus = async () => {
-        const installed = isPWAInstalled()
-        const installable = isPWAInstallable()
-        const hasPrompt = !!getPWAInstallPrompt()
-        const canShow = canShowInstallPrompt()
-        const swStatus = await checkServiceWorkerStatus()
-        
-        setIsInstalled(installed)
-        setCanInstall(canShow)
-        
-        logger.log('PWA Status Check:', {
-          installed,
-          installable,
-          hasPrompt,
-          canShow,
-          userAgent: navigator.userAgent,
-          serviceWorkerStatus: swStatus
-        })
-      }
+    if (!isFeatureEnabled('pwaEnabled')) return
 
-      // Initial check
-      checkPWAStatus()
-      setOnlineStatus(isOnline())
-
-      // Listen for online status changes
-      window.addEventListener('online', () => {
-        setOnlineStatus(true)
-        checkPWAStatus()
+    const checkPWAStatus = async () => {
+      const installed = isPWAInstalled()
+      const promptAvailable = !!getPWAInstallPrompt()
+      const swStatus = await checkServiceWorkerStatus()
+      
+      setIsInstalled(installed)
+      setHasPrompt(promptAvailable)
+      
+      logger.log('PWA Status Check:', {
+        installed,
+        promptAvailable,
+        isIOS: isIOS(),
+        isAndroidChrome: isAndroidChrome(),
+        userAgent: navigator.userAgent,
+        serviceWorkerStatus: swStatus,
       })
-      window.addEventListener('offline', () => {
-        setOnlineStatus(false)
-        checkPWAStatus()
-      })
-
-      // Listen for beforeinstallprompt event
-      window.addEventListener('beforeinstallprompt', () => {
-        logger.log('beforeinstallprompt event fired!')
-        checkPWAStatus()
-      })
-
-      // Listen for appinstalled event
-      window.addEventListener('appinstalled', () => {
-        logger.log('appinstalled event fired!')
-        checkPWAStatus()
-      })
-
-      // Check again after a delay to catch any delayed events
-      setTimeout(checkPWAStatus, 2000)
     }
+
+    checkPWAStatus()
+    setOnlineStatus(isOnline())
+
+    window.addEventListener('online', () => {
+      setOnlineStatus(true)
+      checkPWAStatus()
+    })
+    window.addEventListener('offline', () => {
+      setOnlineStatus(false)
+      checkPWAStatus()
+    })
+
+    // Capture the deferred install prompt when the browser fires it
+    window.addEventListener('beforeinstallprompt', () => {
+      logger.log('beforeinstallprompt event fired!')
+      setHasPrompt(true)
+      checkPWAStatus()
+    })
+
+    window.addEventListener('appinstalled', () => {
+      logger.log('appinstalled event fired!')
+      setIsInstalled(true)
+      setHasPrompt(false)
+    })
+
+    // Re-check after a delay to catch late-arriving events
+    setTimeout(checkPWAStatus, 3000)
   })
 
   const handleInstall = async () => {
@@ -91,31 +95,13 @@ export default function SettingsView() {
       const success = await installPWA()
       if (success) {
         setIsInstalled(true)
-        setCanInstall(false)
+        setHasPrompt(false)
       }
     } catch (error) {
       logger.error('Installation failed:', error)
     } finally {
       setInstalling(false)
     }
-  }
-
-  const handleManualInstall = () => {
-    if (!isFeatureEnabled('pwaEnabled')) return
-    
-    // For mobile Chrome, try to trigger the install banner
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(() => {
-        logger.log('Service Worker ready, trying to trigger install banner')
-        // This might trigger the install banner on mobile Chrome
-        window.dispatchEvent(new Event('beforeinstallprompt'))
-      })
-    }
-  }
-
-  const isMobileChrome = () => {
-    const userAgent = navigator.userAgent
-    return /Android/.test(userAgent) && /Chrome/.test(userAgent) && !/Edge/.test(userAgent)
   }
 
   return (
@@ -141,52 +127,70 @@ export default function SettingsView() {
 
       {/* Sidebar Section */}
       <div class="settings-sidebar">
-        {/* App Installation - PWA Card (keeping inline due to complexity) */}
+        {/* App Installation - PWA Card */}
         <Show when={isFeatureEnabled('pwaEnabled')}>
           <Card icon="📱" title="App Installation" class="pwa-card">
             <div class="status-indicator">
-              <span class={`status-dot ${onlineStatus() ? 'online' : 'offline'}`}></span>
+              <span class={`status-dot ${onlineStatus() ? 'online' : 'offline'}`} />
               <span class="status-text">{onlineStatus() ? 'Online' : 'Offline'}</span>
             </div>
             
+            {/* Already installed */}
             <Show when={isInstalled()}>
               <div class="pwa-status installed">
                 ✅ App installed and ready for offline use
               </div>
             </Show>
             
-            <Show when={canInstall() && !isInstalled()}>
-              <button 
-                class="install-button" 
-                onClick={handleInstall}
-                disabled={installing()}
-              >
-                {installing() ? 'Installing...' : '📱 Install App'}
-              </button>
-              <div class="install-hint">
-                Install for offline access and native app experience
-              </div>
-            </Show>
-            
-            <Show when={!canInstall() && !isInstalled()}>
-              <div class="pwa-status not-supported">
-                ℹ️ Installation not available
-              </div>
-              
-              <Show when={isMobileChrome()}>
+            <Show when={!isInstalled()}>
+              {/* Deferred prompt available — show one-tap install */}
+              <Show when={hasPrompt()}>
+                <button 
+                  class="install-button" 
+                  onClick={handleInstall}
+                  disabled={installing()}
+                  aria-label="Install Mem Deck app"
+                  tabindex="0"
+                >
+                  {installing() ? 'Installing...' : '📱 Install App'}
+                </button>
+                <div class="install-hint">
+                  Install for offline access and native app experience
+                </div>
+              </Show>
+
+              {/* No deferred prompt — show manual instructions */}
+              <Show when={!hasPrompt()}>
                 <div class="mobile-install-options">
-                  <h4>📱 Mobile Chrome Options:</h4>
-                  <ol>
-                    <li>Look for install banner at bottom</li>
-                    <li>Tap menu (⋮) → "Install app"</li>
-                    <li>Refresh and wait 30+ seconds</li>
-                  </ol>
-                  <button 
-                    class="secondary-button" 
-                    onClick={handleManualInstall}
-                  >
-                    🔄 Try Manual Trigger
-                  </button>
+                  <Show when={isIOS()}>
+                    <h4>Install on iPhone / iPad</h4>
+                    <ol>
+                      <li>Tap the <strong>Share</strong> button <span aria-hidden="true">⎙</span> in Safari</li>
+                      <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
+                      <li>Tap <strong>"Add"</strong> to confirm</li>
+                    </ol>
+                  </Show>
+
+                  <Show when={isAndroidChrome()}>
+                    <h4>Install on Android</h4>
+                    <ol>
+                      <li>Tap the <strong>menu</strong> button <span aria-hidden="true">⋮</span></li>
+                      <li>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong></li>
+                      <li>Tap <strong>"Install"</strong> to confirm</li>
+                    </ol>
+                  </Show>
+
+                  <Show when={!isIOS() && !isAndroidChrome()}>
+                    <h4>Install as App</h4>
+                    <ol>
+                      <li>Look for the install icon <span aria-hidden="true">⊕</span> in the address bar</li>
+                      <li>Or open browser menu → <strong>"Install app"</strong></li>
+                    </ol>
+                  </Show>
+
+                  <div class="install-hint">
+                    Install for offline access and native app experience
+                  </div>
                 </div>
               </Show>
             </Show>

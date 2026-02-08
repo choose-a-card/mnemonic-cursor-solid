@@ -29,15 +29,17 @@ export default function ModePerformanceCard(props: ModePerformanceCardProps) {
                   <span class="mode-attempts">{modeData.total} attempts</span>
                 </div>
                 <div class="mode-accuracy-container">
-                  <div 
-                    class="mode-accuracy-bar" 
-                    style={{ width: `${modeData.accuracy}%` }}
-                    classList={{
-                      'high': modeData.accuracy >= 80,
-                      'medium': modeData.accuracy >= 60 && modeData.accuracy < 80,
-                      'low': modeData.accuracy < 60
-                    }}
-                  ></div>
+                  <div class="mode-accuracy-track">
+                    <div 
+                      class="mode-accuracy-bar" 
+                      style={{ width: `${modeData.accuracy}%` }}
+                      classList={{
+                        'high': modeData.accuracy >= 80,
+                        'medium': modeData.accuracy >= 60 && modeData.accuracy < 80,
+                        'low': modeData.accuracy < 60
+                      }}
+                    ></div>
+                  </div>
                   <span class="mode-accuracy-text">{modeData.accuracy}%</span>
                 </div>
               </div>

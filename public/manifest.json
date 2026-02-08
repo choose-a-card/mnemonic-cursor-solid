@@ -1,63 +1,88 @@
 {
-  "name": "Mnemonic Trainer",
-  "short_name": "Mnemonic",
-  "description": "Train your memory with Tamariz and Aronson stacks",
+  "name": "Mem Deck – Memorized Deck Trainer",
+  "short_name": "Mem Deck",
+  "description": "Master the Tamariz and Aronson memorized deck stacks with interactive practice modes.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007aff",
+  "theme_color": "#007AFF",
   "orientation": "portrait-primary",
   "scope": "/",
+  "id": "/",
   "lang": "en",
-  "categories": ["education", "productivity", "games"],
+  "categories": ["education", "productivity"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-167x167.png",
+      "sizes": "167x167",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -65,7 +90,7 @@
       "name": "Practice",
       "short_name": "Practice",
       "description": "Start practicing with cards",
-      "url": "/?tab=practice",
+      "url": "/#/practice",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
@@ -77,7 +102,7 @@
       "name": "Stats",
       "short_name": "Stats",
       "description": "View your progress",
-      "url": "/?tab=stats",
+      "url": "/#/stats",
       "icons": [
         {
           "src": "/icons/icon-96x96.png",
@@ -86,4 +111,4 @@
       ]
     }
   ]
-} 
+}
