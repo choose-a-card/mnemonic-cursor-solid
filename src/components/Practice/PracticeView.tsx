@@ -9,6 +9,7 @@ import CuttingEstimation from './CuttingEstimation'
 import FirstOrSecondHalf from './FirstOrSecondHalf'
 import QuartetPosition from './QuartetPosition'
 import CutToPosition from './CutToPosition'
+import MixedQuiz from './MixedQuiz'
 import PlopDenisBehr from './PlopDenisBehr'
 import PracticeModeSelector from './PracticeModeSelector'
 import PracticeHeader from './PracticeHeader'
@@ -121,6 +122,10 @@ export default function PracticeView(props: PracticeViewProps) {
             
             <Show when={currentMode() === 'cut-to-position'}>
               <CutToPosition />
+            </Show>
+            
+            <Show when={currentMode() === 'mixed'}>
+              <MixedQuiz />
             </Show>
             
             <Show when={currentMode() === 'plop-denis-behr'}>

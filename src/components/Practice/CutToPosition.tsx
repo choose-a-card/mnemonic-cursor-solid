@@ -60,7 +60,7 @@ export default function CutToPosition() {
       correct,
       question: q,
       input: card,
-      mode: 'Cut to Position'
+      mode: 'ACAAN'
     })
     setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
   }

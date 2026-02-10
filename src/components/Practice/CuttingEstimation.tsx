@@ -1,11 +1,12 @@
 import { createSignal, onMount } from 'solid-js'
 import type { QuizQuestion } from '../../types'
-import { playSound } from '../../sounds/sounds';
-import { getRandomInt } from '../../utils/utils';
+import { playSound } from '../../sounds/sounds'
+import { getRandomInt } from '../../utils/utils'
 import { FEEDBACK_TIMER_MS } from '../../constants/timers'
 import { usePractice } from '../../contexts/PracticeContext'
 import CardText from '../shared/CardText'
 import { calculateCutAnswer } from './cuttingEstimationUtils'
+import NumericKeyboard from '../shared/NumericKeyboard'
 
 export default function CuttingEstimation() {
   const { practiceStack, cardInterval, soundEnabled, onResult } = usePractice()
@@ -14,85 +15,88 @@ export default function CuttingEstimation() {
   const [feedback, setFeedback] = createSignal<string>('')
   const [isCorrect, setIsCorrect] = createSignal<boolean>(false)
 
-  function nextQuestion(): void {
+  const nextQuestion = (): void => {
     setFeedback('')
     setInput('')
     setIsCorrect(false)
-    
+
     const N = practiceStack().length
-    
-    // Randomly select a bottom card (cut position)
+
     const cutIdx = getRandomInt(N)
     const cutCard = practiceStack()[cutIdx]
-    
-    // When a card is at the bottom (cutIdx), the top card is at (cutIdx + 1) % N
-    // To bring a target card to the top, we need to calculate how many cards to cut
-    
-    // Randomly select an offset between -8 and +8, excluding 0
-    // This offset represents how many positions away from the current top the target should be
+
     let offset = 0
     while (offset === 0) {
-      offset = getRandomInt(17) - 8 // -8 to +8
+      offset = getRandomInt(17) - 8
     }
-    
-    // Calculate target position: if bottom is at cutIdx, top is at (cutIdx + 1) % N
-    // Target should be offset positions from the top: targetIdx = (cutIdx + 1 + offset + N) % N
+
     const targetIdx = (cutIdx + 1 + offset + N) % N
     const targetCard = practiceStack()[targetIdx]
-    
-    // Calculate the correct answer using the utility function
-    // This ensures consistency and allows for proper testing
-    // We calculate from actual card positions rather than using offset directly
-    // to ensure correctness even if there are any edge cases
+
     const answer = calculateCutAnswer(practiceStack(), cutCard, targetCard)
-    
-    // Verify that the answer matches the offset we used to generate the question
-    // (after normalization). This is a sanity check - they should always match.
+
     if (answer !== offset) {
       console.error(`Answer mismatch: calculated ${answer}, expected ${offset}. This should not happen!`)
-      // Use the calculated answer (from actual positions) as it's more reliable
     }
-    
-    setQuestion({ 
-      targetCard, 
-      cutCard, 
-      answer: answer, 
+
+    setQuestion({
+      targetCard,
+      cutCard,
+      answer: answer,
       type: 'cutting',
       targetPos: cardInterval().start + targetIdx,
       cutPos: cardInterval().start + cutIdx
     })
   }
 
-  function handleSubmit(e: Event): void {
-    e.preventDefault()
-    
-    // Remove focus on touch devices to prevent stuck hover state
-    if ('ontouchstart' in window) {
-      const target = e.target as HTMLFormElement
-      const submitBtn = target.querySelector('button[type="submit"]') as HTMLButtonElement
-      if (submitBtn) submitBtn.blur()
-    }
-    
-    const q = question()
-    
-    const correct = Number(input()) === q.answer
-    
+  const handleNumericDigit = (digit: string): void => {
+    // Only allow digits (sign is handled by toggle)
+    setInput(previous => {
+      const isNegative = previous.startsWith('-')
+      const digits = previous.replace('-', '')
+      const newDigits = digits + digit
+      return isNegative ? '-' + newDigits : newDigits
+    })
+  }
+
+  const handleNumericDelete = (): void => {
+    setInput(previous => {
+      const isNegative = previous.startsWith('-')
+      const digits = previous.replace('-', '')
+      const newDigits = digits.slice(0, -1)
+      // If no digits left, remove the sign too
+      if (newDigits === '') return ''
+      return isNegative ? '-' + newDigits : newDigits
+    })
+  }
+
+  const handleToggleSign = (): void => {
+    setInput(previous => {
+      if (previous === '' || previous === '-') return previous === '-' ? '' : '-'
+      return previous.startsWith('-') ? previous.slice(1) : '-' + previous
+    })
+  }
+
+  const handleNumericSubmit = (): void => {
+    const currentQuestion = question()
+    const correct = Number(input()) === currentQuestion.answer
+
     playSound(soundEnabled(), correct ? 'correct' : 'incorrect')
     setIsCorrect(correct)
-    
+
     if (correct) {
       setFeedback('Correct! ✅')
     } else {
-      setFeedback(`Wrong. Answer: ${q.answer} cards`)
+      setFeedback(`Wrong. Answer: ${currentQuestion.answer} cards`)
     }
-    
-    onResult({ 
-      correct, 
-      question: q, 
-      input: input(), 
-      mode: 'Cutting Estimation' 
+
+    onResult({
+      correct,
+      question: currentQuestion,
+      input: input(),
+      mode: 'Cutting Estimation'
     })
-    
+
     setTimeout(nextQuestion, FEEDBACK_TIMER_MS)
   }
 
@@ -105,31 +109,47 @@ export default function CuttingEstimation() {
       {/* Question */}
       <div class="question-card">
         <div class="question-text">
-          <div><b>Bottom card:</b> <CardText card={question().cutCard || ''} /></div>
-          <div><b>Target card:</b> <CardText card={question().targetCard || ''} /></div>
-          <div style={{'margin-top': '1rem'}}>How many cards (±8) to cut to bring the target to the top? <br/>(+ = forward, – = backward)</div>
+          <div>
+            <b>Bottom:</b> <CardText card={question().cutCard || ''} /> &nbsp;·&nbsp; <b>Target:</b> <CardText card={question().targetCard || ''} />
+          </div>
+          <div style={{'margin-top': '0.5rem', 'font-size': '0.95em'}}>
+            Cut to bring <CardText card={question().targetCard || ''} /> to top?
+          </div>
         </div>
       </div>
-      
-      {/* Answer Form */}
-      <form class="answer-form" onSubmit={handleSubmit}>
+
+      {/* Answer */}
+      <div class="answer-form">
         <div class="input-container">
           <input
             class="answer-input"
-            type="number"
+            type="text"
             value={input()}
-            onInput={e => setInput((e.target as HTMLInputElement).value)}
-            placeholder="Enter number"
-            required
-            autofocus
+            onInput={(event) => {
+              const raw = (event.target as HTMLInputElement).value
+              const filtered = raw.replace(/[^0-9-]/g, '')
+              // Allow at most one leading minus
+              const cleaned = filtered.replace(/(?!^)-/g, '')
+              setInput(cleaned)
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                handleNumericSubmit()
+              }
+            }}
+            placeholder="Enter number (± for sign)"
+            aria-label="Enter number"
+            inputmode="none"
+            autocomplete="off"
           />
         </div>
 
         <div class="feedback-area">
           {feedback() && (
-            <div 
+            <div
               class="feedback-message"
-              classList={{ 
+              classList={{
                 'feedback-correct': isCorrect(),
                 'feedback-error': !isCorrect()
               }}
@@ -139,10 +159,14 @@ export default function CuttingEstimation() {
           )}
         </div>
 
-        <button class="submit-btn" type="submit">
-          Submit Answer
-        </button>
-      </form>
+        <NumericKeyboard
+          isVisible={true}
+          onDigit={handleNumericDigit}
+          onDelete={handleNumericDelete}
+          onSubmit={handleNumericSubmit}
+          onToggleSign={handleToggleSign}
+        />
+      </div>
     </div>
   )
 } 
