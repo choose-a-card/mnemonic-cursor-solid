@@ -80,17 +80,15 @@ export default function StackContext() {
             class="answer-input"
             type="text"
             value={quiz.input()}
-            onInput={e => quiz.setInput((e.target as HTMLInputElement).value)}
-            onFocus={() => quiz.setShowKeyboard(true)}
             placeholder="Enter card"
-            required
-            autofocus
+            aria-label="Card selection (use keyboard below)"
             readonly
+            inputmode="none"
           />
           
           <CardKeyboard
-            isVisible={quiz.showKeyboard()}
-            onClose={() => quiz.setShowKeyboard(false)}
+            isVisible={true}
+            onClose={() => {}}
             onCardSelect={handleCardSelect}
             onPartialSelect={handlePartialSelect}
           />

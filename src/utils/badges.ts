@@ -162,8 +162,8 @@ export const BADGE_DEFINITIONS: Omit<Badge, 'unlocked' | 'unlockedAt' | 'progres
   },
   {
     id: 'cut-to-position-expert',
-    name: 'Cut to Position Master',
-    description: 'Achieve 55% accuracy in Cut to Position mode',
+    name: 'ACAAN Master',
+    description: 'Achieve 55% accuracy in ACAAN mode',
     icon: '🎯',
     category: 'modes',
     requirement: 55
@@ -357,8 +357,8 @@ export const calculateBadgeProgress = (stats: Stats): Badge[] => {
         unlocked = (modeStats['Quartet Position']?.accuracy || 0) >= 65
         break
       case 'cut-to-position-expert':
-        progress = modeStats['Cut to Position']?.accuracy || 0
-        unlocked = (modeStats['Cut to Position']?.accuracy || 0) >= 55
+        progress = modeStats['ACAAN']?.accuracy || 0
+        unlocked = (modeStats['ACAAN']?.accuracy || 0) >= 55
         break
       
       // Streak badges

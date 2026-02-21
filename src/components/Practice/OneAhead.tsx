@@ -15,12 +15,13 @@ export default function OneAhead() {
   const [feedbackCard, setFeedbackCard] = createSignal<string | null>(null)
   const [isCorrect, setIsCorrect] = createSignal<boolean>(false)
   const [showKeyboard, setShowKeyboard] = createSignal<boolean>(false)
-  
+    
   function nextQuestion(): void {
     setFeedback(null)
     setFeedbackCard(null)
     setIsCorrect(false)
     setInput('')
+    setShowKeyboard(true) // Keep keyboard open for next question
     setShowKeyboard(true) // Keep keyboard open for next question
     
     // Pick a random card from the practice stack

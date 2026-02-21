@@ -7,6 +7,7 @@ import { RANKS, SUITS } from '../../constants/cards'
 import { PLOP_DATA } from '../../constants/plopData'
 import { usePractice } from '../../contexts/PracticeContext'
 import CardText from '../shared/CardText'
+import NumericKeyboard from '../shared/NumericKeyboard'
 
 const TRIPLE_CLICK_THRESHOLD_MS = 600
 
@@ -24,6 +25,7 @@ export default function PlopDenisBehr() {
   const [answered, setAnswered] = createSignal<boolean>(false)
   const [wrongSuit, setWrongSuit] = createSignal<boolean>(false)
   const [wrongIndexes, setWrongIndexes] = createSignal<number[]>([])
+  const [activeIndex, setActiveIndex] = createSignal<number>(0)
   let inputRefs: HTMLInputElement[] = []
   let questionRef: HTMLDivElement | undefined
 
@@ -35,6 +37,7 @@ export default function PlopDenisBehr() {
     setInputs(['', '', ''])
     setWrongSuit(false)
     setWrongIndexes([])
+    setActiveIndex(0)
 
     const rankIdx = getRandomInt(RANKS.length)
     const rank = RANKS[rankIdx]
@@ -60,24 +63,42 @@ export default function PlopDenisBehr() {
     setInputs(newInputs)
   }
 
-  const handleKeyDown = (event: KeyboardEvent, idx: number): void => {
+  const handleInputKeyDown = (event: KeyboardEvent, idx: number): void => {
     if (event.key === 'Enter') {
       event.preventDefault()
       if (idx < 2) {
-        inputRefs[idx + 1]?.focus()
+        setActiveIndex(idx + 1)
       } else {
         handleSubmit()
       }
     }
   }
 
-  /** Keep the question visible when an input is focused and the keyboard pushes content */
-  const handleInputFocus = (): void => {
-    if (!questionRef) return
-    // Wait for the keyboard animation to settle, then scroll question into view
-    setTimeout(() => {
-      questionRef?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }, 350)
+  const handleInputFocus = (index: number): void => {
+    setActiveIndex(index)
+  }
+
+  const handleNumericDigit = (digit: string): void => {
+    const idx = activeIndex()
+    const newInputs = [...inputs()]
+    newInputs[idx] = newInputs[idx] + digit
+    setInputs(newInputs)
+  }
+
+  const handleNumericDelete = (): void => {
+    const idx = activeIndex()
+    const newInputs = [...inputs()]
+    newInputs[idx] = newInputs[idx].slice(0, -1)
+    setInputs(newInputs)
+  }
+
+  const handleNumericSubmit = (): void => {
+    const idx = activeIndex()
+    if (idx < 2) {
+      setActiveIndex(idx + 1)
+      return
+    }
+    handleSubmit()
   }
 
   const handleSubmit = (event?: Event): void => {
@@ -226,16 +247,13 @@ export default function PlopDenisBehr() {
           <div class="quartet-inputs plop-inputs">
             {[0, 1, 2].map(index => (
               <input
-                class={`quartet-input${wrongIndexes().includes(index) ? ' quartet-input-wrong' : ''}`}
+                class={`quartet-input${wrongIndexes().includes(index) ? ' quartet-input-wrong' : ''}${activeIndex() === index ? ' quartet-input-active' : ''}`}
                 type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
                 value={inputs()[index]}
                 onInput={event => handleInput(index, (event.target as HTMLInputElement).value)}
-                onKeyDown={event => handleKeyDown(event as KeyboardEvent, index)}
-                onFocus={handleInputFocus}
+                onKeyDown={event => handleInputKeyDown(event as KeyboardEvent, index)}
+                onFocus={() => handleInputFocus(index)}
                 ref={element => inputRefs[index] = element as HTMLInputElement}
-                required
                 aria-label={
                   index === 0
                     ? 'Position of first card from top'
@@ -243,6 +261,8 @@ export default function PlopDenisBehr() {
                     ? 'Distance from first to second card'
                     : 'Distance from second to third card'
                 }
+                inputmode="none"
+                autocomplete="off"
               />
             ))}
           </div>
@@ -262,9 +282,12 @@ export default function PlopDenisBehr() {
           </Show>
         </div>
 
-        <button class="submit-btn" type="submit" disabled={answered()}>
-          Submit
-        </button>
+        <NumericKeyboard
+          isVisible={true}
+          onDigit={handleNumericDigit}
+          onDelete={handleNumericDelete}
+          onSubmit={handleNumericSubmit}
+        />
       </form>
     </div>
   )

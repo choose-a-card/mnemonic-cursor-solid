@@ -107,7 +107,7 @@ export const PRACTICE_MODES = {
   'cutting': 'Cutting Estimation',
   'first-or-second-half': 'First or Second Half',
   'quartet-position': 'Quartet Position',
-  'cut-to-position': 'Cut to Position',
+  'cut-to-position': 'ACAAN Cut To Position',
   'plop-denis-behr': 'PLOP - Denis Behr',
 } as const
 

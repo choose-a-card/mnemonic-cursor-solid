@@ -203,7 +203,7 @@ export const StatsProvider: Component<StatsProviderProps> = (props) => {
   const generateDebugStats = (): void => {
     logger.log('StatsContext: generateDebugStats called')
     const currentStack = props.stack()
-    const modes = ['Card → Position', 'Position → Card', 'One Ahead', 'Stack Context', 'Cutting Estimation', 'First or Second Half', 'Quartet Position', 'Cut to Position']
+    const modes = ['Card → Position', 'Position → Card', 'One Ahead', 'Stack Context', 'Cutting Estimation', 'First or Second Half', 'Quartet Position', 'ACAAN']
     const newStats: Stats = { 
       total: 0, 
       correct: 0, 

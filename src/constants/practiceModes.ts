@@ -21,6 +21,12 @@ export const PRACTICE_MODES: PracticeMode[] = [
     description: 'Given a position, identify which card is there'
   },
   { 
+    id: 'mixed', 
+    name: 'Mixed', 
+    icon: '🔄', 
+    description: 'Randomly alternates between card-to-position and position-to-card questions'
+  },
+  { 
     id: 'one-ahead', 
     name: 'One Ahead', 
     icon: '⏭️', 
@@ -36,7 +42,7 @@ export const PRACTICE_MODES: PracticeMode[] = [
     id: 'cutting', 
     name: 'Cutting Estimation', 
     icon: '✂️', 
-    description: 'Estimate how many cards to cut to reach a target card from any position'
+    description: 'Given the bottom card, estimate how many cards to cut (±8) to bring a target card to the top'
   },
   { 
     id: 'first-or-second-half', 
@@ -52,7 +58,7 @@ export const PRACTICE_MODES: PracticeMode[] = [
   },
   { 
     id: 'cut-to-position', 
-    name: 'Cut to Position', 
+    name: 'ACAAN Cut To Position', 
     icon: '🔀', 
     description: 'Given a target card and position, enter the cut card needed to put the target at that position'
   },
