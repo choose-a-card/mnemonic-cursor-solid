@@ -47,7 +47,8 @@ test.describe('Stats Page', () => {
       const answerInput = page.locator('.answer-input, input[type="number"], input[type="text"]').first()
       if (await answerInput.isVisible()) {
         await answerInput.fill('1')
-        await page.locator('button[type="submit"], .submit-btn').first().click()
+        // Submit using Enter key (works with custom keyboards)
+        await answerInput.press('Enter')
         await page.waitForTimeout(500)
       }
       
@@ -97,8 +98,10 @@ test.describe('Stats Page', () => {
       
       // Answer a few questions
       for (let i = 0; i < 3; i++) {
-        await page.locator('.answer-input').fill(String(i + 1))
-        await page.locator('.submit-btn').click()
+        const answerInput = page.locator('.answer-input')
+        await answerInput.fill(String(i + 1))
+        // Submit using Enter key (works with custom keyboards)
+        await answerInput.press('Enter')
         await page.waitForTimeout(1600) // Wait for feedback timer
       }
       
@@ -145,8 +148,10 @@ test.describe('Stats Page', () => {
       await selectPracticeMode(page, 'card-to-pos')
       
       // Answer a question
-      await page.locator('.answer-input').fill('25')
-      await page.locator('.submit-btn').click()
+      const answerInput = page.locator('.answer-input')
+      await answerInput.fill('25')
+      // Submit using Enter key (works with custom keyboards)
+      await answerInput.press('Enter')
       await page.waitForTimeout(1600)
       
       // Go to stats

@@ -29,7 +29,7 @@ const isAndroidChrome = (): boolean => {
 export default function SettingsView() {
   const { 
     stackType, setStackType, 
-    cardInterval, setCardInterval, 
+    cardInterval, setCardInterval, onCardIntervalCommit, 
     darkMode, setDarkMode, 
     soundEnabled, setSoundEnabled 
   } = useAppSettings()
@@ -119,6 +119,7 @@ export default function SettingsView() {
           cardInterval={cardInterval()}
           onStackTypeChange={setStackType}
           onCardIntervalChange={setCardInterval}
+          onCardIntervalCommit={onCardIntervalCommit}
         />
 
         <CustomStacksCard />

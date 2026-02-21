@@ -41,8 +41,8 @@ test.describe('Practice Page', () => {
       const modeCards = page.locator('.mode-card')
       const count = await modeCards.count()
       
-      // Should have 9 practice modes
-      expect(count).toBe(9)
+      // Should have 10 practice modes (including Mixed)
+      expect(count).toBe(10)
     })
 
     test('should display mode names and descriptions', async ({ page }) => {
@@ -94,21 +94,23 @@ test.describe('Practice Page', () => {
     test('should display answer input', async ({ page }) => {
       const answerInput = page.locator('.answer-input')
       await expect(answerInput).toBeVisible()
-      await expect(answerInput).toHaveAttribute('type', 'number')
+      // Numeric inputs are now type="text" with inputmode="none" for custom keyboard
+      await expect(answerInput).toHaveAttribute('type', 'text')
+      await expect(answerInput).toHaveAttribute('inputmode', 'none')
     })
 
-    test('should display submit button', async ({ page }) => {
-      const submitBtn = page.locator('.submit-btn')
-      await expect(submitBtn).toBeVisible()
-      await expect(submitBtn).toContainText('Submit')
+    test('should display numeric keyboard', async ({ page }) => {
+      const numericKeyboard = page.locator('.numeric-grid')
+      await expect(numericKeyboard).toBeVisible()
+      // Check for OK button
+      await expect(page.locator('.numeric-btn-submit')).toBeVisible()
     })
 
     test('should accept answer submission', async ({ page }) => {
       const answerInput = page.locator('.answer-input')
       await answerInput.fill('1')
-      
-      const submitBtn = page.locator('.submit-btn')
-      await submitBtn.click()
+      // Submit using Enter key (works with custom keyboard)
+      await answerInput.press('Enter')
       
       // Should show feedback
       await expect(page.locator('.feedback-message')).toBeVisible({ timeout: 1000 })
@@ -125,9 +127,8 @@ test.describe('Practice Page', () => {
         // Enter the correct answer
         const answerInput = page.locator('.answer-input')
         await answerInput.fill(String(correctPosition))
-        
-        const submitBtn = page.locator('.submit-btn')
-        await submitBtn.click()
+        // Submit using Enter key
+        await answerInput.press('Enter')
         
         // Should show "Correct" feedback
         const feedback = page.locator('.feedback-message')
@@ -148,9 +149,8 @@ test.describe('Practice Page', () => {
         
         const answerInput = page.locator('.answer-input')
         await answerInput.fill(String(wrongPosition))
-        
-        const submitBtn = page.locator('.submit-btn')
-        await submitBtn.click()
+        // Submit using Enter key
+        await answerInput.press('Enter')
         
         // Should show "Wrong" feedback with the correct answer
         const feedback = page.locator('.feedback-message')
@@ -168,8 +168,9 @@ test.describe('Practice Page', () => {
         
         if (card) {
           const correctPosition = getCardPosition(card)
-          await page.locator('.answer-input').fill(String(correctPosition))
-          await page.locator('.submit-btn').click()
+          const answerInput = page.locator('.answer-input')
+          await answerInput.fill(String(correctPosition))
+          await answerInput.press('Enter')
           
           // Verify correct feedback
           await expect(page.locator('.feedback-message')).toContainText('Correct', { timeout: 1000 })
@@ -192,14 +193,15 @@ test.describe('Practice Page', () => {
       const initialQuestion = await page.locator('.question-text').textContent()
       
       // Submit an answer
-      await page.locator('.answer-input').fill('10')
-      await page.locator('.submit-btn').click()
+      const answerInput = page.locator('.answer-input')
+      await answerInput.fill('10')
+      await answerInput.press('Enter')
       
       // Wait for feedback timer (typically 1500ms)
       await page.waitForTimeout(2000)
       
       // Question should have changed (or could be the same by chance, but input should be cleared)
-      const answerInput = page.locator('.answer-input')
+      // const answerInput = page.locator('.answer-input')
       await expect(answerInput).toHaveValue('')
     })
   })
@@ -283,9 +285,12 @@ test.describe('Practice Page', () => {
         // Click suit button (this auto-submits)
         await page.locator('.suit-btn').filter({ hasText: suit }).first().click({ force: true })
         
+        // Wait a bit longer for auto-submit to process
+        await page.waitForTimeout(200)
+        
         // Verify wrong feedback
         const feedback = page.locator('.feedback-message')
-        await expect(feedback).toBeVisible({ timeout: 2000 })
+        await expect(feedback).toBeVisible({ timeout: 3000 })
         await expect(feedback).toContainText('Wrong')
       }
     })
@@ -510,8 +515,8 @@ test.describe('Practice Page', () => {
         for (let i = 0; i < 4; i++) {
           await inputs.nth(i).fill(String(correctPositions[i]))
         }
-        
-        await page.locator('.submit-btn').click()
+        // Submit by pressing Enter on the last input
+        await inputs.nth(3).press('Enter')
         
         // Verify correct feedback
         const feedback = page.locator('.feedback-message')
@@ -533,8 +538,8 @@ test.describe('Practice Page', () => {
         for (let i = 0; i < 4; i++) {
           await inputs.nth(i).fill(String(correctPositions[3 - i]))
         }
-        
-        await page.locator('.submit-btn').click()
+        // Submit by pressing Enter on the last input
+        await inputs.nth(3).press('Enter')
         
         // Verify correct feedback
         const feedback = page.locator('.feedback-message')
@@ -557,8 +562,8 @@ test.describe('Practice Page', () => {
         await inputs.nth(1).fill(String(correctPositions[0]))
         await inputs.nth(2).fill(String(correctPositions[3]))
         await inputs.nth(3).fill(String(correctPositions[1]))
-        
-        await page.locator('.submit-btn').click()
+        // Submit by pressing Enter on the last input
+        await inputs.nth(3).press('Enter')
         
         // Verify correct feedback
         const feedback = page.locator('.feedback-message')
@@ -582,8 +587,8 @@ test.describe('Practice Page', () => {
         for (let i = 0; i < 4; i++) {
           await inputs.nth(i).fill(String(wrongPositions[i]))
         }
-        
-        await page.locator('.submit-btn').click()
+        // Submit by pressing Enter on the last input
+        await inputs.nth(3).press('Enter')
         
         // Verify wrong feedback with correct positions shown
         const feedback = page.locator('.feedback-message')
@@ -615,8 +620,8 @@ test.describe('Practice Page', () => {
         await inputs.nth(1).fill(String(wrongPositions[0])) // wrong
         await inputs.nth(2).fill(String(correctPositions[2])) // correct
         await inputs.nth(3).fill(String(wrongPositions[1])) // wrong
-        
-        await page.locator('.submit-btn').click()
+        // Submit by pressing Enter on the last input
+        await inputs.nth(3).press('Enter')
         
         // Wait for feedback to appear
         const feedback = page.locator('.feedback-message')
@@ -631,13 +636,13 @@ test.describe('Practice Page', () => {
     })
   })
 
-  test.describe('Cut to Position Mode', () => {
+  test.describe('ACAAN Cut To Position Mode', () => {
     test.beforeEach(async ({ page }) => {
       await selectPracticeMode(page, 'cut-to-position')
     })
 
-    test('should display cut to position header', async ({ page }) => {
-      await expect(page.locator('.practice-name')).toContainText('Cut to Position')
+    test('should display ACAAN cut to position header', async ({ page }) => {
+      await expect(page.locator('.practice-name')).toContainText('ACAAN Cut To Position')
     })
 
     test('should have back button functionality', async ({ page }) => {

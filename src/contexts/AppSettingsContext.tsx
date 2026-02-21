@@ -15,6 +15,8 @@ interface AppSettingsContextType {
   setStackType: (type: StackType) => void
   cardInterval: () => CardInterval
   setCardInterval: (interval: CardInterval) => void
+  /** Call when user commits the card range (e.g. releases slider). Used for analytics only. */
+  onCardIntervalCommit: (interval: CardInterval) => void
   darkMode: () => boolean
   setDarkMode: (mode: boolean) => void
   soundEnabled: () => boolean
@@ -84,6 +86,9 @@ export const AppSettingsProvider: Component<AppSettingsProviderProps> = (props) 
 
   const handleSetCardInterval = (interval: CardInterval) => {
     setCardIntervalClamped(interval)
+  }
+
+  const handleCardIntervalCommit = (interval: CardInterval) => {
     trackEvent(CARD_INTERVAL_CHANGED, {
       range_start: interval.start,
       range_end: interval.end,
@@ -106,6 +111,7 @@ export const AppSettingsProvider: Component<AppSettingsProviderProps> = (props) 
     setStackType: handleSetStackType,
     cardInterval,
     setCardInterval: handleSetCardInterval,
+    onCardIntervalCommit: handleCardIntervalCommit,
     darkMode,
     setDarkMode: handleSetDarkMode,
     soundEnabled,

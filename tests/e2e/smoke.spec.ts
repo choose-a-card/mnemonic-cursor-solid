@@ -28,10 +28,11 @@ test.describe('Smoke Tests', () => {
     await expect(page.locator('.practice-header')).toBeVisible()
     
     // 6. Answer a question (if there's an input)
-    const answerInput = page.locator('.answer-input, input[type="number"]').first()
+    const answerInput = page.locator('.answer-input, input[type="number"], input[type="text"]').first()
     if (await answerInput.isVisible()) {
       await answerInput.fill('1')
-      await page.locator('.submit-btn, button[type="submit"]').first().click()
+      // Submit using Enter key (works with custom keyboards)
+      await answerInput.press('Enter')
       
       // 7. Verify feedback appears
       await expect(page.locator('.feedback-message')).toBeVisible({ timeout: 2000 })
@@ -93,10 +94,11 @@ test.describe('Smoke Tests', () => {
     
     // Answer 3 questions
     for (let i = 0; i < 3; i++) {
-      const answerInput = page.locator('.answer-input, input[type="number"]').first()
+      const answerInput = page.locator('.answer-input, input[type="number"], input[type="text"]').first()
       if (await answerInput.isVisible()) {
         await answerInput.fill(String(i + 1))
-        await page.locator('.submit-btn, button[type="submit"]').first().click()
+        // Submit using Enter key (works with custom keyboards)
+        await answerInput.press('Enter')
         await page.waitForTimeout(1700) // Wait for feedback timer
       }
     }

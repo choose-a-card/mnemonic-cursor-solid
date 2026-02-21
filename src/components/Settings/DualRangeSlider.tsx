@@ -7,6 +7,8 @@ interface DualRangeSliderProps {
   start: number
   end: number
   onRangeChange: (start: number, end: number) => void
+  /** Called once when user releases the slider (commit). Use for analytics. */
+  onRangeCommit?: (start: number, end: number) => void
   step?: number
 }
 
@@ -46,6 +48,9 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
   }
 
   const handleEnd = () => {
+    if (props.onRangeCommit && isDragging()) {
+      props.onRangeCommit(props.start, props.end)
+    }
     setIsDragging(null)
   }
 

@@ -13,6 +13,8 @@ interface StackConfigCardProps {
   cardInterval: CardInterval;
   onStackTypeChange: (type: StackType) => void;
   onCardIntervalChange: (interval: CardInterval) => void;
+  /** Called when user commits the range (releases slider). Optional, for analytics. */
+  onCardIntervalCommit?: (interval: CardInterval) => void;
 }
 
 const PRESET_OPTIONS: { type: PresetStackType; label: string }[] = [
@@ -91,6 +93,11 @@ export default function StackConfigCard(props: StackConfigCardProps) {
             onRangeChange={(start, end) => {
               props.onCardIntervalChange({ start, end })
             }}
+            onRangeCommit={
+              props.onCardIntervalCommit
+                ? (start, end) => props.onCardIntervalCommit!({ start, end })
+                : undefined
+            }
             step={1}
           />
           <div class="range-info">

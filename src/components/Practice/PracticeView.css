@@ -440,7 +440,7 @@
 /* Small screens and down */
 @media (max-width: 640px) {
   .practice-mode {
-    padding-bottom: 380px; /* Space for fixed-bottom custom keyboard on mobile */
+    padding-bottom: 300px; /* Space for fixed-bottom custom keyboard (reduced with smaller keys) */
   }
 
   .practice-view {
@@ -838,10 +838,12 @@
 /* PLOP - Denis Behr mode */
 .plop-section {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: colu/mn; */
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
 }
 
 .plop-label {

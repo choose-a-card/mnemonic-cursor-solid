@@ -58,7 +58,7 @@ export const PRACTICE_MODES: PracticeMode[] = [
   },
   { 
     id: 'cut-to-position', 
-    name: 'ACAAN', 
+    name: 'ACAAN Cut To Position', 
     icon: '🔀', 
     description: 'Given a target card and position, enter the cut card needed to put the target at that position'
   },
